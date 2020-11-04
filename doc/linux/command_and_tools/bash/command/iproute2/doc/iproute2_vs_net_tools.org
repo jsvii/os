@@ -1,0 +1,28 @@
+* ip route2 vs net tools
+
+
+| NET-TOOLS COMMANDS                                          | IPROUTE COMMANDS                                       |
+|-------------------------------------------------------------+--------------------------------------------------------|
+| arp -an                                                     | ip neigh                                               |
+| arp -v                                                      | ip -s neigh                                            |
+| arp -s 192.168.1.1 1:2:3:4:5:6                              | ip neigh add 192.168.1.1 lladdr 1:2:3:4:5:6 dev eth1   |
+| arp -i eth1 -d 192.168.1.1                                  | ip neigh del 192.168.1.1 dev eth1                      |
+| ifconfig                                                    | ip link                                                |
+| ifconfig -a                                                 | ip addr                                                |
+| ifconfig -s                                                 | ip -s link                                             |
+| ifconfig eth0 down                                          | ip link set eth0 down                                  |
+| ifconfig eth0 up                                            |  ip link set eth0 up                                    |
+| ifconfig eth0 192.168.1.1                                   | ip addr add 192.168.1.1/24 dev eth0                    |
+| ifconfig eth0 netmask 255.255.255.0                         | ip addr add 192.168.1.1/24 dev eth0                    |
+| ifconfig eth0 mtu 9000                                      | ip link set eth0 mtu 9000                              |
+| ifconfig eth0:0 192.168.1.2                                 | ip addr add 192.168.1.2/24 dev eth0                    |
+| netstat                                                     | ss                                                     |
+| netstat -neopa                                              | ss -neopa                                              |
+| netstat -g                                                  | ip maddr                                               |
+| iptunnel                                                    | ip tunnel                                              |
+| route                                                       | ip route                                               |
+| route -n                                                    | ip route show                                          |
+| route add                                                   | ip route add                                           |
+| route add -net 192.168.1.0 netmask 255.255.255.0 dev eth0 i | ip route add 192.168.1.0/24 dev eth0                   |
+| route add default gw 192.168.1.1                            |  ip route add default via 192.168.1.1                   |
+| route del                                                   | ip route del                                           |

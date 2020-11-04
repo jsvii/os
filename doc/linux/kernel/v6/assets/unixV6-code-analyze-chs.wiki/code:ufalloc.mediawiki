@@ -1,0 +1,67 @@
+===Source===
+<div class="wikiheadnote">
+*从进程[[code:user|user结构]]中的u_ofile数组中分配一空闲项u_ofile[i]
+*返回值
+**分配成功
+***向用户态 返回 i
+***返回i
+**分配失败
+***返回-1
+</div>
+
+6820
+
+6821  /*
+
+6822 &nbsp;* Allocate a user file descriptor.
+
+6823 &nbsp;*/
+
+6824  ufalloc()
+
+6825  {
+
+6826 &nbsp;&nbsp;&nbsp;&nbsp;register i;
+
+6827
+
+6828 &nbsp;&nbsp;&nbsp;&nbsp;for (i=0; i<[[File:param.h|NOFILE]]; i++)
+
+6829 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:user|u]].u_ofile[i] == NULL) {
+
+6830 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:user|u]].u_ar0[R0] = i;
+
+<blockquote>
+*向用户态返回 i，参看[[中断的参数传递]]
+*LIONS源代码上 为 [[code:user|u]].u_ar0[R0] = 1，疑为笔误
+</blockquote>
+6831 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return(i);
+
+6832 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;}
+
+<blockquote>
+*从头遍历u_ofile数组,寻找空闲项u_ofile[i]
+**若能找到空闲项,则将R0寄存器的值置为1(这里与Unix源代码不符,应该为i)
+**返回i
+</blockquote>
+6833 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u]].u_error = EMFILE;
+
+6834 &nbsp;&nbsp;&nbsp;&nbsp;return(-1);
+
+<blockquote>
+*若不能找到,抛出错误EMFILE,详见[[错误代码]]
+*返回-1
+</blockquote>
+6835  }
+
+6836 /* -------------------------*/
+
+
+
+
+===Ref===
+*[[内存打开文件结构]]
+
+===Caller===
+*[[code:dup]]
+*[[code:falloc]]

@@ -1,0 +1,70 @@
+#+TITLE: UNIX V6内核源码剖析
+#+LANGUAGE: enc
+#+OPTIONS: toc:nil h:4 html-postamble:nil html-preamble:t tex:t f:t
+#+OPTIONS: prop:("VERSION")
+#+AUTHOR: Leo Zhang
+#+TOC: headlines 3
+
+#+BEGIN_COMMENT
+本文档为unix v6学习笔记，用于理解操作系统原理。
+各类分节如下：
+
+- pdp11-intro 介绍pdp11机械构建
+- process 介绍进程
+#+END_COMMENT
+
+#+BEGIN_COMMENT
+整理pdp-11的机器特性，处理器
+#+END_COMMENT
+
+#+INCLUDE: "./sections/pdp11-intro.org" :minlevel 1
+
+#+BEGIN_COMMENT
+汇编语言相关
+#+END_COMMENT
+
+#+INCLUDE: "./sections/assembly-language.org" :minlevel 1
+
+#+BEGIN_COMMENT
+unix 进程的介绍
+#+END_COMMENT
+#+INCLUDE: "./sections/processes.org" :minlevel 1
+
+#+BEGIN_COMMENT
+unix 中断
+#+END_COMMENT
+#+INCLUDE: "./sections/interrupt.org" :minlevel 1
+
+#+INCLUDE: "./sections/signal.org" :minlevel 1
+
+#+INCLUDE: "./sections/block-driver.org" :minlevel 1
+
+#+INCLUDE: "./sections/file-system.org" :minlevel 1
+
+#+INCLUDE: "./sections/pipeline.org" :minlevel 1
+
+#+INCLUDE: "./sections/boot.org" :minlevel 1
+
+#+INCLUDE: "./sections/appendix-system.h.org" :minlevel 1
+
+#+BEGIN_COMMENT
+unix v6在simh下的启动
+#+END_COMMENT
+#+INCLUDE: "./sections/appendix-setup-unixv6-in-simh.org" :minlevel 1
+
+#+BEGIN_COMMENT
+指令集
+#+END_COMMENT
+#+INCLUDE: "./sections/appendix-instruction-set.org" :minlevel 1
+
+
+#+BEGIN_COMMENT
+参与资料的总结
+#+END_COMMENT
+#+INCLUDE: "./sections/appendix-reference.org" :minlevel 1
+
+
+#+BEGIN_COMMENT
+常见问题汇总
+#+END_COMMENT
+#+INCLUDE: "./sections/appendix-quiz.org" :minlevel 1

@@ -1,0 +1,94 @@
+===Source===
+<div class="wikiheadnote">
+*字符设备 设备驱动表
+</div>
+
+4632
+
+4633 /* Character device switch.
+
+4634 &nbsp;*/
+
+4635 struct cdevsw {
+
+4636 &nbsp;&nbsp;&nbsp;&nbsp;int (*d_open)();
+
+4637 &nbsp;&nbsp;&nbsp;&nbsp;int (*d_close)();
+
+4638 &nbsp;&nbsp;&nbsp;&nbsp;int (*d_read)();
+
+4639 &nbsp;&nbsp;&nbsp;&nbsp;int (*d_write)();
+
+4640 &nbsp;&nbsp;&nbsp;&nbsp;int (*d_sgtty)();
+
+4641 } cdevsw[];
+
+4642 /* ------------------------- */ 
+
+
+
+4668
+
+4669 int (*cdevsw[])()
+
+4670 {
+
+4671 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:klopen|klopen]], &[[code:klclose|klclose]], &[[code:klread|klread]], &[[code:klwrite|klwrite]], &[[code:klsgtty|klsgtty]],
+
+4672 &nbsp;&nbsp;&nbsp;&nbsp;/* console */ 
+
+4673 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:pcopen|pcopen]], &[[code:pcclose|pcclose]], &[[code:pcread|pcread]], &[[code:pcwrite|pcwrite]], &[[code:nodev|nodev]],
+
+4674 &nbsp;&nbsp;&nbsp;&nbsp;/* pc */ 
+
+4675 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:lpopen|lpopen]], &[[code:lpclose|lpclose]], &[[code:nodev|nodev]], &[[code:lpwrite|lpwrite]], &[[code:nodev|nodev]],
+
+4676 &nbsp;&nbsp;&nbsp;&nbsp;/* lp */ 
+
+4677 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], /* dc */
+
+4678 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], /* dh */
+
+4679 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], /* dp */
+
+4680 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], /* dj */
+
+4681 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], /* dn */
+
+4682 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nulldev|nulldev]], &[[code:nulldev|nulldev]], &[[code:mmread|mmread]], &[[code:mmwrite|mmwrite]], &[[code:nodev|nodev]],
+
+4683 &nbsp;&nbsp;&nbsp;&nbsp;/* mem */ 
+
+4684 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nulldev|nulldev]], &[[code:nulldev|nulldev]], &[[code:rkread|rkread]], &[[code:rkwrite|rkwrite]], &[[code:nodev|nodev]],
+
+4685 &nbsp;&nbsp;&nbsp;&nbsp;/* rk */ 
+
+4686 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], /* rf */
+
+4687 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], /* rp */
+
+4688 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], /* tm */
+
+4689 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], /* hs */
+
+4690 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], /* hp */
+
+4691 &nbsp;&nbsp;&nbsp;&nbsp;&[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], &[[code:nodev|nodev]], /* ht */
+
+4692 &nbsp;&nbsp;&nbsp;&nbsp;0
+
+4693 };
+
+4694
+
+
+===Ref===
+*[[字符设备管理]]
+
+===Caller===
+*[[code:readi]]
+*[[code:writei]]
+*[[code:closei]]
+*[[code:openi]]
+*[[code:sgtty]]
+*[[code:cinit]]

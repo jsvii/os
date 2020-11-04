@@ -1,0 +1,15 @@
+* xargs
+
+** $1 被忽略
+
+ps ax | grep -E "bar" | grep -v "grep" | awk '{print $1}' | xargs kill -9 $1
+
+~xargs~ reads list from stdin so just discard the last $1 on the line if what you want is to kill processes by their PIDs.
+
+As a side note, ps can also print processes according to their command name (with procps on linux see the -C option).
+
+** 从node.js index.html文档拿到所有文件
+
+#+BEGIN_SRC bash
+sed  -nr 's/.*"(\w+\.html).*+/\1/p' index.html | sort | uniq | awk '{print "https://nodejs.org/dist/v12.16.2/docs/api/"$1}'  | xargs wget
+#+END_SRC

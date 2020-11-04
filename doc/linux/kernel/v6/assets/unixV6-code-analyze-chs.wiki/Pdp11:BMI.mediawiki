@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===BMI
+===Code===100400+ 偏移[offset]
+===Operation===PC ← PC + ( 2 * offset ) if N = 1
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===若标志位N被置位，进行程序控制转移
+===Example===无

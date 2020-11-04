@@ -1,0 +1,166 @@
+===Source===
+
+1242 /* ------------------------- */ 
+
+1243 .globl _copyin, _copyout 
+
+<blockquote>
+copyin
+*从 [[用户态]]地址空间 读入数据
+*共传入3个参数，设为src dst count
+**src : [[用户态]]地址空间 数据源地址
+**dst : [[核心态]]地址空间 目标地址
+**count : 读入数据长度(字节)
+*返回值
+**若成功，返回0
+**否则，返回-1
+*进入函数时，堆栈状态如下
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_copyin_1.png"/></p>
+</blockquote>
+1244 _copyin: 
+
+1245 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:JSR|jsr]] pc,copsu 
+
+<blockquote>
+*跳转到 子程序 1264
+**src → R0
+**dst → R1
+**count/2 → R2
+</blockquote>
+1246 1: 
+
+1247 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MFPI|mfpi]] (r0)+ 
+
+1248 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,(r1)+ 
+
+1249 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:SOB|sob]] r2,1b 
+
+<blockquote>
+*1247 - 1249 构成循环
+*不断 从 [[用户态]]地址空间 数据源地址 读出数据到 [[核心态]]地址空间 目标地址
+*共读 数据长度为 count/2 个字
+</blockquote>
+1250 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BR|br]] 2f 
+
+<blockquote>
+*跳转到 1258
+</blockquote>
+1251 
+
+<blockquote>
+copyout
+*向 [[用户态]]地址空间 写入数据
+*共传入3个参数，设为src dst count
+**src : [[用户态]]地址空间 数据目标地址
+**dst : [[核心态]]地址空间 数据源地址
+**count : 写入数据长度(字节)
+*返回值
+**若成功，返回0
+**否则，返回-1
+*进入函数时，堆栈状态如下
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_copyin_1.png"/></p>
+</blockquote>
+1252 _copyout: 
+
+1253 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:JSR|jsr]] pc,copsu 
+
+<blockquote>
+*跳转到 子程序 1264
+**src → R0
+**dst → R1
+**count/2 → R2
+</blockquote>
+1254 1: 
+
+1255 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (r0)+,-(sp) 
+
+1256 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MTPI|mtpi]] (r1)+ 
+
+1257 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:SOB|sob]] r2,1b 
+
+<blockquote>
+*1254 - 1257 构成循环
+*不断 从 [[核心态]]地址空间 数据源地址 写入数据到 [[用户态]]地址空间 数据目标地址
+*共写 数据长度为 count/2 个字
+</blockquote>
+1258 2: 
+
+1259 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,nofault 
+
+1260 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,r2 
+
+1261 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] r0 
+
+1262 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc 
+
+<blockquote>
+*从堆栈恢复 [[code:nofault|nofault]] 和 r2
+*返回值 r0 置 0
+*函数返回
+</blockquote>
+1263 
+
+1264 copsu: 
+
+1265 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,r0 
+
+1266 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r2,-(sp) 
+
+1267 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] [[code:nofault|nofault]],-(sp) 
+
+1268 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r0,-(sp) 
+
+<blockquote>
+*1265 - 1268 的作用是调整堆栈结构，调整完堆栈结构如图
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_copyin_2.png"/></p>
+*压入堆栈的nofault双字是由1267一句完成
+**通过在 [[pdp11虚拟机]]上实验确认了这个结果，但原理并不清楚
+**列入[[遗留问题]]
+</blockquote>
+1269 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 10(sp),r0 
+
+1270 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 12(sp),r1 
+
+1271 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 14(sp),r2 
+
+1272 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:ASR|asr]] r2 
+
+<blockquote>
+*src → R0
+*dst → R1
+*count/2 → R2
+</blockquote>
+1273 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $1f,[[code:nofault|nofault]] 
+
+<blockquote>
+*将 1276 子程序 设置为出错处理函数
+</blockquote>
+1274 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc 
+
+1275 
+
+<blockquote>
+*以下 为 1276 子程序，用于出错处理
+**从堆栈恢复 [[code:nofault|nofault]] 和 r2
+**返回值 r0 置 -1
+</blockquote>
+1276 1: 
+
+1277 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,[[code:nofault|nofault]] 
+
+1278 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,r2 
+
+1279 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $-1,r0 
+
+1280 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc 
+
+1281 
+
+
+
+===Ref===
+*[[关于汇编函数的说明]]
+
+===Caller===
+*[[code:main]]
+*[[code:iomove]]

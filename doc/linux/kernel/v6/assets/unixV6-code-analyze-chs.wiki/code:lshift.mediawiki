@@ -1,0 +1,54 @@
+===Source===
+<div class="wikiheadnote">
+*进行双字长数据的位移，返回位移结果(不改变源数据)
+*共传入两个参数，设为 nump , bits
+**nump : 指向欲进行操作的双字长数据
+**bits : 进行位移的位数
+***若为正数，向左位移
+***若为负数，向右位移
+*返回 位移结果的低字节
+</div>
+
+1408 /* ------------------------- */ 
+
+1409 .globl _lshift
+
+1410 _lshift:
+
+1411 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 2(sp),r1
+
+<blockquote>
+*nump → R1
+</blockquote>
+1412 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (r1)+,r0
+
+1413 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (r1),r1
+
+<blockquote>
+*数据高字节 → R0
+*数据低字节 → R1
+</blockquote>
+1414 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:ASHC|ashc]] 4(sp),r0
+
+<blockquote>
+*进行位移，位移位数为 bits
+</blockquote>
+1415 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r1,r0
+
+<blockquote>
+*返回值 置为 位移结果的低字节
+</blockquote>
+1416 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc
+
+1417
+
+
+
+===Ref===
+*[[关于汇编函数的说明]]
+
+===Caller===
+*[[code:readi]]
+*[[code:writei]]
+*[[code:mmread]]
+*[[code:mmwrite]]

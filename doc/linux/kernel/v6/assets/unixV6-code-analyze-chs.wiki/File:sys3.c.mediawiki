@@ -1,0 +1,24 @@
+
+===Source===
+
+6000 #
+
+6001 #include "../param.h"
+
+6002 #include "../systm.h"
+
+6003 #include "../reg.h"
+
+6004 #include "../buf.h"
+
+6005 #include "../filsys.h"
+
+6006 #include "../user.h"
+
+6007 #include "../inode.h"
+
+6008 #include "../file.h"
+
+6009 #include "../conf.h"
+
+

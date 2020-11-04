@@ -1,0 +1,103 @@
+===Source===
+<div class="wikiheadnote">
+*"打开" 指定INODE
+**对于 普通INODE，不做操作
+**对于 设备装载INODE，打开设备(d_open())
+*参考 [[文件系统#装载文件系统]]
+*传入2个参数
+**ip : 指向指定的INODE
+**rw : 读写模式，模式常量参看[[file:file.h|file.h]]
+***读写模式只在调用 d_open()时使用，含义不明，列入[[遗留问题]]
+</div>
+
+6694 
+
+6695 /* 
+
+6696 &nbsp;* openi called to allow handler 
+
+6697 &nbsp;* of special files to initialize and 
+
+6698 &nbsp;* validate before actual IO. 
+
+6699 &nbsp;* Called on all sorts of opens 
+
+6700 &nbsp;* and also on mount. 
+
+6701 &nbsp;*/ 
+
+6702 openi(ip, rw) 
+
+6703 int *ip; 
+
+6704 { 
+
+6705 &nbsp;&nbsp;&nbsp;&nbsp;register *rip; 
+
+6706 &nbsp;&nbsp;&nbsp;&nbsp;register dev, maj; 
+
+6707 
+
+6708 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|rip]] = ip; 
+
+6709 &nbsp;&nbsp;&nbsp;&nbsp;dev = [[code:struct inode|rip]]->i_addr[0]; 
+
+6710 &nbsp;&nbsp;&nbsp;&nbsp;maj = [[code:struct inode|rip]]->i_addr[0][[skill:.d_major|.d_major]]; 
+
+<blockquote>
+*dev ← 设备号
+*maj ← 主设备号
+*参看[[文件系统#装载文件系统]]
+</blockquote>
+6711 &nbsp;&nbsp;&nbsp;&nbsp;switch([[code:struct inode|rip]]->i_mode&IFMT) { 
+
+6712 
+
+6713 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case IFCHR: 
+
+6714 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(maj >= nchrdev) 
+
+6715 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  goto bad; 
+
+6716 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   (*[[code:cdevsw|cdevsw]][maj].d_open)(dev, rw); 
+
+6717 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   break; 
+
+6718 
+
+6719 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case IFBLK: 
+
+6720 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(maj >= nblkdev) 
+
+6721 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  goto bad; 
+
+6722 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   (*[[code:bdevsw|bdevsw]][maj].d_open)(dev, rw); 
+
+6723 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*打开相应设备
+*6711 的用法 参看 [[文件系统#inode类型]]
+</blockquote>
+6724 &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+6725 
+
+6726 bad: 
+
+6727 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = ENXIO; 
+
+<blockquote>
+*若 主设备号越界，抛出错误
+**[[错误代码]] : ENXIO
+</blockquote>
+6728 } 
+
+6729 /* ------------------------- */ 
+
+
+===Ref===
+*[[文件系统]]
+
+===Caller===
+*[[code:open1]]

@@ -1,0 +1,120 @@
+* smb
+
+Samba是一款可以在Linux和Windows之间通过SMB/CIFS（Server Message Block/Common Internet File System）共享文件和打印机的开源/免费套件。
+
+** smb配置
+#+BEGIN_SRC shell
+zypper in samba
+# samba的配置文档，会在  /usr/share/doc/packages/samba/examples/ 下有多个案例
+zypper in samba-doc
+
+mkdir /share & chmod -R 777 /share/
+sudo firewall-cmd --permanent --add-service samba
+
+systemctl enable smb.service
+systemctl start smb.service
+#+END_SRC
+
+** smb配置项的指令
+
+smb的配置文档   https://doc.opensuse.org/documentation/leap/reference/html/book.opensuse.reference/cha.samba.html#sec.samba.serv.inst
+
+smb打印机配置 http://www.cnblogs.com/sztsian/p/3462170.html
+
+  - global指令是
+
+  - 其他配置是每个分享的独立配置
+
+opensuse的smb中配置了多个，从文件分享到打印机分享等。
+
+
+** 共享文件设置参数
+#+BEGIN_SRC shell
+[share]         　　　　　　　　　　　   # 自定义共享名称
+comment =  This is share software   　   # 共享描述
+path  =  /home/testfile             　　 # 共享目录路径
+browseable  =  yes/no                    # 设置共享是否可浏览，如果no就表示隐藏，需要通过IP+共享名称进行访问
+writable  =  yes/no  　　　　　　　　　  # 设置共享是否具有可写权限
+read only  =  yes/no  　　　　　　　　　 # 设置共享是否具有只读权限
+admin users  =  root 　　　　　　　　　　# 设置共享的管理员，如果security =share 时，引项无效，多用户中间使用逗号隔开，例如admin users = root,user1,user2
+valid users  =  username  　　　　　　   # 设置允许访问共享的用户，例如valid users = user1,user2,@group1,@group2（多用户或组使用逗号隔开，@group表示group用户组）
+invalid users  =  username     　　　 　 # 设置不允许访问共享的用户
+write list  =  username   　　　　　　　 # 设置在共享具有写入权限的用户，例如例如write list  = user1,user2,@group1,@group2（多用户或组使用逗号隔开，@group表示group用户组）
+public  =  yes/no   　　　　　　　　　   # 设置共享是否允许guest账户访问
+guest  ok  =  yes/no  　　　　　　　　　 # 功能同public 一样
+create mask = 0700                  　　 # 创建的文件权限为700
+directory mode = 0700               　　 # 创建的文件目录为 700
+#+END_SRC
+
+#+BEGIN_SRC shell
+# smb.conf is the main Samba configuration file. You find a full commented
+# version at /usr/share/doc/packages/samba/examples/smb.conf.SUSE if the
+# samba-doc package is installed.
+[global]
+        workgroup = WORKGROUP    #配置工作组名称。默认情况下没有加入域的windows 7计算机工作组为WORKGROUP
+        passdb backend = tdbsam
+        printing = cups
+        printcap name = cups
+        printcap cache time = 750
+        cups options = raw
+        map to guest = Bad User
+        logon path = \\%L\profiles\.msprofile
+        logon home = \\%L\%U\.9xprofile
+        logon drive = P:
+        usershare allow guests = No
+        wins server = 
+        wins support = No
+[homes]
+        comment = Home Directories
+        valid users = %S, %D%w%S
+        browseable = No
+        read only = No
+        inherit acls = Yes
+        guest ok = Yes
+
+# 这时配置了一个基本的共享文件
+[public]
+        comment = leo's public share stuff
+        path = /home/samba
+        public = yes
+        browseable = yes
+        writable = true
+        printable = no
+
+#[profiles]
+#       comment = Network Profiles Service
+#       path = %H
+#       read only = No
+#       store dos attributes = Yes
+#       create mask = 0600
+#       directory mask = 0700
+#[users]
+#       comment = All users
+#       path = /home
+#       read only = No
+#       inherit acls = Yes
+#       veto files = /aquota.user/groups/shares/
+#[groups]
+#       comment = All groups
+#       path = /home/groups
+#       read only = No
+#       inherit acls = Yes
+
+
+#[printers]
+#       comment = All Printers
+#       path = /var/tmp
+#       printable = Yes
+#       create mask = 0600
+#       browseable = No
+#[print$]
+#       comment = Printer Drivers
+#       path = /var/lib/samba/drivers
+#       write list = @ntadmin root
+#       force group = ntadmin
+#       create mask = 0664
+#       directory mask = 0775
+#+END_SRC
+
+
+“这个是个实验”

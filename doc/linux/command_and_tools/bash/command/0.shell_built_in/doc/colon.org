@@ -1,0 +1,29 @@
+* colon : 无
+
+Do nothing beyond expanding arguments and performing redirections. The return status is zero.
+
+#+BEGIN_SRC bash
+if [ "$a" -ge 10 ]
+then
+    :
+elif [ "$a" -le 5 ]
+then
+    echo "1"
+else
+    echo "2"
+fi
+#+END_SRC
+
+为了代码的可维护性，一般用 ~true~ 命令更好
+
+#+BEGIN_SRC bash
+if [ "$a" -ge 10 ]
+then
+    true
+elif [ "$a" -le 5 ]
+then
+    echo "1"
+else
+    echo "2"
+fi
+#+END_SRC

@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===BHIS
+===Code===103000 + 偏移[offset]
+===Operation===PC ← PC + ( 2 * offset ) if C = 0
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===若标志位满足 C = 0 ，进行程序控制转移<br/>指令BHIS与[[pdp11:BCC|BCC]]完全相同
+===Example===无

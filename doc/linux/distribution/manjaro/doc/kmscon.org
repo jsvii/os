@@ -1,0 +1,23 @@
+* kmscon
+
+#+BEGIN_SRC bash
+sudo pacman -Syyu
+#+END_SRC
+
+#+BEGIN_SRC bash
+systemctl disable getty@tty1.service
+systemctl enable kmsconvt@tty1.service
+#+END_SRC
+
+
+~/etc/kmscon/kmscon.conf~ 文件配置
+
+#+BEGIN_SRC bash
+font-size=18
+xbx-options=ctrl:nocaps
+font-name=Hack Nerd Font Mono
+#+END_SRC
+
+** ref
+
+https://wiki.archlinux.org/index.php/KMSCON

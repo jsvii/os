@@ -1,0 +1,1392 @@
+* 进程
+
+** 做了什么事情
+
+- 内核要管理执行中的进程
+
+- 内存怎么分配给进程
+
+- 进程如何访问到被分配的内存
+
+- 并行，多个进程是如何实现的, TTS
+
+- 如何有效地利用内存空间, =swap in=, =swap out= 交换处理
+
+- 如何做到多个进程共享代码段
+
+** 有哪些方法
+
+#+BEGIN_SRC C
+fubyte()
+fuibyte()
+fuword()
+fuiword()
+subyte()
+suibyte()
+suword()
+suiword()
+#+END_SRC C
+
+
+** proc结构体
+
+=/root/usr/sys/proc.h=  进程的结构体
+
+#+BEGIN_SRC C
+struct	proc
+{
+    char	p_stat;          // 状态.等于NULL意味着proc[]数组中这个元素为空,也就是没有这个进程
+    char	p_flag;          // 执行优先级
+    char	p_pri;		/* priority, negative is high */
+    char	p_sig;		/* signal number sent to this process */ //信号
+    char	p_uid;		/* user id, used to direct tty signals */
+    char	p_time;		/* resident time for scheduling */
+    char	p_cpu;		/* cpu usage for scheduling */
+    char	p_nice;		/* nice for scheduling */
+    int	p_ttyp;		/* controlling tty */
+    int	p_pid;		/* unique process id */
+    int	p_ppid;		/* process id of parent */
+    int	p_addr;		/* address of swappable image */
+    int	p_size;		/* size of swappable image (*64 bytes) */
+    int	p_wchan;	/* event process is awaiting */
+    int	*p_textp;	/* pointer to text structure */
+} proc[NPROC];
+/* stat codes */
+#define	SSLEEP	1		/* sleeping on high priority */
+#define	SWAIT	2		/* sleeping on low priority */
+#define	SRUN	3		/* running */
+#define	SIDL	4		/* intermediate state in process creation */
+#define	SZOMB	5		/* intermediate state in process termination */
+#define	SSTOP	6		/* process being traced */
+/* flag codes */
+#define	SLOAD	01		/* in core */
+#define	SSYS	02		/* scheduling process */
+#define	SLOCK	04		/* process cannot be swapped */
+#define	SSWAP	010		/* process is being swapped out */
+#define	STRC	020		/* process is being traced */
+#define	SWTED	040		/* another tracing flag */
+#+END_SRC
+
+
+#+CAPTION: proc.h 各元素
+#+NAME:   tab:basic-data
+| member | desc                                                          |
+|--------+------------------------------------------------------------------|
+| p_stat | 状态.等于NULL意味着proc[]数组中这个元素为空,也就是没有这个进程              |
+| p_flag | 标志变量.                                                       |
+| p_pri  | 执行优先级.                                                      |
+| p_sig  | 信号                                                           |
+| p_uid  | user id                                                       |
+| p_time | 在内存中或交换空间中存在的时间                                         |
+| p_cpu | 占用CPU的累计时间                                                   |
+| p_nice | 用来降低执行优先级的补正系数                                           |
+| p_ttyp | 正在操作进程的终端                                                  |
+| p_pid | 进程ID                                                          |
+| p_ppid | 父进程ID                                                          |
+| p_addr | 数据段的物理地址 (单位为64字节)                                        |
+| p_size | 数据段的长度 (单位为64字节)                                           |
+| p_wchan | 使进程进入休眠状态的原因                                             |
+| *p_textp | 使用的代码段                                                     |
+
+
+在 =/root/usr/sys/param.h= 中定义了一个最大进程数量,就是说不可能创建 =50= 个以上的进程
+
+#+BEGIN_SRC C
+#define	NPROC	50		/* max number of processes */
+#+END_SRC
+
+
+=p_stat= 的取值范围
+
+#+BEGIN_SRC C
+/* stat codes */
+#define	SSLEEP	1		/* sleeping on high priority */
+#define	SWAIT	2		/* sleeping on low priority */
+#define	SRUN	3		/* running */
+#define	SIDL	4		/* intermediate state in process creation */
+#define	SZOMB	5		/* intermediate state in process termination */
+#define	SSTOP	6		/* process being traced */
+#+END_SRC
+
+=p_flag= 的取值范围
+
+#+BEGIN_SRC C
+/* flag codes */
+#define	SLOAD	01		/* in core */
+#define	SSYS	02		/* scheduling process */
+#define	SLOCK	04		/* process cannot be swapped */
+#define	SSWAP	010		/* process is being swapped out */
+#define	STRC	020		/* process is being traced */
+#define	SWTED	040		/* another tracing flag */
+#+END_SRC
+
+** user 结构体
+
+为什么叫user结构体？ 看了诸多注释，也没有这方面的讲解，个人理解，可能是指 =process= 的使用者，故而叫 =user=
+
+  - user结构体用来管理进程的上下文信息，当进程被换出交换空间时，对应的user结构体也会被换出
+
+  - 它被放在固定的位置
+
+#+BEGIN_SRC C
+/*
+ * The user structure.
+ * One allocated per process.
+ * Contains all per process data
+ * that doesn't need to be referenced
+ * while the process is swapped.
+ * The user block is USIZE*64 bytes
+ * long; resides at virtual kernel
+ * loc 140000; contains the system
+ * stack per user; is cross referenced
+ * with the proc structure for the
+ * same process.
+ */
+struct user
+{
+        int	u_rsav[2];		/* save r5,r6 when exchanging stacks 看起来似乎是return save的意思 */
+        int	u_fsav[25];		/* save fp registers */
+                                        /* rsav and fsav must be first in structure */
+        char	u_segflg;		/* flag for IO; user or kernel space */
+        char	u_error;		/* return error code */
+        char	u_uid;			/* effective user id */
+        char	u_gid;			/* effective group id */
+        char	u_ruid;			/* real user id */
+        char	u_rgid;			/* real group id */
+        int	u_procp;		/* pointer to proc structure */
+        char	*u_base;		/* base address for IO */
+        char	*u_count;		/* bytes remaining for IO */
+        char	*u_offset[2];		/* offset in file for IO */
+        int	*u_cdir;		/* pointer to inode of current directory */
+        char	u_dbuf[DIRSIZ];		/* current pathname component */
+        char	*u_dirp;		/* current pointer to inode */
+        struct	{			/* current directory entry */
+                int	u_ino;
+                char	u_name[DIRSIZ];
+        } u_dent;
+        int	*u_pdir;		/* inode of parent directory of dirp */
+        int	u_uisa[16];		/* prototype of segmentation addresses */
+        int	u_uisd[16];		/* prototype of segmentation descriptors */
+        int	u_ofile[NOFILE];	/* pointers to file structures of open files */
+        int	u_arg[5];		/* arguments to current system call */
+        int	u_tsize;		/* text size (*64) */
+        int	u_dsize;		/* data size (*64) */
+        int	u_ssize;		/* stack size (*64) */
+        int	u_sep;			/* flag for I and D separation */
+        int	u_qsav[2];		/* label variable for quits and interrupts */
+        int	u_ssav[2];		/* label variable for swapping  */
+        int	u_signal[NSIG];		/* disposition of signals */
+        int	u_utime;		/* this process user time */
+        int	u_stime;		/* this process system time */
+        int	u_cutime[2];		/* sum of childs' utimes */
+        int	u_cstime[2];		/* sum of childs' stimes */
+        int	*u_ar0;			/* address of users saved R0 */
+        int	u_prof[4];		/* profile arguments */
+        char	u_intflg;		/* catch intr from sys */
+                                        /* kernel stack per user
+                                         * extends from u + USIZE*64
+                                         * backward not to reach here
+                                         */
+} u;  // 这里是定义在头文件里的，说明有这个变量用，用于给C编译器看的。
+
+#+END_SRC
+
+#+BEGIN_SRC asm
+;; sys/conf/m40.s
+.globl	_u
+_u	= 140000 user结构体地址固定
+#+END_SRC
+
+#+CAPTION: user结构体中的成员含义
+#+NAME:   tab:basic-data
+| 成员        | 含义                                                        |
+|-------------+------------------------------------------------------------|
+| u_rsav[]    | 用来保存 r5, r6 当前值,即记录环境指针,栈指针                       |
+| u_fsav[]    | pdp-11/40 不使用这一属性                                     |
+| u_segflg    | 读写文件时,使用的标志变量                                       |
+| u_error     | 出错时用来保存错误代码                            |
+| u_procp     | proc[]在内存中保存着，代表着所有的进程，user结构体中这是一个指针类型，指向proc[]中代表自己所属的进程  |
+| *u_ar0       | 系统调用处理中，操作用户进程的通用寄存器或psw时使用, 指向的是R0寄存器的位置        |
+| u_ssav[2]   | 进程被移入到交换空间时，会用于保存r5, r6的值，此时的u_rsav不再有效(因为子进程要copy父进程的数据，父进程在进行一系列的调度。) savu(u.u_ssav)后必然执行swap |
+
+
+#+BEGIN_SRC C
+/* u_error codes */
+#define	EFAULT	106   //在用户空间和内核空间传递数据失败等
+#define	EPERM	1     // permission 当前用户不是超级用户
+#define	ENOENT	2     // 指定文件不存在
+#define	ESRCH	3     // 信号的目标进程不存在，或者已经结束
+#define	EINTR	4     // 系统调用中对信号作了处理
+#define	EIO	5     // IO错误
+#define	ENXIO	6     // 设备编号所示的设备不存在
+#define	E2BIG	7     //
+#define	ENOEXEC	8     //
+#define	EBADF	9     //
+#define	ECHILD	10    // 系统调用wait时，无法找到子进程
+#define	EAGAIN	11    // 系统调用fork时，无法在proc[]中找到空元素（进程数已经达到上限了）
+#define	ENOMEM	12    //
+#define	EACCES	13    //
+#define	ENOTBLK	15    //
+#define	EBUSY	16    //
+#define	EEXIST	17    //
+#define	EXDEV	18    //
+#define	ENODEV	19    //
+#define	ENOTDIR	20    //
+#define	EISDIR	21    //
+#define	EINVAL	22    //
+#define	ENFILE	23    //
+#define	EMFILE	24    //
+#define	ENOTTY	25    //
+#define	ETXTBSY	26    //
+#define	EFBIG	27    //
+#define	ENOSPC	28    //
+#define	ESPIPE	29    //
+#define	EROFS	30    //
+#define	EMLINK	31    //
+#define	EPIPE	32    //
+#+END_SRC
+
+** 进程的创建
+
+#+BEGIN_SRC C
+/ C library -- fork
+
+/ pid = fork();
+/
+/ pid == 0 in child process; pid == -1 means error return
+/ in child, parents id is in par_uid if needed
+
+.globl	_fork, cerror, _par_uid
+
+_fork:
+        mov	r5,-(sp)
+        mov	sp,r5         // sp减一
+        sys	fork
+                br 1f
+        bec	2f
+        jmp	cerror
+1:
+        mov	r0,_par_uid
+        clr	r0
+2:
+        mov	(sp)+,r5
+        rts	pc
+.bss
+_par_uid: .=.+2
+#+END_SRC
+
+上面 =_fork= 是下划线头，是因为 =unix v6= 的编译器会将C语言的函数变为下划线开头的标签。
+
+
+系统调用的C如下
+
+#+BEGIN_SRC c
+fork()
+{
+        register struct proc *p1, *p2;
+
+        p1 = u.u_procp;                             // u是 140000 在 conf/m40.s之中有定义，指向执行进程的user结构体
+        for(p2 = &proc[0]; p2 < &proc[NPROC]; p2++)
+                if(p2->p_stat == NULL)              //在proc[] 中找到空元素，可以分配进程
+                        goto found;
+        u.u_error = EAGAIN;                         //prco[]进程已经用光
+        goto out;
+
+found:
+        if(newproc()) {
+                u.u_ar0[R0] = p1->p_pid;
+                u.u_cstime[0] = 0;
+                u.u_cstime[1] = 0;
+                u.u_stime = 0;
+                u.u_cutime[0] = 0;
+                u.u_cutime[1] = 0;
+                u.u_utime = 0;
+                return;
+        }
+        u.u_ar0[R0] = p2->p_pid;
+
+out:
+        u.u_ar0[R7] =+ 2;
+}
+#+END_SRC
+
+=问題:=  为什么 =newproc()= 函数对子进程返回1？
+
+因为新进程是由 =swtch= 进行切换时才得以执行的，所的进程被执行时，要返回它被换行时保存的位置，这个位置是通过 =savu= 得以保存的，也是通过 =retu= 得以恢复的（新的进程没有被切换过，但不要紧，它在复制父进程的数据时，复制了一样的数据），所以它返回到 =fork= 被调用的位置。
+
+
+#+BEGIN_SRC C
+if(newproc() == 1) {
+  printf("位于子进程空间。实际是从 swtch 中返回。");
+} else {
+  printf("位于父进程空间。从 newproc 中返回。");
+}
+
+#+END_SRC
+
+
+#+BEGIN_SRC C
+/*
+ * Create a new process-- the internal version of
+ * sys fork.
+ * It returns 1 in the new process.
+ * How this happens is rather hard to understand.
+ * The essential fact is that the new process is created
+ * in such a way that appears to have started executing
+ * in the same call to newproc as the parent;
+ * but in fact the code that runs is that of swtch.
+ * The subtle implication of the returned value of swtch
+ * (see above) is that this is the value that newproc's
+ * caller in the new process sees.
+ */
+newproc()
+{
+        int a1, a2;
+        struct proc *p, *up;
+        register struct proc *rpp;
+        register *rip, n;
+
+        p = NULL;
+        /*
+         * First, just locate a slot for a process
+         * and copy the useful info from this process into it.
+         * The panic "cannot happen" because fork has already
+         * checked for the existence of a slot.
+         */
+retry:
+        mpid++;
+        if(mpid < 0) {
+                mpid = 0;
+                goto retry;
+        }
+        for(rpp = &proc[0]; rpp < &proc[NPROC]; rpp++) {
+                if(rpp->p_stat == NULL && p==NULL)
+                        p = rpp;
+                if (rpp->p_pid==mpid)
+                        goto retry;
+        }
+        if ((rpp = p)==NULL)
+                panic("no procs");
+
+        /*
+         * make proc entry for new proc
+         */
+
+        rip = u.u_procp;
+        up = rip;
+        rpp->p_stat = SRUN;
+        rpp->p_flag = SLOAD;
+        rpp->p_uid = rip->p_uid;
+        rpp->p_ttyp = rip->p_ttyp;
+        rpp->p_nice = rip->p_nice;
+        rpp->p_textp = rip->p_textp;
+        rpp->p_pid = mpid;
+        rpp->p_ppid = rip->p_pid;
+        rpp->p_time = 0;
+
+        /*
+         * make duplicate entries
+         * where needed
+         */
+
+        for(rip = &u.u_ofile[0]; rip < &u.u_ofile[NOFILE];)
+                if((rpp = *rip++) != NULL)
+                        rpp->f_count++;
+        if((rpp=up->p_textp) != NULL) {
+                rpp->x_count++;
+                rpp->x_ccount++;
+        }
+        u.u_cdir->i_count++;
+        /*
+         * Partially simulate the environment
+         * of the new process so that when it is actually
+         * created (by copying) it will look right.
+         */
+        savu(u.u_rsav);
+        rpp = p;
+        u.u_procp = rpp;
+        rip = up;
+        n = rip->p_size;
+        a1 = rip->p_addr;
+        rpp->p_size = n;
+        a2 = malloc(coremap, n);
+        /*
+         * If there is not enough core for the
+         * new process, swap out the current process to generate the
+         * copy.
+         */
+        if(a2 == NULL) {
+                rip->p_stat = SIDL;
+                rpp->p_addr = a1;
+                savu(u.u_ssav);
+                xswap(rpp, 0, 0);
+                rpp->p_flag =| SSWAP;
+                rip->p_stat = SRUN;
+        } else {
+        /*
+         * There is core, so just copy.
+         */
+                rpp->p_addr = a2;
+                while(n--)
+                        copyseg(a1++, a2++);
+        }
+        u.u_procp = rip;
+        return(0);
+}
+#+END_SRC
+
+panic通过调用循环来阻止程序继续执行。
+
+实现是用idle来做的；
+
+#+BEGIN_SRC c
+panic(s) char *s;
+{
+        panicstr = s;
+        update();     // update 的实现在alloc之中，好像是用于文件的同步，存疑。@20171127
+        printf("panic: %s\n", s);
+        for(;;)
+                idle();
+}
+
+#+END_SRC
+
+#+BEGIN_SRC c
+.globl	_idle
+_idle:
+        mov	PS,-(sp)
+        bic	$340,PS
+        wait             //一直等待中断
+        mov	(sp)+,PS
+        rts	pc
+#+END_SRC
+
+
+** 切换执行进程
+
+内核函数 =sleep= 一般在下述几种情况下被调用
+
+  - 用户程序访问了系统调用 =wait=
+
+  - 等待周边设备处理完毕
+
+  - 等待使用中的资源被释放
+
+wait的签名表示了它是要等待某个资源，同时，与它相关的wakeup也释放了那个资源.p_wchan指定了要等待的资源。
+
+#+BEGIN_SRC C
+
+// /usr/sys/ken/slp.c
+/*
+ * Give up the processor till a wakeup occurs
+ * on chan, at which time the process
+ * enters the scheduling queue at priority pri.
+ * The most important effect of pri is that when
+ * pri<0 a signal cannot disturb the sleep;
+ * if pri>=0 signals will be processed.
+ * Callers of this routine must be prepared for
+ * premature return, and check that the reason for
+ * sleeping has gone away.
+ */
+sleep(chan, pri)
+{
+        register *rp, s;
+
+        s = PS->integ;                         // PS指向PSW所映射的地址，s这一刻就相当于是PSW
+        rp = u.u_procp;                        // rp 指向当过在proc[]中所代表的执行进程的元素
+        if(pri >= 0) {                         // 如果要设置的优先级大于等于0，就是指设置为SWAIT状态
+                if(issig())
+                        goto psig;
+                spl6();                        // 设置处理器中断优先级为6，这一过程不能被其他中断打断
+                rp->p_wchan = chan;            // 当前进程所等待的资源进行设置
+                rp->p_stat = SWAIT;            // 设置为SWAIT状态
+                rp->p_pri = pri;               //
+                spl0();                        // 恢复处理器中断优先级
+                if(runin != 0) {
+                        runin = 0;
+                        wakeup(&runin);
+                }
+                swtch();
+                if(issig())
+                        goto psig;
+        } else {                              // 如果要设置的优先级小于0，就是指设置为SSLEEP状态
+                spl6();
+                rp->p_wchan = chan;
+                rp->p_stat = SSLEEP;
+                rp->p_pri = pri;
+                spl0();
+                swtch();
+        }
+        PS->integ = s;
+        return;
+
+        /*
+         * If priority was low (>=0) and
+         * there has been a signal,
+         * execute non-local goto to
+         * the qsav location.
+         * (see trap1/trap.c)
+         */
+psig:
+        aretu(u.u_qsav);
+}
+#+END_SRC
+
+
+在 =swtch= 函数中大量运用了 =savu= , =retu= , =aretu= 等切换上下文的技术。
+
+  - =savu= 向user结构体中存储数据
+
+  - =retu= , =aretu= 从user结构体中恢复数据
+
+
+
+#+BEGIN_SRC C
+// /usr/sys/ken/slp.c
+/*
+ * This routine is called to reschedule the CPU.
+ * if the calling process is not in RUN state,
+ * arrangements for it to restart must have
+ * been made elsewhere, usually by calling via sleep.
+ */
+swtch()
+{
+        static struct proc *p;            // p是一个static变量，所以永远是存在的，它保存的是上次swtch时所选择的进程，如果它不存在（似乎只有启动时才就样），就选择proc[]中的第一个元素
+        register i, n;
+        register struct proc *rp;         // rp似乎是指runable process
+
+        if(p == NULL)
+                p = &proc[0];
+        /*
+         * Remember stack of caller
+         */
+        savu(u.u_rsav);          // 把执行进程的现场进行保护,这个u是调用 swtch时执行的进程user,  //这个位置非常重要，新建进程时，这里savu了sleep调用 swtch
+        /*
+         * Switch to scheduler's stack
+         */
+        retu(proc[0].p_addr);     // proc[0]是系统启动时就有的进程，供调度器使用的系统进程
+
+loop:
+        runrun = 0;
+        rp = p;
+        p = NULL;
+        n = 128;
+        /*
+         * Search for highest-priority runnable process
+         */
+        i = NPROC;
+        do {
+                rp++;
+                if(rp >= &proc[NPROC])
+                        rp = &proc[0];
+                if(rp->p_stat==SRUN && (rp->p_flag&SLOAD)!=0) {  // 必须是SRUN 并且是SLOAD的进程才能被选中
+                        if(rp->p_pri < n) {
+                                p = rp;
+                                n = rp->p_pri;
+                        }
+                }
+        } while(--i);
+        /*
+         * If no process is runnable, idle.
+         */
+        if(p == NULL) {
+                p = rp;
+                idle();             // 不存在合适的进程，那么就进入等待状态，等着中断来而出现可执行的进程
+                goto loop;          // 一直到找到
+        }
+        rp = p;
+        curpri = n;
+        /*
+         * Switch to stack of the new process and set up
+         * his segmentation registers.
+         */
+        retu(rp->p_addr);          // 恢复被选择进程的r5, r6
+        sureg();
+        /*
+         * If the new process paused because it was
+         * swapped out, set the stack level to the last call
+         * to savu(u_ssav).  This means that the return
+         * which is executed immediately after the call to aretu
+         * actually returns from the last routine which did
+         * the savu.
+         *
+         * You are not expected to understand this. 非常关键的一步
+         */
+        if(rp->p_flag&SSWAP) {
+                rp->p_flag =& ~SSWAP;
+                aretu(u.u_ssav);
+        }
+        /*
+         * The value returned here has many subtle implications.
+         * See the newproc comments.
+         */
+        return(1);   // 本质上是调用cret，返回到切换时的地址
+}
+#+END_SRC
+
+#+BEGIN_SRC C
+        if(rp->p_flag&SSWAP) {
+                rp->p_flag =& ~SSWAP;
+                aretu(u.u_ssav);
+        }
+#+END_SRC
+
+上面是处理是分派切换器中的一个比较难于理解的地方。
+
+但如果和交换器 sched()、 子进程创建 newproc()中的某些过程相结合，就会明白了。
+
+
+  - 在 newproc()创建子进程的过程中， 如果没有足够的内存分配给子进程的数据段，那么子进程的数据段就会被复制到磁盘，而在这之前栈环境已被保存到 u_ssav，但之前子进程的 u_rsav 中也已经保存了栈环境，所以对 u_ssav 的这一步操作看似多余。
+
+在新进程建议时它会发生以下事情
+
+  1. xswap(text.c)会调用 swap(bio.c) 执行换出操作(swap是个IO操作，必然会有sleep对资源有要求)
+
+  1. swap 函数中会调用 sleep 等待操作开始或结束，sleep 又会调用 swtch，而 swtch 又会调用 _savu_ 保存栈环境到 u_rsav，这样 u_rsav 保存的子进程的开始执行地址就指向了 sleep 函数中调用 swtch 的下一条指令，这当然是错误的。 (梁按:这个就是说如果没有这些操作，那么子进程的指向，是swtch调用者sleep的下一条指令，新进程显然不属于那！)
+
+  1. 因为 newproc()需要的子进程开始执行地址是调用 newproc 的下一条指令。那么在调用 xswap 之后再保存栈环境到 u_rsav 怎么样呢? 结论是不可行。因为在调用 xswap 完成后，子进程的 u_rsav 已经被写入磁盘交换区， 所以这时候再改 u_rsav 的值是在改动父进程的 u_rsav 变量，已经没有任何意义。因此在调用 xswap()之前保存栈环境到 u_ssav 是必要的，它记录了子进程正确的栈环境。
+那么既然 newproc 已经调用 savu 保存子进程栈环境到 u_ssav 中，则其第 59 行调用 savu (u.u_rsav) 保存栈环境到 u_rsav 中又为何呢?这是针对系统有足够内存可分配给子进程数据 段的情形的，也就是和 if(a2 == NULL) 相对的 else 情形，这时 u.u_ssav 将不生效。
+假如 newproc 完成后，并没有足够内存分配给子进程，则子进程被换出到磁盘，处于换 出(SSWAP)状态，这时 u.u_ssav 生效。它首先要被交换器换入到内存中，才能够参与 CPU 调度而运行。
+
+
+=sureg= 将保存于user结构体中的APR的值恢复到硬件的用户APR中，这样就做到了用户空间的更新。
+
+=sureg= 方法只在下列几个地方被用到
+
+- =estabur= 方法中
+- =swtch= 方法中
+- =expand= 方法中
+
+#+BEGIN_SRC C
+/*
+ * Load the user hardware segmentation
+ * registers from the software prototype.
+ * The software registers must have
+ * been setup prior by estabur.
+ */
+sureg()
+{
+        register *up, *rp, a;
+
+        a = u.u_procp->p_addr;  // u_procp是user结构体中proc[]元素的指针，p_addr指向了数据段地址
+        up = &u.u_uisa[16];    // u_uisa用于保存用户PAR的值， u_uisd用于保存用户PDR的值
+        rp = &UISA->r[16];     // UISA是用户空间PAR0的地址
+        if(cputype == 40) {
+                up =- 8;        // pdp40 只有8个寄存器
+                rp =- 8;
+        }
+        while(rp > &UISA->r[0])
+                *--rp = *--up + a;    // 恢复了u_uisa
+        if((up=u.u_procp->p_textp) != NULL)
+                a =- up->x_caddr;
+        up = &u.u_uisd[16];     // 又指向u_uisd
+        rp = &UISD->r[16];
+        if(cputype == 40) {
+                up =- 8;
+                rp =- 8;
+        }
+        while(rp > &UISD->r[0]) {
+                *--rp = *--up;
+                if((*rp & WO) == 0)
+                        rp[(UISA-UISD)/2] =- a;
+        }
+}
+#+END_SRC
+
+
+
+
+
+=fork= 的案例
+
+系统调用 =fork= 会创建新的进程, =fork= 函数最主要的特征是，对子进程返回0，对父进程返回进程id.
+
+#+BEGIN_SRC C
+i = fork
+if (i == 0) {
+  execv(program_name, argv);
+  exit();
+}
+while (wait() ! = i );
+#+END_SRC C
+
+
+=fork= 函数主要做了两件事情：
+
+  - 复制了proc[]数组
+  - 复制了数据段
+
+子进程和父进程有一些重要关系：
+
+  - 每个进程有1个父进程和0个以上的子进程
+
+  - 子进程结束时，由父进程释放其资源
+
+  - 子进程继承了父进行打开的文件资源，和当前目录
+
+  - 子进程与父进程共享代码段，但如果子进程执行了其他程序，这种共享关系就将被解除
+
+
+#+BEGIN_SRC C
+.globl	_fork, cerror, _par_uid
+
+_fork:
+    mov	r5,-(sp)
+    mov	sp,r5
+    sys	fork
+        br 1f
+    bec	2f         //
+    jmp	cerror
+1:
+    mov	r0,_par_uid
+    clr	r0
+2:
+    mov	(sp)+,r5
+    rts	pc
+.bss
+_par_uid: .=.+2
+#+END_SRC C
+
+
+** Fork 的系统调用
+
+
+#+BEGIN_SRC C
+/*
+ * fork system call.
+ */
+fork()
+{
+    register struct proc *p1, *p2;
+
+    p1 = u.u_procp;
+    for(p2 = &proc[0]; p2 < &proc[NPROC]; p2++)
+        if(p2->p_stat == NULL)
+            goto found;
+    u.u_error = EAGAIN;
+    goto out;
+
+found:                       //可以分配新进程
+    if(newproc()) {          // newproc向父进程返回0.
+        u.u_ar0[R0] = p1->p_pid;
+        u.u_cstime[0] = 0;
+        u.u_cstime[1] = 0;
+        u.u_stime = 0;
+        u.u_cutime[0] = 0;
+        u.u_cutime[1] = 0;
+        u.u_utime = 0;
+        return;
+    }
+    u.u_ar0[R0] = p2->p_pid;
+
+out:
+    u.u_ar0[R7] =+ 2;
+}
+#+END_SRC C
+
+
+** newproc()
+
+本函数用于创建进程，作用是将执行进程的元素和执行进程的数据段复制到子进程当中。
+
+它有以下步骤
+- 在全局的proc[]中生成当前的进程，这样进程才真正地存在
+- 在当前进程的proc结构体中，准备一些数据，如进程状态，进程id
+- 给当前父进程中打开的文件引用数，增加一下，因为子进程也引用了它们
+
+不要复制的有：
+- 代码段
+
+
+#+BEGIN_SRC C
+/*
+ * Create a new process-- the internal version of
+ * sys fork.
+ * It returns 1 in the new process.
+ * How this happens is rather hard to understand.
+ * The essential fact is that the new process is created
+ * in such a way that appears to have started executing
+ * in the same call to newproc as the parent;
+ * but in fact the code that runs is that of swtch.
+ * The subtle implication of the returned value of swtch
+ * (see above) is that this is the value that newproc's
+ * caller in the new process sees.
+ */
+newproc()
+{
+    int a1, a2;
+    struct proc *p, *up;
+    register struct proc *rpp;
+    register *rip, n;
+
+    p = NULL;
+    /*
+     * First, just locate a slot for a process
+     * and copy the useful info from this process into it.
+     * The panic "cannot happen" because fork has already
+     * checked for the existence of a slot.
+     */
+retry:
+    mpid++;
+    if(mpid < 0) {
+        mpid = 0;
+        goto retry;
+    }
+    for(rpp = &proc[0]; rpp < &proc[NPROC]; rpp++) {
+        if(rpp->p_stat == NULL && p==NULL)
+            p = rpp;
+        if (rpp->p_pid==mpid)
+            goto retry;
+    }
+    if ((rpp = p)==NULL)
+        panic("no procs");
+
+    /*
+     * make proc entry for new proc
+     */
+
+    rip = u.u_procp;
+    up = rip;
+    rpp->p_stat = SRUN;
+    rpp->p_flag = SLOAD;
+    rpp->p_uid = rip->p_uid;
+    rpp->p_ttyp = rip->p_ttyp;
+    rpp->p_nice = rip->p_nice;
+    rpp->p_textp = rip->p_textp;
+    rpp->p_pid = mpid;
+    rpp->p_ppid = rip->p_pid;
+    rpp->p_time = 0;
+
+    /*
+     * make duplicate entries
+     * where needed
+     */
+
+    for(rip = &u.u_ofile[0]; rip < &u.u_ofile[NOFILE];)
+        if((rpp = *rip++) != NULL)
+            rpp->f_count++;
+    if((rpp=up->p_textp) != NULL) {
+        rpp->x_count++;
+        rpp->x_ccount++;
+    }
+    u.u_cdir->i_count++;
+    /*
+     * Partially simulate the environment
+     * of the new process so that when it is actually
+     * created (by copying) it will look right.
+     */
+    savu(u.u_rsav);
+    rpp = p;
+    u.u_procp = rpp;
+    rip = up;
+    n = rip->p_size;
+    a1 = rip->p_addr;
+    rpp->p_size = n;
+    a2 = malloc(coremap, n);
+    /*
+     * If there is not enough core for the
+     * new process, swap out the current process to generate the
+     * copy.
+     * /这里非常重要，如果新进程要在交换空间开辟空间，那么就必须要将进程的栈信息写入，必须保存在u_ssav而非 u.u_rsav，因为u_rsav是随时都会变的
+     * 但u_ssav就是为了这有交换空间时才出来的
+     * 如果是SWAP的进程，成为执行进程时，也必须通过u_ssav
+     */
+    if(a2 == NULL) {
+        rip->p_stat = SIDL;
+        rpp->p_addr = a1;
+        savu(u.u_ssav);
+        xswap(rpp, 0, 0);
+        rpp->p_flag =| SSWAP;
+        rip->p_stat = SRUN;
+    } else {
+    /*
+     * There is core, so just copy.
+     */
+        rpp->p_addr = a2;
+        while(n--)
+            copyseg(a1++, a2++);
+    }
+    u.u_procp = rip;
+    return(0);
+}
+
+#+END_SRC
+
+
+设置进程的 _用户活动页_ 寄存器变量
+
+
+#+BEGIN_SRC C
+// /usr/sys/ken/main.c
+/*
+ * Set up software prototype segmentation
+ * registers to implement the 3 pseudo
+ * text,data,stack segment sizes passed
+ * as arguments.
+ * The argument sep specifies if the
+ * text and data+stack segments are to
+ * be separated.
+ */
+estabur(nt, nd, ns, sep)  //参数名分别为 nt, text代码段大小， nd, data数据段大小， ns, stack栈段大小，sep是指代码段与数据段/栈段是否连续，pdp-11/40中这个值一直为0，即连在一起的。 n是指块数，每块为64字节
+{
+        register a, *ap, *dp;
+
+        if(sep) {      // 40 机器不能用sep，就是0
+                if(cputype == 40) // 40 机器不能用sep，就是0
+                        goto err;
+                if(nseg(nt) > 8 || nseg(nd)+nseg(ns) > 8)  // 70机器的判断
+                        goto err;
+        } else  // 40 机器只有8个apr
+                if(nseg(nt)+nseg(nd)+nseg(ns) > 8)
+                        goto err;
+        if(nt+nd+ns+USIZE > maxmem)
+                goto err;
+        a = 0;
+        ap = &u.u_uisa[0];
+        dp = &u.u_uisd[0];
+        while(nt >= 128) {
+                *dp++ = (127<<8) | RO;
+                *ap++ = a;
+                a =+ 128;
+                nt =- 128;
+        }
+        if(nt) {
+                *dp++ = ((nt-1)<<8) | RO;
+                *ap++ = a;
+        }
+        if(sep)
+        while(ap < &u.u_uisa[8]) {
+                *ap++ = 0;
+                *dp++ = 0;
+        }
+        a = USIZE;
+        while(nd >= 128) {
+                *dp++ = (127<<8) | RW;
+                *ap++ = a;
+                a =+ 128;
+                nd =- 128;
+        }
+        if(nd) {
+                *dp++ = ((nd-1)<<8) | RW;
+                *ap++ = a;
+                a =+ nd;
+        }
+        while(ap < &u.u_uisa[8]) {
+                *dp++ = 0;
+                *ap++ = 0;
+        }
+        if(sep)
+        while(ap < &u.u_uisa[16]) {
+                *dp++ = 0;
+                *ap++ = 0;
+        }
+        a =+ ns;
+        while(ns >= 128) {
+                a =- 128;
+                ns =- 128;
+                *--dp = (127<<8) | RW;
+                *--ap = a;
+        }
+        if(ns) {
+                *--dp = ((128-ns)<<8) | RW | ED;
+                *--ap = a-128;
+        }
+        if(!sep) {
+                ap = &u.u_uisa[0];
+                dp = &u.u_uisa[8];
+                while(ap < &u.u_uisa[8])
+                        *dp++ = *ap++;
+                ap = &u.u_uisd[0];
+                dp = &u.u_uisd[8];
+                while(ap < &u.u_uisd[8])
+                        *dp++ = *ap++;
+        }
+        sureg();
+        return(0);
+
+err:
+        u.u_error = ENOMEM;
+        return(-1);
+}
+#+END_SRC
+
+
+_malloc_ 的逆操作
+
+#+BEGIN_SRC C
+/*
+ * Structure of the coremap and swapmap
+ * arrays. Consists of non-zero count
+ * and base address of that many
+ * contiguous units.
+ * (The coremap unit is 64 bytes,
+ * the swapmap unit is 512 bytes)
+ * The addresses are increasing and
+ * the list is terminated with the
+ * first zero count.
+ * coremap 用于内核空间
+ * swapmap 用于交换空间
+ *
+ * 它们都必须是数据，表示的是一片片内存空间
+ * 操作系统也只可能是操作的是一片片的内存区域的
+ * 如果不然，这里直接一个变量就行了，但根本没有这样理想的情况
+ */
+struct map
+{
+        char *m_size;
+        char *m_addr;
+};
+/*
+ * Allocate size units from the given
+ * map. Return the base of the allocated
+ * space.
+ * Algorithm is first fit.
+ */
+malloc(mp, size)
+struct map *mp;
+{
+        register int a;
+        register struct map *bp;
+
+        for (bp = mp; bp->m_size; bp++) {
+                if (bp->m_size >= size) {
+                        a = bp->m_addr;
+                        bp->m_addr =+ size; //找到需要的内存
+                        if ((bp->m_size =- size) == 0)  // bp->m_size后移，如果正好没有了一块，那么就要指向下一块
+                                do {
+                                        bp++;
+                                        (bp-1)->m_addr = bp->m_addr;  // 内核应该是不方便动态地扩张或者缩小 //都指向下一个了
+                                } while ((bp-1)->m_size = bp->m_size); // 把已经满的一个个往后移，直到发现最后的都没有空间
+                        return(a);
+                }
+        }
+        return(0);
+}
+#+END_SRC
+
+
+
+
+
+#+BEGIN_SRC C
+/*
+ * Free the previously allocated space aa
+ * of size units into the specified map.
+ * Sort aa into map and combine on
+ * one or both ends if possible.
+ * aa是要释放的地址，它比 malloc 多了一个操作数
+ *
+ */
+mfree(mp, size, aa)
+struct map *mp;
+{
+        register struct map *bp;
+        register int t;
+        register int a;
+
+        a = aa;
+        for (bp = mp; bp->m_addr<=a && bp->m_size!=0; bp++);
+        if (bp>mp && (bp-1)->m_addr+(bp-1)->m_size == a) {
+                (bp-1)->m_size =+ size;
+                if (a+size == bp->m_addr) {
+                        (bp-1)->m_size =+ bp->m_size;
+                        while (bp->m_size) {
+                                bp++;
+                                (bp-1)->m_addr = bp->m_addr;
+                                (bp-1)->m_size = bp->m_size;
+                        }
+                }
+        } else {
+                if (a+size == bp->m_addr && bp->m_size) {
+                        bp->m_addr =- size;
+                        bp->m_size =+ size;
+                } else if (size) do {
+                        t = bp->m_addr;
+                        bp->m_addr = a;
+                        a = t;
+                        t = bp->m_size;
+                        bp->m_size = size;
+                        bp++;
+                } while (size = t);
+        }
+}
+#+END_SRC
+
+
+
+#+BEGIN_SRC asm
+/	storage allocator for use with C
+/
+/
+/
+/	hand-tooled from C compilation to modify save-return
+/	so that it can be called from within the C save
+/	when running with coroutines
+/
+/#
+//*
+/ *	C storage allocator
+/ *	(circular first fit strategy)
+/ */
+#define BLOK 512
+#define BUSY 01
+
+char *allocs[2] {		/*initial empty arena*/
+        &allocs[1],
+        &allocs[0]
+};
+struct { int word; };
+char **allocp &allocs[1];	/*current search pointer*/
+char **alloct &allocs[1];	/*top of arena (last cell)*/
+
+alloc(nbytes)
+{
+        register int nwords;
+        register char **p, **q;
+        static char **t;
+
+        allocs[0].word =| BUSY;	/*static initialization*/
+        allocs[1].word =| BUSY;
+
+        nwords = (nbytes+(2*sizeof(p)-1))/sizeof(p);
+        for(p=allocp;;) {
+                do {
+                        if((p->word&BUSY)==0) {
+                                while(((q = *p)->word&BUSY)==0)
+                                        *p = *q;
+                                if(q >= &p[nwords])
+                                        goto found;
+                        }
+                        q = p;
+                        p = p->word & ~BUSY;
+                } while(q>=allocp || p<allocp);
+                if((*alloct=t=sbrk(BLOK*sizeof(p))) == -1)
+                        return(-1);
+                if(t!=alloct+1)
+                        alloct->word =| BUSY;
+                alloct = (*t = &t[BLOK]-1);
+                *alloct = allocs;
+                alloct->word =| BUSY;
+        }
+found:
+        allocp = &p[nwords];
+        if(q>allocp)
+                *allocp = *p;
+        *p = allocp.word|BUSY;
+        return(p+1);
+}
+
+free(p)
+char **p;
+{
+        allocp = p-1;
+        allocp->word =& ~BUSY;
+}
+#+END_SRC
+
+
+exec的一些情况：
+
+- exec没有执行文件，是具体的execl, execv在执行，exec是系统调用，只分配资源。execl，execv在执行完系统调用后，直接跳到用户地位0位置处。
+
+
+#+BEGIN_SRC C
+exec()
+{
+        int ap, na, nc, *bp;
+        int ts, ds, sep;
+        register c, *ip;
+        register char *cp;
+        extern uchar;
+
+        /*
+         * pick up file names
+         * and check various modes
+         * for execute permission
+         */
+
+        ip = namei(&uchar, 0);   // 找到对就的节点 ， ip是可执行文件的
+        if(ip == NULL)
+                return;
+        while(execnt >= NEXEC)
+                sleep(&execnt, EXPRI);
+        execnt++;
+        bp = getblk(NODEV);      //分配的内存
+        if(access(ip, IEXEC) || (ip->i_mode&IFMT)!=0) //判断是否可执行
+                goto bad;
+
+        /*
+         * pack up arguments into
+         * allocated disk buffer
+         */
+
+        cp = bp->b_addr; //把传递给程序的参数放入刚才取得的缓存区，并将其作为处理参数时的工作内存
+        na = 0;  // number of arguments 参数的数量
+        nc = 0;  // 参数的总字节数
+        while(ap = fuword(u.u_arg[1])) {
+                na++;
+                if(ap == -1)
+                        goto bad;
+                u.u_arg[1] =+ 2;
+                for(;;) {
+                        c = fubyte(ap++);
+                        if(c == -1)
+                                goto bad;
+                        *cp++ = c;
+                        nc++;
+                        if(nc > 510) {
+                                u.u_error = E2BIG;
+                                goto bad;
+                        }
+                        if(c == 0)
+                                break;
+                }
+        }
+        if((nc&1) != 0) {
+                *cp++ = 0;
+                nc++;
+        }
+
+        /*
+         * read in first 8 bytes
+         * of file for segment
+         * sizes:
+         * w0 = 407/410/411 (410 implies RO text) (411 implies sep ID)
+         * w1 = text size
+         * w2 = data size
+         * w3 = bss size
+         */
+
+        u.u_base = &u.u_arg[0];
+        u.u_count = 8;
+        u.u_offset[1] = 0;
+        u.u_offset[0] = 0;
+        u.u_segflg = 1;
+        readi(ip);
+        u.u_segflg = 0;
+        if(u.u_error)
+                goto bad;
+        sep = 0;
+        if(u.u_arg[0] == 0407) {
+                u.u_arg[2] =+ u.u_arg[1];
+                u.u_arg[1] = 0;
+        } else
+        if(u.u_arg[0] == 0411)
+                sep++; else
+        if(u.u_arg[0] != 0410) {
+                u.u_error = ENOEXEC;
+                goto bad;
+        }
+        if(u.u_arg[1]!=0 && (ip->i_flag&ITEXT)==0 && ip->i_count!=1) {
+                u.u_error = ETXTBSY;
+                goto bad;
+        }
+
+        /*
+         * find text and data sizes
+         * try them out for possible
+         * exceed of max sizes
+         */
+
+        ts = ((u.u_arg[1]+63)>>6) & 01777;
+        ds = ((u.u_arg[2]+u.u_arg[3]+63)>>6) & 01777;
+        if(estabur(ts, ds, SSIZE, sep))
+                goto bad;
+
+        /*
+         * allocate and clear core
+         * at this point, committed
+         * to the new image
+         */
+
+        u.u_prof[3] = 0;
+        xfree();
+        expand(USIZE);
+        xalloc(ip);
+        c = USIZE+ds+SSIZE;
+        expand(c);
+        while(--c >= USIZE)
+                clearseg(u.u_procp->p_addr+c);
+
+        /*
+         * read in data segment
+         */
+
+        estabur(0, ds, 0, 0);
+        u.u_base = 0;
+        u.u_offset[1] = 020+u.u_arg[1];
+        u.u_count = u.u_arg[2];
+        readi(ip);
+
+        /*
+         * initialize stack segment
+         */
+
+        u.u_tsize = ts;
+        u.u_dsize = ds;
+        u.u_ssize = SSIZE;
+        u.u_sep = sep;
+        estabur(u.u_tsize, u.u_dsize, u.u_ssize, u.u_sep);
+        cp = bp->b_addr;
+        ap = -nc - na*2 - 4;
+        u.u_ar0[R6] = ap;
+        suword(ap, na);
+        c = -nc;
+        while(na--) {
+                suword(ap=+2, c);
+                do
+                        subyte(c++, *cp);
+                while(*cp++);
+        }
+        suword(ap+2, -1);
+
+        /*
+         * set SUID/SGID protections, if no tracing
+         */
+
+        if ((u.u_procp->p_flag&STRC)==0) {
+                if(ip->i_mode&ISUID)
+                        if(u.u_uid != 0) {
+                                u.u_uid = ip->i_uid;
+                                u.u_procp->p_uid = ip->i_uid;
+                        }
+                if(ip->i_mode&ISGID)
+                        u.u_gid = ip->i_gid;
+        }
+
+        /*
+         * clear sigs, regs and return
+         */
+
+        c = ip;
+        for(ip = &u.u_signal[0]; ip < &u.u_signal[NSIG]; ip++)
+                if((*ip & 1) == 0)
+                        *ip = 0;
+        for(cp = &regloc[0]; cp < &regloc[6];)
+                u.u_ar0[*cp++] = 0;
+        u.u_ar0[R7] = 0;
+        for(ip = &u.u_fsav[0]; ip < &u.u_fsav[25];)
+                *ip++ = 0;
+        ip = c;
+
+bad:
+        iput(ip);
+        brelse(bp);
+        if(execnt >= NEXEC)
+                wakeup(&execnt);
+        execnt--;
+}
+#+END_SRC
+
+
+
+
+*** C语言编译情况
+
+C语言编译成汇编的代码。
+
+#+BEGIN_SRC C
+callee(a, b) {
+
+}
+#+END_SRC

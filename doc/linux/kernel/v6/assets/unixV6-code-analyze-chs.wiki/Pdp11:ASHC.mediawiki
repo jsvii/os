@@ -1,0 +1,33 @@
+===Instruction===ASHC
+===Code===073RSS
+===Operation===R,R∨1 ← R,R∨1 双字长数据的二进制形式向左/向右移动NN位<br/>NN = (src)二进制形式的低6位
+===Coden===若 运算结果<0，则置位<br/>否则，清位
+===Codez===若 运算结果=0，则置位<br/>否则，清位
+===Codev===若 按位移动过程中，寄存器符号位改变，则置位<br/>否则，清位
+===Codec===始终等于被移出寄存器的数位
+===Description=== 根据源地址的数据，将目标寄存器(及其后继寄存器)的数据按位向左/向右移动指定位数<br/>移动位数 = (src)二进制形式的低6位，范围为 -32..31<br/>移动位数为负，移动方向向右<br/>移动位数为正，移动方向向左<br/>若 寄存器选取奇地址寄存器，则R,RV1指向同一寄存器，移位方向若为右移，则相当于单个字长寄存器循环移位
+===Example===<p>向左移动模式<img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_instruction_Ashc_left.png"/></p><br/><p>向右移动模式<img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_instruction_Ashc_right.png"/></p><br/>
+
+移动方式举例
+<table class="wikitable" border="1" cellspacing="0" align="center" style="width:60%">
+<tr>
+<th width="200px">(src)二进制形式的低六位</th>
+<th>移动动作</th>
+</tr>
+<tr>
+<td> 011111</td>
+<td> 左移31位</td>
+</tr>
+<tr>
+<td> 000001</td>
+<td> 左移1位</td>
+</tr>
+<tr>
+<td> 111111</td>
+<td> 右移1位</td>
+</tr>
+<tr>
+<td> 100000</td>
+<td> 右移32位</td>
+</tr>
+</table>

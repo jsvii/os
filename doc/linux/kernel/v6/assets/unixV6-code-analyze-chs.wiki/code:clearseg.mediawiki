@@ -1,0 +1,76 @@
+===Source===
+<div class="wikiheadnote">
+*将 内存 第i块 64字节 置零
+*输入一个参数 i
+</div>
+
+0674 /* ------------------------- */ 
+
+0675 .globl _clearseg
+
+0676 _clearseg:
+
+0677 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] PS,-(sp)
+
+0678 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] UISA0,-(sp)
+
+<blockquote>
+*PS UISA0 保护入栈
+*UISD0 将在0681 保护入栈
+*以上 将在0689 还原
+</blockquote>
+0679 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $30340,PS
+
+<blockquote>
+*置 PS
+**处理机优先级 置 7，[[关中断]]
+**先前态 置 用户态
+**当前态 置 核心态
+</blockquote>
+0680 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 6(sp),UISA0
+
+<blockquote>
+*UISA0 ← i
+</blockquote>
+0681 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] UISD0,-(sp)
+
+0682 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $6,UISD0
+
+<blockquote>
+*UISD0 ← 6
+**置段 为 可读写
+</blockquote>
+0683 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] r0
+
+0684 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $32.,r1
+
+0685 1:
+
+0686 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] -(sp)
+
+0687 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MTPI|mtpi]] (r0)+
+
+0688 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:SOB|sob]] r1,1b
+
+<blockquote>
+*将 第i块64字节置零
+</blockquote>
+0689 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,UISD0
+
+0690 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,UISA0
+
+0691 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,PS
+
+0692 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc
+
+0693
+
+
+===Ref===
+*[[关于汇编函数的说明]]
+
+===Caller===
+*[[code:main]]
+*[[code:exec]]
+*[[code:sbreak]]
+*[[code:grow]]

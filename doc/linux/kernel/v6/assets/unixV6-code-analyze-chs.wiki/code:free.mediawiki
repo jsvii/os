@@ -1,0 +1,127 @@
+===Source===
+<div class="wikiheadnote">
+*释放 指定设备指定的占用块
+*共传入两个参数 dev , bno
+**dev : 指定设备的设备号
+**bno : 指定块号
+</div>
+
+6994 
+
+6995 /* 
+
+6996 &nbsp;* place the specified disk block 
+
+6997 &nbsp;* back on the free list of the 
+
+6998 &nbsp;* specified device. 
+
+6999 &nbsp;*/ 
+
+7000 free(dev, bno) 
+
+7001 { 
+
+7002 &nbsp;&nbsp;&nbsp;&nbsp;register *fp, *bp, *ip; 
+
+<blockquote>
+*fp 指向 [[code:struct filsys|struct filsys]]
+*bp 指向 [[code:struct buf|struct buf]]
+</blockquote>
+7003 
+
+7004 &nbsp;&nbsp;&nbsp;&nbsp;fp = [[code:getfs|getfs]](dev); 
+
+<blockquote>
+*根据设备号 找到 设备的超级块
+</blockquote>
+7005 &nbsp;&nbsp;&nbsp;&nbsp;fp->s_fmod = 1; 
+
+<blockquote>
+*置 超级块的修改标志
+*但 7026行 有同样的一行，此行意义不明，列入[[遗留问题]]
+</blockquote>
+7006 &nbsp;&nbsp;&nbsp;&nbsp;while(fp->s_flock) 
+
+7007 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:sleep|sleep]](&fp->s_flock, PINOD); 
+
+<blockquote>
+*若 超级块的空闲块数组 被置锁，则睡眠
+*直到 超级块的空闲块数组 可用
+*[[睡眠原因]] : filsys.s_flock
+*[[进程优先级|睡眠优先级]] : PINOD
+</blockquote>
+7008 &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:badblock|badblock]](fp, bno, dev)) 
+
+7009 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+<blockquote>
+*若释放的不是一般块，则函数直接返回
+</blockquote>
+7010 &nbsp;&nbsp;&nbsp;&nbsp;if(fp->s_nfree &lt;= 0) { 
+
+7011 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;fp->s_nfree = 1; 
+
+7012 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;fp->s_free[0] = 0; 
+
+7013 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 空闲块数组 无有效元素，则初始化空闲块数组
+</blockquote>
+7014 &nbsp;&nbsp;&nbsp;&nbsp;if(fp->s_nfree >= 100) { 
+
+7015 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;fp->s_flock++; 
+
+7016 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bp = [[code:getblk|getblk]](dev, bno); 
+
+7017 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ip = bp->b_addr; 
+
+7018 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;*ip++ = fp->s_nfree; 
+
+7019 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:bcopy|bcopy]](fp->s_free, ip, 100); 
+
+7020 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;fp->s_nfree = 0; 
+
+7021 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:bwrite|bwrite]](bp); 
+
+7022 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;fp->s_flock = 0; 
+
+7023 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]](&fp->s_flock); 
+
+7024 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 空闲块数组 满，则
+** 空闲块数组 置锁
+** 往刚才释放的空闲块中写入:
+*** s-nfree
+*** s-free 中的 100元素
+** 清空空闲块数组（有效元素个数置零）
+** 空闲块数组解锁
+** 唤醒等待使用空闲块数组的进程
+*此时，刚才释放的空闲块已经接管了之前filsys的空闲块管理任务
+ 之后7025-7026行，将释放的空闲块纳入新的filsys进行管理
+参看[[文件系统#空闲块管理|文件系统之空闲块管理]]
+</blockquote>
+7025 &nbsp;&nbsp;&nbsp;&nbsp;fp->s_free[fp->s_nfree++] = bno; 
+
+7026 &nbsp;&nbsp;&nbsp;&nbsp;fp->s_fmod = 1; 
+
+<blockquote>
+* 刚才释放的空闲块的块号 加入 s-free 数组 管理
+* 置 超级块 的修改标志
+</blockquote>
+7027 } 
+
+7028 /* ------------------------- */ 
+
+7029 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[文件系统]]
+
+===Caller===
+*[[code:itrunc]]

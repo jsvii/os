@@ -1,0 +1,14 @@
+* FAQ
+
+** complete is not defined
+
+#+BEGIN_SRC shell
+# bash compinit
+autoload -Uz bashcompinit; bashcompinit
+#!/usr/bin/env bash
+#+END_SRC
+
+
+**
+
+source "$HOME/.bash_profile"

@@ -1,0 +1,80 @@
+* sed 脚本
+
+** 概览
+
+语法规划如下：
+#+BEGIN_SRC bash
+[addr]X[options]
+#+END_SRC
+
+X 为所使用的命令。
+
+*** Demo
+
+#+BEGIN_SRC bash
+# 删除 30-35行的内容
+sed '30,35d' input.txt > output.txt
+
+# 直接输出内容，遇到foo开头的，以42号退出码quit
+sed '/^foo/q42' input.txt > output.txt
+#+END_SRC
+
+
+
+** 多个命令
+
+$ seq 6 | sed '1d
+3d
+5d'
+2
+4
+6
+
+$ seq 6 | sed -e 1d -e 3d -e 5d
+2
+4
+6
+
+
+$ seq 6 | sed '1d;3d;5d'
+2
+4
+6
+
+
+The {,},b,t,T,: commands can be separated with a semicolon (this is a non-portable GNU sed extension).
+
+$ seq 4 | sed '{1d;3d}'
+2
+4
+
+$ seq 6 | sed '{1d;3d};5d'
+2
+4
+6
+
+
+** 多个命令
+
+
+一个命令是下面的语法，多个命令是下面这种语法多个重合。
+#+BEGIN_SRC bash
+[addr]X[options]
+#+END_SRC
+
+举个典型的例子:
+
+#+BEGIN_SRC bash
+$ seq 6 | sed '1d;3d;5d'
+2
+4
+6
+#+END_SRC
+
+
+** ~s~ 命令详解
+
+
+#+BEGIN_SRC bash
+s/regexp/replacement/[flags]
+#+END_SRC

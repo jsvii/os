@@ -1,0 +1,29 @@
+* power
+
+** 电脑会自动休眠
+
+修改文件 =/etc/systemd/logind.conf= 将 =HandleLidSwitch=ignore=
+
+** 修改启动级别为multi-user.target
+
+#+BEGIN_SRC bash
+sudo systemctl set-default multi-user.target
+#+END_SRC
+
+** PCI
+
+lspci
+
+PCI 【计】 外部控制器接口, 构成控制器接口, 可编程通信接口
+
+
+** 桌面版
+
+  1. Energy Saving 
+
+    - Button Events Handling
+
+      - when Laptop lid closed  [Lock Screen]
+
+  
+

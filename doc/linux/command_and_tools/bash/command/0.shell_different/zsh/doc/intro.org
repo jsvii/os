@@ -1,0 +1,5 @@
+* zsh intro
+
+#+BEGIN_SRC bash
+git clone https://git.code.sf.net/p/zsh/code zsh-code
+#+END_SRC

@@ -1,0 +1,36 @@
+* Media
+
+#+BEGIN_SRC bash
+zypper install k3b-codecs ffmpeg lame gstreamer-plugins-bad gstreamer-plugins-ugly gstreamer-plugins-ugly-orig-addon gstreamer-plugins-libav vlc vlc-codecs libxine2-codecs
+#+END_SRC
+
+** codecs
+
+按照下文进行安装，注意：yast2安装时要有HTTP_PROXY变量.
+
+https://opensuse-guide.org/codecs.php
+
+1) Add the needed repositories:
+#+BEGIN_SRC bash
+zypper addrepo -f http://packman.inode.at/suse/openSUSE_Leap_15.1/ packman
+zypper addrepo -f http://opensuse-guide.org/repo/openSUSE_Leap_15.1/ dvd
+#+END_SRC
+
+2) Then install the necessary packages:
+#+BEGIN_SRC bash
+zypper install --allow-vendor-change ffmpeg lame gstreamer-plugins-bad gstreamer-plugins-ugly gstreamer-plugins-ugly-orig-addon gstreamer-plugins-libav libavdevice56 libavdevice58 libdvdcss2 vlc-codecs
+#+END_SRC
+
+3) Make sure all your multimedia packages are coming from the Packman Repository:
+#+BEGIN_SRC bash
+zypper dup --allow-vendor-change --from http://packman.inode.at/suse/openSUSE_Leap_15.1/
+
+
+
+#+END_SRC
+
+
+Package 'gstreamer-plugins-ugly-orig-addon' not found.
+Package 'k3b-codecs' not found.
+Package 'libxine2-codecs' not found.
+Package 'vlc-codecs' not found.

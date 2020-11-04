@@ -1,0 +1,77 @@
+* 高频使用的命令
+
+** # 注释命令
+
+** 删除命令 ~d~
+
+删除命令格式如下
+
+    [address1[,address2]]d
+
+`address1`和`address2`是开始和截止地址，它们可以是行号或者字符串匹配模式，这两种地址都是可选的。
+
+由命令的名称可以知道， ~delete~ 命令是用来执行删除操作的，并且因为SED是基于行的编辑器，因此我们说该命令是用来删除行的。注意的是，该命令只会移除模式空间中的行，这样该行就不会被发送到输出流，但原始内容不会改变。
+
+    $ sed 'd' books.txt
+
+为什么没有输出任何内容？默认情况下，SED将会对每一行执行删除操作，这就是该命令为什么没有在标准输出中输出任何内容的原因。
+
+下列命令只移除第四行
+
+    [jerry]$ sed '4d' books.txt
+    1) A Storm of Swords, George R. R. Martin, 1216
+    2) The Two Towers, J. R. R. Tolkien, 352
+    3) The Alchemist, Paulo Coelho, 197
+    5) The Pilgrimage, Paulo Coelho, 288
+    6) A Game of Thrones, George R. R. Martin, 864
+
+SED也接受使用逗号(,)分隔的地址范围。我们可以构造地址范围去移除N1到N2行，例如，下列命令将删除2-4行
+
+    $ sed '2, 4 d' books.txt
+    1) A Storm of Swords, George R. R. Martin, 1216
+    5) The Pilgrimage, Paulo Coelho, 288
+    6) A Game of Thrones, George R. R. Martin, 864
+
+SED的地址范围并不仅仅限于数字，我们也可以指定模式匹配作为地址，下面的示例会移除所有作者为Paulo Coelho的书籍
+
+    $ sed '/Paulo Coelho/d' books.txt
+    1) A Storm of Swords, George R. R. Martin, 1216
+    2) The Two Towers, J. R. R. Tolkien, 352
+    4) The Fellowship of the Ring, J. R. R. Tolkien, 432
+    6) A Game of Thrones, George R. R. Martin, 864
+
+我移除所有以`Storm`和`Fellowship`开头的行
+
+    $ sed '/Storm/,/Fellowship/d' books.txt
+    5) The Pilgrimage, Paulo Coelho, 288
+    6) A Game of Thrones, George R. R. Martin, 864
+
+
+** 退出命令 ~q~
+
+在SED中，可以使用`Quit`命令退出当前的执行流
+
+    [address]q
+    [address]q [value]
+
+需要注意的是，`q`命令不支持地址范围，只支持单个地址匹配。默认情况下SED会按照读取、执行、重复的工作流执行，但当它遇到`q`命令的时候，它会退出当前的执行流。
+
+    $ sed '3 q' books.txt
+    1) A Storm of Swords, George R. R. Martin, 1216
+    2) The Two Towers, J. R. R. Tolkien, 352
+    3) The Alchemist, Paulo Coelho, 197
+
+    $ sed '/The Alchemist/ q' books.txt
+    1) A Storm of Swords, George R. R. Martin, 1216
+    2) The Two Towers, J. R. R. Tolkien, 352
+    3) The Alchemist, Paulo Coelho, 197
+
+`q`命令也支持提供一个value，这个value将作为程序的返回代码返回
+
+    $ sed '/The Alchemist/ q 100' books.txt
+    1) A Storm of Swords, George R. R. Martin, 1216
+    2) The Two Towers, J. R. R. Tolkien, 352
+    3) The Alchemist, Paulo Coelho, 197
+
+    $ echo $?
+    100

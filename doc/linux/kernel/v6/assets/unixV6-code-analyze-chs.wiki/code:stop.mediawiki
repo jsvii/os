@@ -1,0 +1,90 @@
+===Source===
+<div class="wikiheadnote">
+*[[跟踪]] 系统中，子进程进入SSTOP状态，响应跟踪请求
+</div>
+
+4009 
+
+4010 /* 
+
+4011 &nbsp;* Enter the tracing STOP state. 
+
+4012 &nbsp;* In this state, the parent is 
+
+4013 &nbsp;* informed and the process is able to 
+
+4014 &nbsp;* receive commands from the parent. 
+
+4015 &nbsp;*/ 
+
+4016 stop() 
+
+4017 { 
+
+4018 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct proc|struct proc]] *pp, *cp; 
+
+4019 
+
+4020 loop: 
+
+4021 &nbsp;&nbsp;&nbsp;&nbsp;cp = [[code:user|u.u_procp]]; 
+
+4022 &nbsp;&nbsp;&nbsp;&nbsp;if(cp->p_ppid != 1) 
+
+<blockquote>
+*LIONS 源代码为<code>4022 &nbsp;&nbsp;&nbsp;&nbsp;if(cp->p_pid != 1)</code>
+疑为笔误
+</blockquote>
+4023 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for (pp = &[[code:proc|proc]][0]; pp < &[[code:proc|proc]][NPROC]; pp++) 
+
+4024 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if (pp->p_pid == cp->p_ppid) { 
+
+<blockquote>
+*pp ← 现行进程的父进程
+</blockquote>
+4025 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:wakeup|wakeup]](pp); 
+
+4026 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  cp->p_stat = SSTOP; 
+
+4027 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:swtch|swtch]](); 
+
+<blockquote>
+*唤醒 父进程
+*子进程 置 SSTOP
+*要求进程切换
+</blockquote>
+<blockquote>
+*当 父进程 提出了跟踪请求，且子进程再次切换上台，继续执行
+</blockquote>
+4028 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  if ((cp->p_flag&STRC)==0 <nowiki>||</nowiki> [[code:procxmt|procxmt]]()) 
+
+4029 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; return; 
+
+<blockquote>
+*以下情况 函数返回
+**子进程 STRC 被清 (不再进行跟踪)
+**父进程 向 子进程 发送信号([[code:procxmt|procxmt]]() == 1)
+</blockquote>
+4030 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  goto loop; 
+
+4031 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } 
+
+4032 &nbsp;&nbsp;&nbsp;&nbsp;[[code:exit|exit]](); 
+
+<blockquote>
+*以下情况 进程终止
+**子进程 的 父进程 为 1#进程
+(父进程 已经退出，子进程托管给1#进程)
+(已经没有必要继续跟踪了)
+</blockquote>
+4033 } 
+
+4034 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[跟踪]]
+
+===Caller===
+*[[code:issig]]

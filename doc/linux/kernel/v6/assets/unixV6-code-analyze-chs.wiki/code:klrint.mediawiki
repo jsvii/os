@@ -1,0 +1,47 @@
+===Source===
+<div class="wikiheadnote">
+*KL 设备中断处理函数
+*一般 由读取数据完成 引发
+</div>
+
+8078 klrint(dev)
+
+8079 {   register int c, *addr;
+
+8080 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct tty|struct tty]] *tp;
+
+8081 &nbsp;&nbsp;&nbsp;&nbsp;tp = &[[code:kl11|kl11]][dev[[skill:.d_minor|.d_minor]]];
+
+<blockquote>
+*找到 设备号dev 对应的 KL设备 的[[code:struct tty|struct tty]]结构
+</blockquote>
+8082 &nbsp;&nbsp;&nbsp;&nbsp;addr = tp->t_addr;
+
+8083 &nbsp;&nbsp;&nbsp;&nbsp;c = addr->[[skill:klrbuf|klrbuf]];
+
+<blockquote>
+*获取 输入的字符 c
+</blockquote>
+8084 &nbsp;&nbsp;&nbsp;&nbsp;addr->[[skill:klrcsr|klrcsr]] <nowiki>=|</nowiki> RDRENB;
+
+<blockquote>
+*置 设备接收器 可用
+*RDRENB 定义在 [[file:kl.c|kl.c]]
+</blockquote>
+8085 &nbsp;&nbsp;&nbsp;&nbsp;if ((c&0177)==0)
+
+8086 &nbsp;&nbsp;&nbsp;&nbsp;addr->[[skill:kltbuf|kltbuf]] = c; /* hardware botch */ 
+
+<blockquote>
+*诡异，列入[[遗留问题]]
+</blockquote>
+8087 &nbsp;&nbsp;&nbsp;&nbsp;[[code:ttyinput|ttyinput]](c, tp);
+
+<blockquote>
+*c 送入 tty 原始输入队列
+</blockquote>
+8088 } 
+
+8089 /* ------------------------- */ 
+
+

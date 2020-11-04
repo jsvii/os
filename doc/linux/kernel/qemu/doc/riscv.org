@@ -1,0 +1,161 @@
+* RISC-V
+
+~QEMU 4.1~ introduced support for the ~-bios~ option in QEMU for RISC-V for the ~RISC-V virt machine~ and ~sifive_u machine~.
+
+~QEMU 4.1~ has no changes to the default behaviour to avoid breakages. This default will change in a future QEMU release, so please prepare now. All users of the virt or sifive_u machine must change their command line usage.
+
+QEMU 4.1 has three options, please migrate to one of these three:
+
+1. “-bios none“ - This is the current default behavior if no -bios option is included. QEMU will not automatically load any firmware. It is up to the user to load all the images they need.
+
+2. “-bios default“ - In a future QEMU release this will become the default behaviour if no -bios option is specified. This  option will load the default ~OpenSBI firmware~ automatically. The firmware is included with the QEMU release and no user interaction is required. All a user needs to do is specify the kernel they want to boot with the -kernel option
+
+3. “-bios <file>“ - Tells QEMU to load the specified file as the firmwrae.
+
+** Speci
+
+The RISC-V ISA privledge ~specification version 1.09.1~ has been ~deprecated~. QEMU supports both the newer ~version 1.10.0~ and the ratified ~version 1.11.0~, these should be used instead of the 1.09.1 version.
+
+
+The RISC-V cpus with the ISA version in the ~CPU name~ have been depcreated.The four CPUs are: “rv32gcsu-v1.9.1“, “rv32gcsu-v1.10.0“, “rv64gcsu-v1.9.1“ and “rv64gcsu-v1.10.0“. Instead the version can be specified via the CPU “priv_spec“ option when using the “rv32“ or “rv64“ CPUs.
+
+
+The RISC-V ~no MMU cpus~ have been ~depcreated~. The two CPUs: “rv32imacu-nommu“ and “rv64imacu-nommu“ should no longer be used. Instead the MMU status can be specified via the CPU “mmu“ option when using the “rv32“ or “rv64“ CPUs.
+
+
+
+** Description
+
+RISC-V is an open source instruction set. It is a modular with only a small set of mandatory instructions. Every other module might be implemented by
+vendors allowing RISC-V to be suitable for small embended systems up to large supercomputers.
+
+** Build Directions
+
+For RV64GC:
+
+ ./configure --target-list=riscv64-softmmu && make
+
+For RV32GC:
+
+ ./configure --target-list=riscv32-softmmu && make
+
+** Booting Linux
+
+*** Booting 64-bit Fedora
+
+Download the Fedora disk images Decompress the disk image:
+
+  xzdec -d stage4-disk.img.xz > stage4-disk.img
+
+Boot linux using RV64GC qemu:
+
+  qemu-system-riscv64 \
+   -nographic \
+   -machine virt \
+   -smp 4 \
+   -m 2G \
+   -kernel bbl \
+   -object rng-random,filename=/dev/urandom,id=rng0 \
+   -device virtio-rng-device,rng=rng0 \
+   -append "console=ttyS0 ro root=/dev/vda" \
+   -device virtio-blk-device,drive=hd0 \
+   -drive file=stage4-disk.img,format=raw,id=hd0 \
+   -device virtio-net-device,netdev=usernet \
+   -netdev user,id=usernet,hostfwd=tcp::10000-:22
+
+- Login: root
+- Password: riscv
+
+*** Booting 32-bit OpenEmbedded Images
+
+Follow the usual OpenEmbedded build flow using meta-riscv to build for the qemuriscv32 machine. More details on doing this can be found here:
+https://github.com/riscv/meta-riscv/#build-image
+
+Once the images are build you can boot them using:
+
+ qemu-system-riscv32 \
+   -device loader,file=./tmp-glibc/deploy/images/qemuriscv32/Image,addr=0x80400000 \
+   -device virtio-net-device,netdev=net0 -netdev user,id=net0,hostfwd=tcp::2222-:22,hostfwd=tcp::2323-:23 \
+   -drive id=disk0,file=./tmp-glibc/deploy/images/qemuriscv64/core-image-minimal-qemuriscv32.ext4,if=none,format=raw \
+   -device virtio-blk-device,drive=disk0 \
+   -object rng-random,filename=/dev/urandom,id=rng0 \
+   -device virtio-rng-device,rng=rng0 \
+   -kernel ./tmp-glibc/deploy/images/qemuriscv32/Image \
+   -append 'root=/dev/vda rw highres=off  console=ttyS0 mem=512M ip=dhcp earlycon=sbi ' \
+   -show-cursor  -nographic -machine virt -m 512 -serial mon:stdio -serial null
+
+The above command will open up SSH and telnet ports which can be used to communicate with the guest. It will also pass in host entropy to the guest,
+allowing entropy to be available on boot.
+
+NOTE: When using OpenEmbedded it is recommended to use the runqemu script to boot QEMU. It will dynamically handle display options as well as advanced
+networking
+
+*** Booting 64-bit OpenEmbedded Images
+
+Follow the usual OpenEmbedded build flow using meta-riscv to build for the qemuriscv64 machine. More details on doing this can be found here:
+https://github.com/riscv/meta-riscv/#build-image
+
+Once the images are build you can boot them using:
+
+ qemu-system-riscv64 \
+   -device loader,file=./tmp-glibc/deploy/images/qemuriscv64/Image,addr=0x80200000 \
+   -device virtio-net-device,netdev=net0 -netdev user,id=net0,hostfwd=tcp::2222-:22,hostfwd=tcp::2323-:23 \
+   -drive id=disk0,file=./tmp-glibc/deploy/images/qemuriscv64/core-image-minimal-qemuriscv64.ext4,if=none,format=raw \
+   -device virtio-blk-device,drive=disk0 \
+   -object rng-random,filename=/dev/urandom,id=rng0 \
+   -device virtio-rng-device,rng=rng0 \
+   -kernel ./tmp-glibc/deploy/images/qemuriscv64/Image \
+   -append 'root=/dev/vda rw highres=off  console=ttyS0 mem=512M ip=dhcp earlycon=sbi ' \
+   -show-cursor  -nographic -machine virt -m 512 -serial mon:stdio -serial null
+
+The above command will open up SSH and telnet ports which can be used to communicate with the guest. It will also pass in host entropy to the guest,
+allowing entropy to be available on boot.
+
+NOTE: When using OpenEmbedded it is recommended to use the runqemu script to boot QEMU. It will dynamically handle display options as well as advanced
+networking
+
+*** Booting 32-bit Buildroot Images
+
+Clone the Buildroot source code and cd into the directory.
+
+Generate the default config:
+
+ make qemu_riscv32_virt_defconfig
+
+Build the images
+
+ make
+
+Boot the images:
+
+ qemu-system-riscv32 \
+   -M virt -nographic \
+   -kernel output/images/fw_jump.elf \
+   -device loader,file=output/images/Image,addr=0x80400000 \
+   -append "root=/dev/vda ro" \
+   -drive file=output/images/rootfs.ext2,format=raw,id=hd0 \
+   -device virtio-blk-device,drive=hd0 \
+   -netdev user,id=net0 -device virtio-net-device,netdev=net0
+
+*** Booting 64-bit Buildroot Images
+
+Clone the Buildroot source code and cd into the directory.
+
+Generate the default config:
+
+ make qemu_riscv64_virt_defconfig
+
+Build the images
+
+ make
+
+Boot the images:
+
+ qemu-system-riscv64 \
+   -M virt -nographic \
+   -kernel output/images/fw_jump.elf \
+   -device loader,file=output/images/Image,addr=0x80200000 \
+   -append "root=/dev/vda ro" \
+   -drive file=output/images/rootfs.ext2,format=raw,id=hd0 \
+   -device virtio-blk-device,drive=hd0 \
+   -netdev user,id=net0 -device virtio-net-device,netdev=net0

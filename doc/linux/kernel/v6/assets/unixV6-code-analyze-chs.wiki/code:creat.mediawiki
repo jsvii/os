@@ -1,0 +1,74 @@
+===Source===
+<div class="wikiheadnote">
+*创建文件 的系统调用
+*从 用户态 传入2个参数 name, mode
+**name : 文件路径
+**mode : 
+***0 : 读模式
+***1 : 写模式
+***2 : 读写模式
+</div>
+
+5777 
+
+5778 /* 
+
+5779 &nbsp;* creat system call 
+
+5780 &nbsp;*/ 
+
+5781 creat() 
+
+5782 { 
+
+5783 &nbsp;&nbsp;&nbsp;&nbsp;register *ip; 
+
+5784 &nbsp;&nbsp;&nbsp;&nbsp;extern uchar; 
+
+5785 
+
+5786 &nbsp;&nbsp;&nbsp;&nbsp;ip = [[code:namei|namei]](&[[code:uchar|uchar]], 1); 
+
+<blockquote>
+*ip 指向 文件路径name 对应的 文件inode块
+</blockquote>
+5787 &nbsp;&nbsp;&nbsp;&nbsp;if(ip == NULL) { 
+
+5788 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_error]]) 
+
+5789 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+5790 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ip = [[code:maknode|maknode]]([[code:user|u.u_arg]][1]&07777&(~ISVTX)); 
+
+<blockquote>
+*创建INODE，并链入父目录
+*标志位强制清 ISVTX，定义参看[[File:inode.h|inode.h]]
+</blockquote>
+5791 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (ip==NULL) 
+
+5792 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return; 
+
+5793 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:open1|open1]](ip, FWRITE, 2); 
+
+5794 &nbsp;&nbsp;&nbsp;&nbsp;} else
+
+<blockquote>
+*LIONS源代码原文为
+<code>
+5794     } 
+
+</code>
+疑为笔误
+</blockquote>
+5795 &nbsp;&nbsp;&nbsp;&nbsp;[[code:open1|open1]](ip, FWRITE, 1); 
+
+5796 } 
+
+5797 /* ------------------------- */ 
+
+
+
+===Param===
+:(creat = 8.)
+:<b>sys creat; name; mode</b>
+:(file descriptor in r0)

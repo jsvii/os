@@ -1,0 +1,52 @@
+* apt
+
+
+** 源有地址
+
+如 ~focal~ , ~bionic~ 等
+
+#+BEGIN_SRC bash
+[DIR] 12.04.5/                2019-03-12 05:16    -   Ubuntu 12.04.5 LTS (Precise Pangolin)
+[DIR] 12.04/                  2019-03-12 05:16    -   Ubuntu 12.04.5 LTS (Precise Pangolin)
+[DIR] 14.04.6/                2019-03-07 15:07    -   Ubuntu 14.04.6 LTS (Trusty Tahr)
+[DIR] 14.04/                  2019-03-07 15:07    -   Ubuntu 14.04.6 LTS (Trusty Tahr)
+[DIR] 16.04.6/                2020-08-13 16:09    -   Ubuntu 16.04.7 LTS (Xenial Xerus)
+[DIR] 16.04.7/                2020-08-13 16:09    -   Ubuntu 16.04.7 LTS (Xenial Xerus)
+[DIR] 16.04/                  2020-08-13 16:09    -   Ubuntu 16.04.7 LTS (Xenial Xerus)
+[DIR] 18.04.4/                2020-08-13 15:39    -   Ubuntu 18.04.5 LTS (Bionic Beaver)
+[DIR] 18.04.5/                2020-08-13 15:39    -   Ubuntu 18.04.5 LTS (Bionic Beaver)
+[DIR] 18.04/                  2020-08-13 15:39    -   Ubuntu 18.04.5 LTS (Bionic Beaver)
+[DIR] 19.10/                  2019-10-17 14:39    -   Ubuntu 19.10 (Eoan Ermine)
+[DIR] 20.04.1/                2020-08-07 09:02    -   Ubuntu 20.04.1 LTS (Focal Fossa)
+[DIR] 20.04/                  2020-08-07 09:02    -   Ubuntu 20.04.1 LTS (Focal Fossa)
+[DIR] bionic/                 2020-08-13 15:39    -   Ubuntu 18.04.5 LTS (Bionic Beaver)
+[DIR] eoan/                   2019-10-17 14:39    -   Ubuntu 19.10 (Eoan Ermine)
+[DIR] focal/                  2020-08-07 09:02    -   Ubuntu 20.04.1 LTS (Focal Fossa)
+[DIR] precise/                2019-03-12 05:16    -   Ubuntu 12.04.5 LTS (Precise Pangolin)
+[DIR] trusty/                 2019-03-07 15:07    -   Ubuntu 14.04.6 LTS (Trusty Tahr)
+[DIR] xenial/                 2020-08-13 16:09    -   Ubuntu 16.04.7 LTS (Xenial Xerus)
+#+END_SRC
+
+#+BEGIN_SRC bash
+deb http://mirrors.163.com/ubuntu/ bionic main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ bionic-security main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ bionic-updates main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ bionic-proposed main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ bionic-backports main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ bionic main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ bionic-security main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ bionic-updates main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ bionic-proposed main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ bionic-backports main restricted universe multiverse
+#+END_SRC
+
+#+BEGIN_SRC bash
+deb http://mirrors.163.com/ubuntu/ focal main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ focal-security main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ focal-updates main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ focal-backports main restricted universe multiverse
+# deb-src http://mirrors.163.com/ubuntu/ focal main restricted universe multiverse
+# deb-src http://mirrors.163.com/ubuntu/ focal-security main restricted universe multiverse
+# deb-src http://mirrors.163.com/ubuntu/ focal-updates main restricted universe multiverse
+# deb-src http://mirrors.163.com/ubuntu/ focal-backports main restricted universe multiverse
+#+END_SRC

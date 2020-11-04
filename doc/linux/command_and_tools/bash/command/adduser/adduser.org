@@ -1,0 +1,20 @@
+* adduser
+
+useradd
+
+
+#+BEGIN_SRC shell
+# By default ‘useradd‘ command creates a user’s home directory under /home directory with username.
+# 默认是会新建个home directory的，也可以 -d 显式指定目录
+useradd -d /data/projects anusha
+
+# 添加到组
+useradd -G admins,webadmin,developers tecmint
+
+
+# 添加user后修改密码
+password emacstest
+# hello,world!
+
+sudo useradd –G new_group user_name
+#+END_SRC

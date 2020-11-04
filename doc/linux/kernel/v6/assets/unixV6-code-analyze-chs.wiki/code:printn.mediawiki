@@ -1,0 +1,41 @@
+===Source===
+<div class="wikiheadnote">
+*输出给定数字在给定进制下的表示
+*输入两个参数n,b
+**n : 给定的数字
+**b : 进制
+</div>
+
+2365
+
+2366  /*
+
+2367 &nbsp;* Print an unsigned integer in base b.
+
+2368 &nbsp;*/
+
+2369 printn(n, b)
+
+2370 {
+
+2371 &nbsp;&nbsp;&nbsp;&nbsp;register a;
+
+2372
+
+2373 &nbsp;&nbsp;&nbsp;&nbsp;if(a = [[code:ldiv|ldiv]](n, b))
+
+2374 &nbsp;&nbsp;&nbsp;&nbsp;printn(a, b);
+
+2375 &nbsp;&nbsp;&nbsp;&nbsp;[[code:putchar|putchar]]([[code:lrem|lrem]](n, b) + '0');
+
+<blockquote>
++ '0' 操作将数字转换为相应ACSII码
+</blockquote>
+2376 }
+
+2377  /* ------------------------- */
+
+
+
+===Caller===
+*[[code:printf]]

@@ -1,0 +1,153 @@
+* s 命令
+
+** syntax
+
+文本替换命令非常常见，其格式如下
+
+#+BEGIN_SRC bash
+[address1[,address2]]s/pattern/replacement/[flags]
+#+END_SRC
+
+#+BEGIN_SRC bash
+s/regexp/replacement/[flags]
+#+END_SRC
+
+
+#+BEGIN_SRC bash
+$ sed 's/,/ |/' books.txt
+1) Storm of Swords | George R. R. Martin, 1216
+2) The Two Towers | J. R. R. Tolkien, 352
+3) The Alchemist | Paulo Coelho, 197
+4) The Fellowship of the Ring | J. R. R. Tolkien, 432
+5) The Pilgrimage | Paulo Coelho, 288
+6) A Game of Thrones | George R. R. Martin, 864
+#+END_SRC
+
+是不是觉得哪里不对？相信你已经发现，每一行的第二个逗号都没有被替换，只有第一个被替换了，确实如此，在SED中，使用替换命令的时候默认只会对第一个匹配的位置进行替换。使用 ~g~ 选项告诉SED对所有内容进行替换：
+
+#+BEGIN_SRC bash
+$ sed 's/,/ | /g' books.txt
+1) Storm of Swords |  George R. R. Martin |  1216
+2) The Two Towers |  J. R. R. Tolkien |  352
+3) The Alchemist |  Paulo Coelho |  197
+4) The Fellowship of the Ring |  J. R. R. Tolkien |  432
+5) The Pilgrimage |  Paulo Coelho |  288
+6) A Game of Thrones |  George R. R. Martin |  864
+#+END_SRC
+
+> 如果对匹配模式（或地址范围）的行进行替换，则只需要在~s~命令前添加地址即可。比如只替换匹配*The Pilgrimage*的行：~ sed '/The Pilgrimage/ s/,/ | /g' books.txt~
+
+还有一些其它的选项，这里就简单的描述一下，不在展开讲解
+
+- ~数字n~: 只替换第n次匹配，比如 ~sed 's/,/ | /2' books.txt~ ，只替换每行中第二个逗号
+
+- ~p~ ：如果s命令得以执行，就输出这一行，比如 ~sed -n 's/Paulo Coelho/PAULO COELHO/p' books.txt~
+
+- ~w~ ：存储改变的行到文件，比如 ~sed -n 's/Paulo Coelho/PAULO COELHO/w junk.txt' books.txt~
+
+- ~i~ ：匹配时忽略大小写，比如 ~sed  -n 's/pAuLo CoElHo/PAULO COELHO/pi' books.txt~
+
+如果要替换的内容中包含 ~/~，这个要添加转义操作符。
+
+#+BEGIN_SRC bash
+$ echo "/bin/sed" | sed 's/\/bin\/sed/\/home\/mylxsw\/src\/sed\/sed-4.2.2\/sed/'
+/home/mylxsw/src/sed/sed-4.2.2/sed
+#+END_SRC
+
+上面的命令中，我们使用~\~对~/~进行了转义，不过表达式已经看起来非常难看了，在SED中还可以使用~|~，~@~，~^~，~!~作为命令的分隔符，所以，下面的几个命令和上面的是等价的
+
+#+BEGIN_SRC bash
+echo "/bin/sed" | sed 's|/bin/sed|/mylxsw/mylxsw/src/sed/sed-4.2.2/sed|'
+echo "/bin/sed" | sed 's@/bin/sed@/home/mylxsw/src/sed/sed-4.2.2/sed@'
+echo "/bin/sed" | sed 's^/bin/sed^/home/mylxsw/src/sed/sed-4.2.2/sed^'
+echo "/bin/sed" | sed 's!/bin/sed!/home/mylxsw/src/sed/sed-4.2.2/sed!'
+#+END_SRC
+
+** flags
+
+
+The s command can be followed by zero or more of the following flags:
+
+*** g
+
+Apply the replacement to all matches to the regexp, not just the first.
+全局替换，而非仅替换第一个出现的。
+
+*** number
+
+Only replace the numberth match of the regexp.
+
+interaction in s command Note: the POSIX standard does not specify what should happen when you mix the g and number modifiers, and currently there is no widely agreed upon meaning across sed implementations. For GNU sed, the interaction is defined to be: ignore matches before the numberth, and then match and replace all matches from the numberth on.
+
+*** p
+
+If the substitution was made, then print the new pattern space.
+
+Note: when both the p and e options are specified, the relative ordering of the two produces very different results. In general, ep (evaluate then print) is what you want, but operating the other way round can be useful for debugging. For this reason, the current version of GNU sed interprets specially the presence of p options both before and after e, printing the pattern space before and after evaluation, while in general flags for the s command show their effect just once. This behavior, although documented, might change in future versions.
+
+*** w filename
+
+If the substitution was made, then write out the result to the named file. As a GNU sed extension, two special values of filename are supported: /dev/stderr, which writes the result to the standard error, and /dev/stdout, which writes to the standard output.3
+
+*** e
+
+This command allows one to pipe input from a shell command into pattern space. If a substitution was made, the command that is found in pattern space is executed and pattern space is replaced with its output. A trailing newline is suppressed; results are undefined if the command to be executed contains a NUL character. This is a GNU sed extension.
+
+*** I i
+
+ The I modifier to regular-expression matching is a GNU extension which makes sed match regexp in a case-insensitive manner.
+
+*** M m
+
+m 代表 multi-line 模式。它要求 ~^~ 和 ~$~ 去匹配每个新一行的 empty string
+
+The M modifier to regular-expression matching is a GNU sed extension which directs GNU sed to match the regular expression in multi-line mode. The modifier causes ^ and $ to match respectively (in addition to the normal behavior) the empty string after a newline, and the empty string before a newline. There are special character sequences (\` and \') which always match the beginning or the end of the buffer. In addition, the period character does not match a new-line character in multi-line mode.
+
+*** number
+
+Only replace the numberth match of the regexp.
+
+这个是flag是，用match中的内容来XXXXXX
+
+interaction in s command Note: the POSIX standard does not specify what should happen when you mix the g and number modifiers, and currently there is no widely agreed upon meaning across sed implementations. For GNU sed, the interaction is defined to be: ignore matches before the numberth, and then match and replace all matches from the numberth on.
+
+#+BEGIN_SRC bash
+# 替换第2个出现的b
+echo 'abab' | sed 's/b/x/2'
+# abax
+#+END_SRC
+
+
+** 对flags的解释案例
+
+*** 对 m g 的理解
+
+输入2次 x, 因为 ~.~ 也匹配换行符
+
+#+BEGIN_SRC bash
+$ seq 6 | sed -n 'N;N;s/.*/x/p'
+x
+x
+#+END_SRC
+
+输入2次 x, 但多了个m，第一次s后就退出
+
+#+BEGIN_SRC bash
+seq 6 | sed -n 'N;N;s/.*/x/mp'
+x
+2
+3
+x
+5
+6
+#+END_SRC
+
+#+BEGIN_SRC bash
+seq 21 | sed -n 'N;N;s/.*/x/mgp'
+x
+x
+x
+x
+x
+x
+#+END_SRC

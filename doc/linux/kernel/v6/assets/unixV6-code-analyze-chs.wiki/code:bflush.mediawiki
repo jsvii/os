@@ -1,0 +1,77 @@
+===Source===
+<div class= "wikiheadnote">
+*将带有延迟写标识且对应于指定设备(或NODEV)的缓存块写回该设备
+*传入1个参数dev,为指定设备号
+</div>
+
+5223
+
+5224 /* make sure all write-behind blocks
+
+5225 &nbsp;* on dev (or NODEV for all)
+
+5226 &nbsp;* are flushed out.
+
+5227 &nbsp;* (from umount and update)
+
+5228 &nbsp;*/
+
+5229 bflush(dev)
+
+5230 {
+
+5231 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct buf|struct buf]] *[[code:struct buf|bp]];
+
+5232
+
+5233 loop:
+
+5234 &nbsp;&nbsp;&nbsp;&nbsp;[[code:spl|spl]]6();
+
+<blockquote>
+*[[关中断]]
+</blockquote>
+5235 &nbsp;&nbsp;&nbsp;&nbsp;for ([[code:struct buf|bp]] = [[自由队列|bfreelist]].av_forw; [[code:struct buf|bp]] != &[[自由队列|bfreelist]];
+
+5236 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct buf|bp]] = [[code:struct buf|bp]]->av_forw) {
+
+5237 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  if ([[code:struct buf|bp]]->b_flags&B_DELWRI &&
+
+5238 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; (dev == NODEV<nowiki>||</nowiki>dev == [[code:struct buf|bp]]->b_dev)) {
+
+<blockquote>
+*遍历[[自由队列]],寻找带有延迟写标识,且其对应设备号为NODEV或是dev(函数传入参数)的缓存块
+</blockquote>
+5239 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:struct buf|bp]]->b_flags =<nowiki>|</nowiki> B_ASYNC;
+
+5240 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:notavil|notavil]](bp);
+
+5241 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:bwrite|bwrite]](bp);
+
+<blockquote>
+*对于找到的缓存块,置异步写标识
+*将其从自由队列中取出
+*然后写回相应设备
+</blockquote>
+5242 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  goto loop;
+
+5243 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  }
+
+5244 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+5245 &nbsp;&nbsp;&nbsp;&nbsp;[[code:spl|spl]]0();
+
+<blockquote>
+*[[开中断]]
+</blockquote>
+5246 }
+
+5247 /* ------------------------- */
+
+
+
+===Ref===
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:update]]

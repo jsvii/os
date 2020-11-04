@@ -1,0 +1,7 @@
+->ttrcsr ， ->klrcsr → 接收器状态寄存器<br/>
+->ttrbuf ， ->klrbuf → 接收器数据缓存寄存器<br/>
+->tttcsr ， ->kltcsr → 发送器状态寄存器<br/>
+->tttbuf ， ->kltbuf → 发送器数据缓存寄存器<br/>
+*使用了[[编程技巧#无名结构]]
+*无名结构 定义在 [[file:tty.c|tty.c]] ，[[file:kl.c|kl.c]]
+*寄存器 定义参看 [[字符设备管理]]

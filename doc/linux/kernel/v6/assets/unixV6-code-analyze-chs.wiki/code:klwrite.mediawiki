@@ -1,0 +1,19 @@
+
+===Source===
+<div class="wikiheadnote">
+*kl接口的写函数
+*传入1个参数:设备号
+</div>
+
+8066 klwrite(dev)
+
+8067 { [[code:ttwrite|ttwrite]](&[[code:kl11|kl11]][dev.[[file:conf.h|d_minor]]<nowiki>]</nowiki>);
+
+8068 }
+
+8069 /* ------------------------- */
+
+
+
+===Caller===
+*[[code:cdevsw]]

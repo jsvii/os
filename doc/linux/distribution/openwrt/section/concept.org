@@ -1,0 +1,50 @@
+* 概念
+
+
+** main
+
+
+** network interface
+
+就是指网络层对外接口，是偏软件层面的
+
+
+默认有：
+
+- LAN 局域网接口
+
+- WAN 广域网接口 对应的就是路由器对外网线
+
+- WWAN 接口 供wifi接外网的
+
+*** 注意
+
+这个配置项不要强制一一对应到软件层面，它更多的是openwrt用以给你配置的选项
+
+*** interface
+
+https://openwrt.org/docs/guide-developer/networking/network.interfaces
+
+- Physical Network Interfaces 物理网络接口
+
+- Virtual Network Interfaces 虚拟网络接口
+
+** network
+
+在 network -> wireless 中，使用radio 可以添加新网络
+
+
+
+默认Generic MAC80211 802.11bgn
+
+*** WAN
+
+LAN stands for local area network
+
+***  WAN
+
+WAN stands for wide area network
+
+*** WWAN
+
+Wireless WAN - Wireless wide area network (WWAN), is a form of wireless network.

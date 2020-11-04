@@ -1,0 +1,33 @@
+* cd 与 pushd & popd & dirs 三架马车
+
+** cd
+
+ =cd -= 返回到前一个目录
+
+** pushd pod dirs troika
+
+  - pushd：切换到作为参数的目录，并把原目录和当前目录压入到一个虚拟的堆栈中，如果不指定参数，则会回到前一个目录，并把堆栈中最近的两个目录作交换
+
+  - popd： 弹出堆栈中最近的目录
+
+  - dirs: 列出当前堆栈中保存的目录列表
+
+***  pushd +n:
+
+   n是一个数字,有此参数时，是切换到堆栈中的第n个目录,并把此目录 _以堆栈循环的方式_ 推到堆栈的顶部，需要注意: 堆栈从第0个开始数起
+
+*** dirs
+
++n -n 在dirs的centos、opensuse实现中，都不可用
+
+  +n 不明白 Displays the nth entry counting from the left of the list shown by dirs when invoked without options, starting with zero.
+
+  -n 不明白 Displays the nth entry counting from the right of the list shown by dirs when  invoked  without  options,  starting  with zero.
+
+  -c 清空 Clears the directory stack by deleting all of the entries.
+
+  -l 长显示，无波浪线表线home。 roduces a longer listing; the default listing format uses a tilde to denote the home directory.
+
+  -p 打印一个一行 Print the directory stack with one entry per line.
+
+  -v Print the directory stack with one entry per line, prefixing each entry with its index in the stack.

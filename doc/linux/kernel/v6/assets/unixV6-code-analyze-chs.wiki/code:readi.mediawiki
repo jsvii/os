@@ -1,0 +1,192 @@
+===Source===
+<div class="wikiheadnote">
+*读取文件
+*输入参数
+**aip : 文件对应的[[code:struct inode|INODE结构]]
+**[[code:user|u_segflg]] : 目标地址的地址空间
+**[[code:user|u_base]] : 目标地址
+**[[code:user|u_offset]] : 文件偏移量(字节)
+**[[code:user|u_count]] : 欲读取的字节数
+*运行时修正以下参数
+**[[code:user|u.u_base]]
+**[[code:user|u.u_offset]]
+**[[code:user|u.u_count]]
+</div>
+
+<blockquote>
+*该函数处理了两种情况，普通INODE 和 块设备装载INODE(参看[[文件系统#装载文件系统]])
+**普通INODE，对块的处理：将 逻辑块号 转化为 物理块号
+**块设备装载INODE，对块的处理：对于块设备来说，逻辑块号=物理块号
+</blockquote>
+6210 
+
+6211 /* 
+
+6212 &nbsp;* Read the file corresponding to 
+
+6213 &nbsp;* the inode pointed at by the argument. 
+
+6214 &nbsp;* the actual read arguments are found 
+
+6215 &nbsp;* in the variables: 
+
+6216 &nbsp;* u_base core address for destination 
+
+6217 &nbsp;* u_offset byte offset in file 
+
+6218 &nbsp;* u_count number of bytes to read 
+
+6219 &nbsp;* u_segflg read to kernel/user 
+
+6220 &nbsp;*/ 
+
+6221 readi(aip) 
+
+6222 [[code:struct inode|struct inode]] *aip; 
+
+6223 { 
+
+6224 &nbsp;&nbsp;&nbsp;&nbsp;int *bp; 
+
+6225 &nbsp;&nbsp;&nbsp;&nbsp;int lbn, bn, on; 
+
+6226 &nbsp;&nbsp;&nbsp;&nbsp;register dn, n; 
+
+6227 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct inode|struct inode]] *ip; 
+
+6228 
+
+6229 &nbsp;&nbsp;&nbsp;&nbsp;ip = aip; 
+
+6230 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_count]] == 0) 
+
+6231 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+<blockquote>
+*欲读取字节数为0，函数直接返回
+</blockquote>
+6232 &nbsp;&nbsp;&nbsp;&nbsp;ip->i_flag <nowiki>=|</nowiki> IACC; 
+
+<blockquote>
+*标志 该INODE块已被存取
+</blockquote>
+6233 &nbsp;&nbsp;&nbsp;&nbsp;if((ip->i_mode&IFMT) == IFCHR) { 
+
+6234 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;(*[[code:cdevsw|cdevsw]][ip->i_addr[0][[skill:.d_major|.d_major]] ].d_read)(ip->i_addr[0]); 
+
+6235 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+6236 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*处理 字符设备装载INODE(参看[[文件系统#装载文件系统]])
+</blockquote>
+6237 
+
+6238 &nbsp;&nbsp;&nbsp;&nbsp;do { 
+
+6239 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;lbn = bn = [[code:lshift|lshift]]([[code:user|u.u_offset]], -9); 
+
+<blockquote>
+*u.u_offset右移9位，相当于u.u_offset/512，计算需要读取的逻辑块号
+*u.u_offset值 不改变
+*lbn,bn 赋值为逻辑块号
+</blockquote>
+6240 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;on = [[code:user|u.u_offset]][1] & 0777; 
+
+<blockquote>
+*on 赋值为 块内偏移量
+</blockquote>
+6241 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n = [[code:min|min]](512-on, [[code:user|u.u_count]]); 
+
+<blockquote>
+*n 置为 该块内需读取的字节数 (= 512-块内偏移量 与 需读取字节 的最小值)
+</blockquote>
+6242 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if((ip->i_mode&IFMT) != IFBLK) { 
+
+<blockquote>
+*若 INODE 不为 块设备装载INODE(参看[[文件系统#装载文件系统]]),...
+*此处用法参看[[文件系统#inode类型]]
+</blockquote>
+6243 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   dn = [[code:dpcmp|dpcmp]](ip->i_size0&0377, ip->i_size1, 
+
+6244 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; u.u_offset[0], u.u_offset[1]); 
+
+6245 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(dn &lt;= 0) 
+
+6246 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  return; 
+
+<blockquote>
+*比较 文件大小 和 文件偏移量(u_offset)
+*若 文件偏移量 > 文件大小 ，则函数返回
+*否则，dn = min{ 512 , 文件大小-文件偏移量}
+</blockquote>
+6247 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   n = [[code:min|min]](n, dn); 
+
+<blockquote>
+*n 置为 文件当前块需读字节(= min(该块内需读取的字节数 , 文件剩余字节数))
+</blockquote>
+6248 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if ((bn = [[code:bmap|bmap]](ip, lbn)) == 0) 
+
+6249 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  return; 
+
+<blockquote>
+*bn 置为 需读取块在物理设备对应的块号
+</blockquote>
+6250 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   dn = ip->i_dev; 
+
+<blockquote>
+*dn 置为 需读取块所在的物理设备号
+</blockquote>
+6251 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} else { 
+
+6252 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   dn = ip->i_addr[0]; 
+
+6253 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   rablock = bn+1; 
+
+6254 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 ip 为 块设备装载INODE，则
+**获取 设备号dn (参看[[文件系统#装载文件系统]])
+**bn直接作为物理块号(对于设备，逻辑块号=物理块号，不需转换)
+**设置rablock
+</blockquote>
+6255 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (ip->i_lastr+1 == lbn) 
+
+6256 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   bp = [[code:breada|breada]](dn, bn, rablock); 
+
+6257 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;else 
+
+6258 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   bp = [[code:bread|bread]](dn, bn); 
+
+<blockquote>
+*若为顺序读，则用使用预读方式读取块
+</blockquote>
+6259 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ip->i_lastr = lbn; 
+
+<blockquote>
+*更新INODE最后一个读取的块号
+</blockquote>
+6260 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:iomove|iomove]](bp, on, n, B_READ); 
+
+<blockquote>
+*从读取的块里读出相应的字节
+</blockquote>
+6261 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:brelse|brelse]](bp); 
+
+6262 &nbsp;&nbsp;&nbsp;&nbsp;} while(u.u_error==0 && u.u_count!=0); 
+
+6263 } 
+
+6264 /* ------------------------- */ 
+
+
+===Ref===
+*[[文件系统]]
+
+===Caller===
+*[[code:exec]]
+*[[code:xalloc]]
+*[[code:rdwr]]
+*[[code:readp]]

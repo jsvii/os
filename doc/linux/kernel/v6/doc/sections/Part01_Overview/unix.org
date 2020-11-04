@@ -1,0 +1,158 @@
+* unix files
+
+** dir
+
+47 个源文件中，包括 3 个.s 的汇编语言文件和 14 个.h、  47个.c 的 C 语言文件。
+
+*** 系统启动
+
+目录 =/usr/sys/conf/=:
+
+#+BEGIN_SRC C
+low.s     //中断向量表，由 mkconf 根据不同硬件自动生成(mkconf.c)
+m40.s1     //m40.s 是针对 11/40 处理机的汇编语言支持例程文件
+data.s
+#+END_SRC
+
+
+*** 进程管理和调度
+
+目录 =/usr/sys/=:
+
+#+BEGIN_SRC C
+param.h
+user.h
+text.h
+seg.h
+reg.h
+proc.h
+#+END_SRC
+
+目录 =/usr/sys/ken/= :
+
+#+BEGIN_SRC C
+main.c
+slp.c
+text.c
+bio.c //交换函数 swap
+clock.c //进程优先级调整器
+#+END_SRC
+
+
+*** 内存管理
+
+目录 =/usr/sys/ken/=:
+
+#+BEGIN_SRC C
+malloc.c
+#+END_SRC
+
+*** 信号机制
+
+目录 =/usr/sys/ken/=:
+
+#+BEGIN_SRC C
+m40.s
+sig.c
+#+END_SRC
+
+*** 中断和自陷处理
+
+目录 =/usr/sys/conf/=:
+
+#+BEGIN_SRC C
+m40.s
+#+END_SRC
+
+目录 =/usr/sys/ken/=:
+
+#+BEGIN_SRC C
+clock.c
+trap.c
+#+END_SRC
+
+*** 文件系统和管道
+
+目录 =/usr/sys/=:
+
+#+BEGIN_SRC C
+filesys.h
+file.h
+inode.h
+ino.h
+buf.h
+systm.h
+#+END_SRC
+
+目录 =/usr/sys/ken/=:
+
+#+BEGIN_SRC C
+alloc.c
+bio.c
+fio.c
+iget.c
+nami.c
+rdwri.c
+subr.c
+sys2.c    //文件系统相关的系统调用
+sys3.c    //文件系统相关的系统调用
+pipe.c
+#+END_SRC
+
+*** 系统调用
+
+目录 =/usr/sys/=:
+
+#+BEGIN_SRC C
+user.h    //错误码定义
+#+END_SRC
+
+目录 =/usr/sys/ken/=:
+
+#+BEGIN_SRC C
+sys1.c
+sys2.c
+sys3.c
+sys4.c
+sysent.c
+trap.c //系统调用本身也是一种自陷
+#+END_SRC
+
+*** I/O 设备管理
+
+目录 =/usr/sys/= :
+
+#+BEGIN_SRC C
+buf.h
+conf.h
+tty.h
+systm.h
+#+END_SRC
+
+目录 =/usr/sys/dmr/= : //该目录下都是设备驱动程序代码
+
+#+BEGIN_SRC C
+kl.c //电传接口驱动
+tty.c //电传终端驱动
+rk.c //磁盘驱动
+pc.c //纸带打孔机驱动
+lp.c //行打印机驱动
+mem.c //内存字符设备驱动
+partab.c
+#+END_SRC
+
+目录 =/usr/sys/ken/= :
+
+#+BEGIN_SRC C
+prf.c
+#+END_SRC
+
+*** 公共工具函数及移植(utility function & transplant)
+
+目录 =/usr/sys/conf/= :
+
+#+BEGIN_SRC C
+m40.s //包含很多常用函数如 ldiv、copyseg 等
+mkconf.c //针对不同的硬件，生成不同的驱动
+sysfix.c //用于在不同的硬件间移植系统
+#+END_SRC

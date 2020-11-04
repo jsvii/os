@@ -1,0 +1,19 @@
+
+===Source===
+<div class="wikiheadnote">
+*kl接口的读函数
+*传入1个参数:设备号
+</div>
+
+8062 klread(dev)
+
+8063 { [[code:ttread|ttread]](&[[code:kl11|kl11]][dev[[skill:.d_minor|.d_minor]]<nowiki>]</nowiki>);
+
+8064 }
+
+8065 /* ------------------------- */
+
+
+
+===Caller===
+*[[code:cdevsw]]

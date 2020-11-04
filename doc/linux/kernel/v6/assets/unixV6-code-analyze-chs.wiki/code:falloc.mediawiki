@@ -1,0 +1,162 @@
+===Source===
+<div class="wikiheadnote">
+*在[[code:struct file|file[] ]] 中分配文件结构[[code:struct file|struct file]]
+*在[[code:user|u.u_ofile]] 中 分配 文件打开结构
+**置[[skill:u.u_ar0|u.u_ar0[R0]]]为i，[[code:user|u.u_ofile[i]]]指向分配的文件打开结构
+*返回值
+**若无法分配，则返回 NULL
+**否则，返回分配的文件结构
+</div>
+
+6838 /*
+
+6839 &nbsp;* Allocate a user file descriptor 
+
+6840 &nbsp;* and a file structure. 
+
+6841 &nbsp;* Initialize the descriptor 
+
+6842 &nbsp;* to point at the file structure. 
+
+6843 &nbsp;* 
+
+6844 &nbsp;* no file -- if there are no available 
+
+6845 &nbsp;* file structures. 
+
+6846 &nbsp;*/ 
+
+6847 falloc() 
+
+6848 { 
+
+6849 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct file|struct file]] *fp; 
+
+6850 &nbsp;&nbsp;&nbsp;&nbsp;register i; 
+
+6851 
+
+6852 &nbsp;&nbsp;&nbsp;&nbsp;if ((i = [[code:ufalloc|ufalloc]]()) &lt; 0) 
+
+6853 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return(NULL); 
+
+<blockquote>
+*在[[code:user|u.u_ofile]] 中 指向打开文件结构的指针
+**若分配失败，则返回NULL
+**否则 i 置为分配单元在[[code:user|u.u_ofile]]的位置
+同时 置[[skill:u.u_ar0|u.u_ar0[R0]]]为i
+[[code:user|u.u_ofile[i]]]指向分配的文件打开结构
+</blockquote>
+6854 &nbsp;&nbsp;&nbsp;&nbsp;for (fp = &[[code:struct file|file]][0]; fp < &[[code:struct file|file]][NFILE]; fp++) 
+
+6855 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (fp->f_count==0) { 
+
+6856 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:user|u.u_ofile]][i] = fp; 
+
+6857 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   fp->f_count++; 
+
+6858 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   fp->f_offset[0] = 0; 
+
+6859 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   fp->f_offset[1] = 0; 
+
+6860 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return(fp); 
+
+6861 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*遍历[[code:struct file|file]]数组，寻找空闲的元素
+*若找到，则
+**[[code:user|u.u_ofile]][i] 指向 fp
+**初始化 fp 的参数，参看[[code:struct file|struct file]]
+</blockquote>
+6862 &nbsp;&nbsp;&nbsp;&nbsp;[[code:printf|printf]]("no file
+\n"); 
+
+6863 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = ENFILE; 
+
+6864 &nbsp;&nbsp;&nbsp;&nbsp;return(NULL); 
+
+<blockquote>
+*若没找到，则
+**打印错误信息
+**抛出错误，[[错误代码]] : ENFILE
+**返回NULL
+</blockquote>
+6865 } 
+
+6866 /* ------------------------- */ 
+
+6867 
+
+6868 
+
+6869 
+
+6870 
+
+6871 
+
+6872 
+
+6873 
+
+6874 
+
+6875 
+
+6876 
+
+6877 
+
+6878 
+
+6879 
+
+6880 
+
+6881 
+
+6882 
+
+6883 
+
+6884 
+
+6885 
+
+6886 
+
+6887 
+
+6888 
+
+6889 
+
+6890 
+
+6891 
+
+6892 
+
+6893 
+
+6894 
+
+6895 
+
+6896 
+
+6897 
+
+6898 
+
+6899 
+
+
+
+===Ref===
+*[[内存打开文件结构]]
+
+===Caller===
+*[[code:open1]]
+*[[code:pipe]]

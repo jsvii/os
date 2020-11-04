@@ -1,0 +1,103 @@
+* signal 信号
+
+** signal方法
+
+  - 较为原始的api
+
+  - 兼容性不好，可移植性差
+
+#+BEGIN_SRC C
+typedef void (*__sighandler_t) (int);
+extern __sighandler_t signal (int __sig, __sighandler_t __handler)
+#+END_SRC
+
+
+** 不同的signal
+
+#+BEGIN_SRC C
+//bits/signum.h
+/* Signals.  */
+#define	SIGHUP		1	/* Hangup (POSIX).  */
+#define	SIGINT		2	/* Interrupt (ANSI).  */
+#define	SIGQUIT		3	/* Quit (POSIX).  */
+#define	SIGILL		4	/* Illegal instruction (ANSI).  */
+#define	SIGTRAP		5	/* Trace trap (POSIX).  */
+#define	SIGABRT		6	/* Abort (ANSI).  */
+#define	SIGIOT		6	/* IOT trap (4.2 BSD).  */
+#define	SIGBUS		7	/* BUS error (4.2 BSD).  */
+#define	SIGFPE		8	/* Floating-point exception (ANSI).  */
+#define	SIGKILL		9	/* Kill, unblockable (POSIX).  */
+#define	SIGUSR1		10	/* User-defined signal 1 (POSIX).  */
+#define	SIGSEGV		11	/* Segmentation violation (ANSI).  */
+#define	SIGUSR2		12	/* User-defined signal 2 (POSIX).  */
+#define	SIGPIPE		13	/* Broken pipe (POSIX).  */
+#define	SIGALRM		14	/* Alarm clock (POSIX).  */
+#define	SIGTERM		15	/* Termination (ANSI).  */
+#define	SIGSTKFLT	16	/* Stack fault.  */
+#define	SIGCLD		SIGCHLD	/* Same as SIGCHLD (System V).  */
+#define	SIGCHLD		17	/* Child status has changed (POSIX).  */
+#define	SIGCONT		18	/* Continue (POSIX).  */
+#define	SIGSTOP		19	/* Stop, unblockable (POSIX).  */
+#define	SIGTSTP		20	/* Keyboard stop (POSIX).  */
+#define	SIGTTIN		21	/* Background read from tty (POSIX).  */
+#define	SIGTTOU		22	/* Background write to tty (POSIX).  */
+#define	SIGURG		23	/* Urgent condition on socket (4.2 BSD).  */
+#define	SIGXCPU		24	/* CPU limit exceeded (4.2 BSD).  */
+#define	SIGXFSZ		25	/* File size limit exceeded (4.2 BSD).  */
+#define	SIGVTALRM	26	/* Virtual alarm clock (4.2 BSD).  */
+#define	SIGPROF		27	/* Profiling alarm clock (4.2 BSD).  */
+#define	SIGWINCH	28	/* Window size change (4.3 BSD, Sun).  */
+#define	SIGPOLL		SIGIO	/* Pollable event occurred (System V).  */
+#define	SIGIO		29	/* I/O now possible (4.2 BSD).  */
+#define	SIGPWR		30	/* Power failure restart (System V).  */
+#define SIGSYS		31	/* Bad system call.  */
+#define SIGUNUSED	31
+#define	_NSIG		65	/* Biggest signal number + 1
+#+END_SRC
+
+**  sigaction
+
+#+BEGIN_SRC C
+extern int sigaction (int __sig, const struct sigaction *__restrict __act,
+                      struct sigaction *__restrict __oact) __THROW;
+#+END_SRC
+
+  - __sig 是要处理的信号
+
+  - __act 是sigaction结构，定义了信号类型的新行为
+
+  - __oact old action 一般为null，也就是0，如果不是null
+
+#+BEGIN_SRC C
+//* Structure describing the action to be taken when a signal arrives.  *//
+struct sigaction
+  {
+    void (*sa_handler)(int);
+    /* Additional set of signals to be blocked.  */
+    sigset_t sa_mask;
+
+    /* Special flags.  */
+    int sa_flags;
+    /* Restore handler.  */
+    void (*sa_restorer) (void);
+  };
+#+END_SRC
+
+
+
+** POSIX signal set operations.
+
+  - sigemptyset initializes the signal set given by set to empty, with all signals excluded from the set.初始化信号集set,将指定的信号集set清空，即set的值为0。
+
+  - sigfillset initializes set to full, including all signals. 初始化信号集set,将指定的信号集set全部置位，即set值为0x7FFFFFFF
+
+  - sigaddset 将信号signum对应于信号集set的那一位置位
+
+  - sigdelset add and delete respectively signal signum from set.  将信号signum对应于信号集set的那一位清零
+
+  - sigismember tests whether signum is a member of set. 查询信号signum是否在信号集中置位了。如果置位了，返回1，否则返回0
+
+为什么需要有这两个方法, 或者为什么经常使用下面这种方法。
+#+BEGIN_SRC C
+sigfillset(&sigaction.sa_mask)
+#+END_SRC

@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===JSR
+===Code===004RDD
+===Operation===(tmp) ← (dst) (tmp是处理机内部寄存器)<br/>↓(SP) ← reg (reg的值入栈)<br/>reg ← PC (PC的值传入reg)<br/>PC ← (tmp) (PC指向指定子程序地址)
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===程序控制跳转到指定子程序并进行现场保护 <br/>JSR执行过程中，(reg)送入堆栈，旧PC值送入reg，指定子程序地址送入PC，完成向子程序的控制转移<br/>[ [[遗留问题]] ]
+===Example===<p>JSR_R5,SBR<br/><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_instruction_Jsr_r5_sbr.png"/></p>

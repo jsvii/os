@@ -1,0 +1,11 @@
+* 参考资料
+
+** 网络相关
+
+  - route policy的资料  http://www.policyrouting.org/PolicyRoutingBook/ONLINE/TOC.html
+
+** linux学习
+
+  - http://linux.vbird.org/
+
+  - https://jvns.ca/ Julia Evans博客

@@ -1,0 +1,11 @@
+* wifi
+
+** centos 面板的小问题
+
+在面板之中 setting identity
+
+mac Address选择真实的网卡
+
+clone Address 写为需要重写的地址，切记
+
+

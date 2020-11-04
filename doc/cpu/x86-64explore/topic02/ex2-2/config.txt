@@ -1,0 +1,8 @@
+#uboot,0,c.img,63,1
+#setup,0,c.img,20,4
+
+boot,0,pdemo.img,0,1		
+setup,0,pdemo.img,20,4
+
+#c.img,0,\\.\g:,0,200
+

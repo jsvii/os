@@ -1,0 +1,78 @@
+#+TITLE: opensuse 系统配置检查表
+#+LANGUAGE: en
+#+OPTIONS: toc:nil h:4 html-postamble:nil html-preamble:t tex:t f:t
+#+OPTIONS: prop:("VERSION")
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+AUTHOR: Leo Zhang
+
+
+* 安装步骤
+
+  1. setction/install.org liveusb安装方法
+
+  1. network.org 网络设置
+
+* 工具
+
+  1. shell_tmux_guake.org
+
+    - zsh & oh-my-zsh
+
+    - tmux
+
+    - guake
+
+    - xshell
+
+  1. development-tools
+
+    - git
+
+    - node.js
+
+    - build essential
+
+    - golang
+
+    - sdcv
+
+
+* 出错
+
+  1. setction/crash.org
+
+
+#+BEGIN_COMMENT
+添加中国境内repo，添加一些其他的repo
+#+END_COMMENT
+#+INCLUDE: "./section/zypper.org" :minlevel 1
+
+#+BEGIN_COMMENT
+网络设置
+#+END_COMMENT
+#+INCLUDE: "./section/network.org" :minlevel 1
+
+#+BEGIN_COMMENT
+shell
+tmux
+#+END_COMMENT
+#+INCLUDE: "./section/shell_tmux.org" :minlevel 1
+
+#+BEGIN_COMMENT
+emacs 相关
+#+END_COMMENT
+#+INCLUDE: "./section/emacs.org" :minlevel 1
+
+#+BEGIN_COMMENT
+latex 相关
+#+END_COMMENT
+#+INCLUDE: "./section/latex.org" :minlevel 1
+
+#+BEGIN_COMMENT
+
+#+END_COMMENT
+#+INCLUDE: "./section/developtools.org" :minlevel 1
+
+
+
+

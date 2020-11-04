@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===BVC
+===Code===102000+ 偏移[offset]
+===Operation===PC ← PC + ( 2 * offset ) if V = 0
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===若标志位V未被置位，进行程序控制转移<br/>互补操作为[[pdp11:BVS|BVS]]
+===Example===无

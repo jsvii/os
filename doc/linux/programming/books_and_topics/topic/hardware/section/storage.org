@@ -1,0 +1,20 @@
+* 存储
+
+** m2
+
+*** 关键点
+
+  - M.2插槽有两种，金手指有两个缺口的Socket 2，金手指只有一个缺口的Socket 3
+
+  - SATA跟PCIE，这两个东西是指串行接口或者就是数据走的通道，有时候用SATA这个词指插槽，而这里的SATA指数据走的通道，目前的新设备普遍都是SATA3接口了，但是SATA3是向下兼容SATA2跟SATA1的
+
+  - PCI-E跟SATA3简单说就是数据走的“路”，PCI-E就像是特别宽大的路，数据可以走的特别快，而SATA3与之相比更像是一条崎岖的小路，数据走的特别慢，但是CPU内部就那么大一点，修不了特别多的大路，所以PCI-E通道也就仅有那么几条
+
+  - SATA的插槽只能走SATA3的通道，而M.2的插槽上文我们说了分为Socket 2跟Socket 3，M.2（Socket 2）的固态可以走SATA3或者PCI-E 3.0×2通道(就是两条PCI-E)，而M.2（Socket 3）的固态则可以走PCI-E 3.0×4通道
+
+  - NVM Express（NVMe），或称非易失性内存主机控制器接口规范(Non-Volatile Memory express),是一个逻辑设备接口规范。他是与AHCI类似的、基于设备逻辑接口的总线传输协议规范（相当于通讯协议中的应用层），用于访问通过PCI-Express（PCIe）总线附加的非易失性内存介质，虽然理论上不一定要求 PCIe 总线协议。
+
+#+BEGIN_COMMENT
+nvme是一种协议
+
+#+END_COMMENT

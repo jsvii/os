@@ -1,0 +1,4 @@
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_memory_par.png"/></p>
+*长度16位
+*仅0-11位有效，为PAF[Page Address Field]段
+*用于[[Pdp11:内存管理|内存管理]]

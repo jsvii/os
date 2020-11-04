@@ -1,0 +1,27 @@
+=综述=
+对于用户，定义了如下变量:
+*u_uid 有效用户ID
+*u_gid 有效组ID
+*u_ruid 真实用户ID
+*u_rgid 真实组ID
+以上变量均定义在 [[code:user|user]]<br/>
+
+对于进程，定义了如下变量:
+*p_uid 进程的用户ID
+以上变量定义在 [[code:proc|proc]]<br/>
+
+==有效ID 与 真实ID==
+*真实ID 在登录时就已确定，只有具有超级用户权限才可修改
+*有效ID 可视为描述对外权限的ID
+*举例说明
+**某用户登录 
+***u_uid = u_ruid = 100
+**该用户执行 su 指令，获得超级用户权限
+***u_ruid = 100
+***u_uid = 0
+
+=相关函数=
+*[[code:setuid|setuid]]
+*[[code:getuid|getuid]]
+*[[code:setgid|setgid]]
+*[[code:getgid|getgid]]

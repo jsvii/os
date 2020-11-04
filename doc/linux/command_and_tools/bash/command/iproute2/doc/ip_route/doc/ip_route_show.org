@@ -1,0 +1,87 @@
+* show
+
+** commands
+
+*** View all routes
+
+#+BEGIN_SRC bash
+ip route
+ip route show
+#+END_SRC
+
+You can use -4 and -6 options to view only IPv4 or IPv6 routes. If no options given, IPv4 routes are displayed. To view IPv6 routes, use:
+
+#+BEGIN_SRC bash
+ip -6 route
+#+END_SRC
+
+*** View routes to a network and all its subnets
+
+ip route show to root ${address}/${mask}
+
+For example, if you use 192.168.0.0/24 subnet in your network and it's broken into 192.168.0.0/25 and 192.168.0.128/25, you can see all
+those routes with:
+
+#+BEGIN_SRC bash
+ip route show to root 192.168.0.0/24
+#+END_SRC
+
+Note: the word "to" in this and other show commands is optional.
+
+*** View routes to a network and all supernets
+
+ip route show to match ${address}/${mask}
+If you want to view routes to 192.168.0.0/24 and all larger subnets, use:
+ip route show to match 192.168.0.0/24
+As routers prefer more specific routes to less specific, this is often useful for debugging in situations when traffic to specific
+subnet is sent the wrong way because a route to it is missing but routes to larger subnets exist.
+
+→ View routes to exact subnet
+
+ip route show to exact ${address}/${mask}
+If you want to see the routes to 192.168.0.0/24, but not to, say 192.168.0.0/25 and 192.168.0.0/16, you can use:
+ip route show to exact 192.168.0.0/24
+
+→ View only the route actually used by the kernel
+
+ip route get ${address}/${mask}
+Example:
+ip route get 192.168.0.0/24
+Note that in complex routing scenarios like multipath routing, the result may be "correct but not complete", as it always shows one
+route that will be used first. In most situations it's not a problem, but never forget to look at the corresponding "show" command
+output too.
+
+
+#+BEGIN_SRC bash
+$ ip route show table all
+
+default via 99.48.98.254 dev wlan1 proto dhcp metric 600
+99.48.98.0/24 dev wlan1 proto kernel scope link src 99.48.98.212 metric 600
+192.168.1.0/24 dev eth1 proto kernel scope link src 192.168.1.95 metric 100
+broadcast 99.48.98.0 dev wlan1 table local proto kernel scope link src 99.48.98.212
+local 99.48.98.212 dev wlan1 table local proto kernel scope host src 99.48.98.212
+broadcast 99.48.98.255 dev wlan1 table local proto kernel scope link src 99.48.98.212
+broadcast 127.0.0.0 dev lo table local proto kernel scope link src 127.0.0.1
+local 127.0.0.0/8 dev lo table local proto kernel scope host src 127.0.0.1
+local 127.0.0.1 dev lo table local proto kernel scope host src 127.0.0.1
+broadcast 127.255.255.255 dev lo table local proto kernel scope link src 127.0.0.1
+broadcast 192.168.1.0 dev eth1 table local proto kernel scope link src 192.168.1.95
+local 192.168.1.95 dev eth1 table local proto kernel scope host src 192.168.1.95
+broadcast 192.168.1.255 dev eth1 table local proto kernel scope link src 192.168.1.95
+local ::1 dev lo proto kernel metric 256 pref medium
+fd88:b423:8f24::b43 dev eth1 proto kernel metric 100 pref medium
+fd88:b423:8f24::/64 dev eth1 proto ra metric 100 pref medium
+fd88:b423:8f24::/48 via fe80::220c:c8ff:fe4a:667c dev eth1 proto ra metric 100 pref medium
+fe80::/64 dev eth1 proto kernel metric 100 pref medium
+fe80::/64 dev eth1 proto kernel metric 256 pref medium
+fe80::/64 dev wlan1 proto kernel metric 256 pref medium
+fe80::/64 dev wlan1 proto kernel metric 600 pref medium
+local ::1 dev lo table local proto kernel metric 0 pref medium
+local fd88:b423:8f24::b43 dev lo table local proto kernel metric 0 pref medium
+local fd88:b423:8f24:0:3803:2590:fb82:c6fd dev lo table local proto kernel metric 0 pref medium
+local fd88:b423:8f24:0:3af5:5494:7244:2fca dev lo table local proto kernel metric 0 pref medium
+local fe80::757b:c4ad:2313:e43 dev lo table local proto kernel metric 0 pref medium
+local fe80::90ea:8217:d68e:67aa dev lo table local proto kernel metric 0 pref medium
+ff00::/8 dev eth1 table local metric 256 pref medium
+ff00::/8 dev wlan1 table local metric 256 pref medium
+#+END_SRC

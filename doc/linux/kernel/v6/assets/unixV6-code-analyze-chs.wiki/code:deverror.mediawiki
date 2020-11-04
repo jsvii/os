@@ -1,0 +1,136 @@
+===Source===
+<div class="wikiheadnote">
+*打印 设备错误信息
+*输入3个参数 bp , o1 , o2
+**bp : 设备[[code:struct buf|struct buf]]指针
+**o1 : 块号
+**o2 : 通常是 错误状态号
+</div>
+
+2439 
+
+2440 /* 
+
+2441 &nbsp;* deverr prints a diagnostic from 
+
+2442 &nbsp;* a device driver. 
+
+2443 &nbsp;* It prints the device, block number, 
+
+2444 &nbsp;* and an octal word (usually some error 
+
+2445 &nbsp;* status register) passed as argument. 
+
+2446 &nbsp;*/ 
+
+2447 deverror([[code:struct buf|bp]], o1, o2) 
+
+2448 int *[[code:struct buf|bp]]; 
+
+2449 { 
+
+2450 &nbsp;&nbsp;&nbsp;&nbsp;register *rbp; 
+
+2451 
+
+2452 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct buf|rbp]] = [[code:struct buf|bp]]; 
+
+2453 &nbsp;&nbsp;&nbsp;&nbsp;[[code:prdev|prdev]]("err", [[code:struct buf|rbp]]->b_dev); 
+
+2454 &nbsp;&nbsp;&nbsp;&nbsp;[[code:printf|printf]]("bn%l er%o %o
+\n", [[code:struct buf|rbp]]->b_blkno, o1, o2); 
+
+2455 } 
+
+2456 /* ------------------------- */ 
+
+2457 
+
+2458 
+
+2459 
+
+2460 
+
+2461 
+
+2462 
+
+2463 
+
+2464 
+
+2465 
+
+2466 
+
+2467 
+
+2468 
+
+2469 
+
+2470 
+
+2471 
+
+2472 
+
+2473 
+
+2474 
+
+2475 
+
+2476 
+
+2477 
+
+2478 
+
+2479 
+
+2480 
+
+2481 
+
+2482 
+
+2483 
+
+2484 
+
+2485 
+
+2486 
+
+2487 
+
+2488 
+
+2489 
+
+2490 
+
+2491 
+
+2492 
+
+2493 
+
+2494 
+
+2495 
+
+2496 
+
+2497 
+
+2498 
+
+2499 
+
+
+
+===Caller===
+*[[code:rkintr]]

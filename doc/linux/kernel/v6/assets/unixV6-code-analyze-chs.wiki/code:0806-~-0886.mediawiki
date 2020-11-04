@@ -1,0 +1,300 @@
+===Source===
+
+0806 /* ------------------------- */ 
+
+0807 .globl _fubyte, _subyte 
+
+0808 /* ------------------------- */ 
+
+0809 .globl _fuibyte, _suibyte 
+
+0810 /* ------------------------- */ 
+
+0811 .globl _fuword, _suword 
+
+0812 /* ------------------------- */ 
+
+0813 .globl _fuiword, _suiword 
+
+<blockquote>
+fubyte
+fuibyte
+*从[[用户态]]地址空间，读取一个字节
+*输入 : 欲读取字节 在对应地址空间的地址
+*R0低八位 : 返回读取的字节内容
+*若出错，则返回 -1 (由出错处理程序返回)
+</blockquote>
+0814 _fuibyte: 
+
+0815 _fubyte: 
+
+0816 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 2(sp),r1 
+
+0817 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BIC|bic]] $1,r1 
+
+<blockquote>
+*输入参数 存入 R1
+*R1 取偶 (末位置0)
+</blockquote>
+0818 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:JSR|jsr]] pc,gword 
+
+<blockquote>
+*转入gword(0851)，读取[[用户态]]地址空间中R1指向的字内容，存入R0
+</blockquote>
+0819 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CMP|cmp]] r1,2(sp) 
+
+0820 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BEQ|beq]] 1f 
+
+0821 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:SWAB|swab]] r0 
+
+0822 1: 
+
+0823 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BIC|bic]] $!377,r0 
+
+0824 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc 
+
+<blockquote>
+*若 输入参数为偶数，则转入0822，直接取R0低八位返回
+*若 输入参数为奇数，要交换高低字节，取R0低八位返回
+</blockquote>
+0825 
+
+<blockquote>
+:subyte
+:suibyte
+*向[[用户态]]地址空间，写入一个字节
+*共输入两个参数 : 设为 addr 和 c
+**addr : 写入字节的地址([[用户态]]地址空间)
+**c : 欲写入的字节
+*返回值
+**若出错，则返回 -1 (由出错处理程序返回)
+**否则，返回0
+</blockquote>
+0826 _suibyte: 
+
+0827 _subyte: 
+
+0828 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 2(sp),r1 
+
+0829 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BIC|bic]] $1,r1 
+
+<blockquote>
+*输入参数 addr 存入 R1
+*R1 取偶 (末位置0)
+</blockquote>
+0830 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:JSR|jsr]] pc,gword 
+
+0831 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r0,-(sp) 
+
+<blockquote>
+*转入gword(0851)，读取[[用户态]]地址空间中R1指向的字内容，存入R0
+*R0入栈
+</blockquote>
+0832 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CMP|cmp]] r1,4(sp) 
+
+0833 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BEQ|beq]] 1f 
+
+0834 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOVB|movb]] 6(sp),1(sp) 
+
+0835 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BR|br]] 2f 
+
+0836 1: 
+
+0837 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOVB|movb]] 6(sp),(sp) 
+
+0838 2: 
+
+<blockquote>
+*若 addr 为 偶数，则 欲写入字节 写入 刚才读出的字 的低字节
+*否则，欲写入字节 写入 刚才读出的字 的高字节
+</blockquote>
+0839 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,r0 
+
+<blockquote>
+*从堆栈恢复R0
+*之所以 向堆栈压入R0，再恢复，是因为 需要使用 字节寻址，这样使用比较方便
+</blockquote>
+0840 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:JSR|jsr]] pc,pword 
+
+<blockquote>
+*转入pword(0868)，向[[用户态]]地址空间中R1指向的地址，写回 修改后的字
+</blockquote>
+
+0841 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] r0 
+
+0842 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc 
+
+<blockquote>
+*返回值置0
+*正常函数返回
+</blockquote>
+0843 
+
+<blockquote>
+:fuiword
+:fuword
+*从[[用户态]]地址空间，读取一个字
+*输入 : 欲读取字 在对应地址空间的地址
+*R0 : 返回读取的字内容
+*若出错，则返回 -1 (由出错处理程序返回)
+</blockquote>
+
+0844 _fuiword: 
+
+0845 _fuword: 
+
+0846 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 2(sp),r1 
+
+0847 fuword: 
+
+0848 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:JSR|jsr]] pc,gword 
+
+0849 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc 
+
+0850 
+
+0851 gword: 
+
+0852 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] PS,-(sp) 
+
+0853 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BIS|bis]] $340,PS 
+
+<blockquote>
+*保护[[PS]]状态字入栈
+*[[处理机优先级]]置7，[[关中断]]
+</blockquote>
+
+0854 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] [[code:nofault|nofault]],-(sp) 
+
+<blockquote>
+*保护 [[code:nofault|nofault]] (出错处理函数) 入栈
+</blockquote>
+
+0855 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $err,[[code:nofault|nofault]] 
+
+<blockquote>
+*将err(0880) 设置为出错处理函数
+</blockquote>
+0856 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MFPI|mfpi]] (r1) 
+
+0857 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,r0 
+
+<blockquote>
+*从 [[用户态]]地址空间 取出 (r1) 指向的值
+*若[[pdp11:MFPI|MFPI]]出错，则通过[[code:trap|trap]]转入[[code:nofault|nofault]]指向的err(0880) 函数，进行错误处理
+*若不出错，则将读出的值传入R0，作为函数返回值
+</blockquote>
+
+0858 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BR|br]] 1f 
+
+<blockquote>
+*转到 0875
+</blockquote>
+0859 
+
+<blockquote>
+:suiword
+:suword
+*向 [[用户态]]地址空间 (R1) 位置 写入 (R0)
+*输入两个参数： R1,R0
+</blockquote>
+
+0860 _suiword: 
+
+0861 _suword: 
+
+0862 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 2(sp),r1 
+
+0863 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 4(sp),r0 
+
+0864 suword: 
+
+0865 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:JSR|jsr]] pc,pword 
+
+0866 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc 
+
+0867 
+
+0868 pword: 
+
+0869 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] PS,-(sp) 
+
+0870 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BIS|bis]] $340,PS 
+
+<blockquote>
+*保护[[PS]]状态字入栈
+*[[处理机优先级]]置7，[[关中断]]
+</blockquote>
+0871 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] [[code:nofault|nofault]],-(sp) 
+
+0872 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $err,[[code:nofault|nofault]] 
+
+<blockquote>
+*保护 [[code:nofault|nofault]] (出错处理函数) 入栈
+</blockquote>
+0873 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r0,-(sp) 
+
+0874 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MTPI|mtpi]] (r1) 
+
+<blockquote>
+*向 [[用户态]]地址空间 (r1) 指向的地址，写入R0的值
+*若[[pdp11:MTPI|MTPI]]出错，则通过[[code:trap|trap]]转入[[code:nofault|nofault]]指向的err(0880) 函数，进行错误处理
+</blockquote>
+0875 1: 
+
+0876 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,[[code:nofault|nofault]] 
+
+0877 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,PS 
+
+<blockquote>
+*从堆栈恢复 [[code:nofault|nofault]] 和 [[PS]]
+*将err(0880) 设置为出错处理函数
+</blockquote>
+0878 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc 
+
+<blockquote>
+*函数返回
+</blockquote>
+0879 
+
+<blockquote>
+*err 为 出错处理函数
+*从堆栈恢复 [[code:nofault|nofault]] 和 [[PS]]
+*从堆栈弹出 本级函数(gword,pword)的返回地址
+*返回值 R0 置 -1
+*向 上一级函数(例如fubyte等)返回地址 返回
+</blockquote>
+0880 err: 
+
+0881 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,[[code:nofault|nofault]] 
+
+0882 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,PS 
+
+0883 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:TST|tst]] (sp)+ 
+
+0884 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $-1,r0 
+
+0885 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc 
+
+0886 
+
+
+
+===Ref===
+*[[关于汇编函数的说明]]
+
+===Caller===
+*[[code:main]]
+*[[code:trap]]
+*[[code:exec]]
+*[[code:times]]
+*[[code:psig]]
+*[[code:procxmt]]
+*[[code:stat1]]
+*[[code:passc]]
+*[[code:cpass]]
+*[[code:uchar]]
+*[[code:gtty]]
+*[[code:stty]]
+*[[code:mmread]]
+*[[code:mmwrite]]

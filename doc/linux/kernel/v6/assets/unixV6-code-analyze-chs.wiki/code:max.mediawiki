@@ -1,0 +1,33 @@
+===Source===
+<div class="wikiheadnote">
+*返回 a,b 的最大值
+* a,b为字节长变量
+</div>
+
+6322 
+
+6323 /* Return the logical maximum 
+
+6324 &nbsp;* of the 2 arguments. 
+
+6325 &nbsp;*/ 
+
+6326 max(a, b) 
+
+6327 char *a, *b; 
+
+6328 { 
+
+6329 
+
+6330 &nbsp;&nbsp;&nbsp;&nbsp;if(a > b) 
+
+6331 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return(a); 
+
+6332 &nbsp;&nbsp;&nbsp;&nbsp;return(b); 
+
+6333 } 
+
+6334 /* ------------------------- */ 
+
+

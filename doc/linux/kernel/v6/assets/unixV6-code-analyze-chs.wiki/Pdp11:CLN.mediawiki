@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===CLN
+===Code===000250
+===Operation===Clear N
+===Coden===清
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===清标志位N 
+===Example===无

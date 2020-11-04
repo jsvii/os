@@ -1,0 +1,76 @@
+===Source===
+<div class="wikiheadnote">
+*对 指定缓存块 进行延迟写
+**若 该块对应设备 为磁带设备，进行异步写，而不是延迟写
+*共传入一个参数 bp
+** bp : 指定的缓存块的管理结构
+</div>
+
+4827 
+
+4828 /* 
+
+4829 &nbsp;* Release the buffer, marking it so that if it is grabbed 
+
+4830 &nbsp;* for another purpose it will be written out before being 
+
+4831 &nbsp;* given up (e.g. when writing a partial block where it is 
+
+4832 &nbsp;* assumed that another write for the same block will soon 
+
+4833 &nbsp;* follow). This can’t be done for magtape, since writes 
+
+4834 &nbsp;* must be done in the same order as requested. 
+
+4835 &nbsp;*/ 
+
+4836 bdwrite(bp) 
+
+4837 [[code:struct buf|struct buf]] *bp; 
+
+4838 { 
+
+4839 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct buf|struct buf]] *rbp; 
+
+4840 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct devtab|struct devtab]] *dp; 
+
+4841 
+
+4842 &nbsp;&nbsp;&nbsp;&nbsp;rbp = bp; 
+
+4843 &nbsp;&nbsp;&nbsp;&nbsp;dp = [[code:bdevsw|bdevsw]][ [[code:struct buf|rbp]]->b_dev[[skill:.d_major|.d_major]] ].[[code:struct devtab|d_tab]]; 
+
+<blockquote>
+*dp 指向 该块对应的设备的[[code:struct devtab|struct devtab]]管理结构
+</blockquote>
+4844 &nbsp;&nbsp;&nbsp;&nbsp;if (dp == &tmtab <nowiki>||</nowiki> dp == &httab) 
+
+4845 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:bawrite|bawrite]](rbp); 
+
+<blockquote>
+*若 对应设备为磁带设备，则异步写
+</blockquote>
+4846 &nbsp;&nbsp;&nbsp;&nbsp;else { 
+
+4847 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;<nowiki>rbp->b_flags =| B_DELWRI | B_DONE; </nowiki>
+
+4848 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:brelse|brelse]](rbp); 
+
+<blockquote>
+*将 该块 置 B_DELWRI 和 B_DONE 标志
+*释放该块（将该块置为可用，写设备操作将推后执行）
+</blockquote>
+4849 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+4850 } 
+
+4851 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:writei]]
+*[[code:bmap]]

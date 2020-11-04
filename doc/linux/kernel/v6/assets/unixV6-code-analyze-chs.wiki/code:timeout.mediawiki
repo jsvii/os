@@ -1,0 +1,164 @@
+===Source===
+<div class="wikiheadnote">
+*向 事件执行队列(参看[[code:clock|clock]]) 添加一个事件
+*输入3个参数 fun , arg , tim
+**fun : 事件函数
+**arg : 事件参数
+**tim : 事件延迟时间
+</div>
+
+3833 
+
+3834 /* 
+
+3835 &nbsp;* timeout is called to arrange that 
+
+3836 &nbsp;* fun(arg) is called in tim/HZ seconds. 
+
+3837 &nbsp;* An entry is sorted into the callout 
+
+3838 &nbsp;* structure. The time in each structure 
+
+3839 &nbsp;* entry is the number of HZ’s more 
+
+3840 &nbsp;* than the previous entry. 
+
+3841 &nbsp;* In this way, decrementing the 
+
+3842 &nbsp;* first entry has the effect of 
+
+3843 &nbsp;* updating all entries. 
+
+3844 &nbsp;*/ 
+
+3845 timeout(fun, arg, tim) 
+
+3846 { 
+
+3847 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct callo|struct callo]] *p1, *p2; 
+
+3848 &nbsp;&nbsp;&nbsp;&nbsp;register t; 
+
+3849 &nbsp;&nbsp;&nbsp;&nbsp;int s; 
+
+3850 
+
+3851 &nbsp;&nbsp;&nbsp;&nbsp;t = tim; 
+
+3852 &nbsp;&nbsp;&nbsp;&nbsp;s = PS->integ; 
+
+3853 &nbsp;&nbsp;&nbsp;&nbsp;p1 = &[[code:callout|callout]][0]; 
+
+3854 &nbsp;&nbsp;&nbsp;&nbsp;[[code:spl|spl7]](); 
+
+<blockquote>
+*[[关中断]]
+*防止 时钟中断 处理 事件执行队列
+</blockquote>
+3855 &nbsp;&nbsp;&nbsp;&nbsp;while(p1->c_func != 0 && p1->c_time <= t) { 
+
+3856 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;t =- p1->c_time; 
+
+3857 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;p1++; 
+
+3858 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+3859 &nbsp;&nbsp;&nbsp;&nbsp;p1->c_time =- t; 
+
+<blockquote>
+*在事件执行队列中，寻找 插入事件 的合适位置
+</blockquote>
+3860 &nbsp;&nbsp;&nbsp;&nbsp;p2 = p1; 
+
+3861 &nbsp;&nbsp;&nbsp;&nbsp;while(p2->c_func != 0) 
+
+3862 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;p2++; 
+
+3863 &nbsp;&nbsp;&nbsp;&nbsp;while(p2 >= p1) { 
+
+3864 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;(p2+1)->c_time = p2->c_time; 
+
+3865 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;(p2+1)->c_func = p2->c_func; 
+
+3866 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;(p2+1)->c_arg = p2->c_arg; 
+
+3867 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;p2--; 
+
+3868 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+3869 &nbsp;&nbsp;&nbsp;&nbsp;p1->c_time = t; 
+
+3870 &nbsp;&nbsp;&nbsp;&nbsp;p1->c_func = fun; 
+
+3871 &nbsp;&nbsp;&nbsp;&nbsp;p1->c_arg = arg; 
+
+<blockquote>
+*插入事件
+</blockquote>
+3872 &nbsp;&nbsp;&nbsp;&nbsp;PS->integ = s; 
+
+<blockquote>
+*还原 PS
+*相当于 [[开中断]]
+</blockquote>
+3873 } 
+
+3874 /* ------------------------- */ 
+
+3875 
+
+3876 
+
+3877 
+
+3878 
+
+3879 
+
+3880 
+
+3881 
+
+3882 
+
+3883 
+
+3884 
+
+3885 
+
+3886 
+
+3887 
+
+3888 
+
+3889 
+
+3890 
+
+3891 
+
+3892 
+
+3893 
+
+3894 
+
+3895 
+
+3896 
+
+3897 
+
+3898 
+
+3899 
+
+
+
+===Ref===
+*[[code:clock|clock]]
+
+===Caller===
+*[[code:ttstart]]

@@ -1,0 +1,90 @@
+* fbterm
+
+** 安装
+
+*** 安装fbterm fcitx-fbterm
+
+#+BEGIN_SRC bash
+zypper in fbterm
+#+END_SRC
+
+*** 把普通用户加入video group
+
+方法A:
+
+#+BEGIN_SRC bash
+sudo gpasswd -a <your username> video
+#+END_SRC
+
+方法B:
+
+#+BEGIN_SRC bash
+usermod -aG video <USERNAME>
+#+END_SRC
+
+方法C:
+
+但不推荐因为这么做修改了 setuid
+
+#+BEGIN_SRC bash
+chmod u+s /usr/bin/fbterm
+#+END_SRC
+
+*** 让普通用户下的fbterm能接受系统按键（来进行输入法切换）
+
+#+BEGIN_SRC bash
+$ sudo setcap 'cap_sys_tty_config+ep' /usr/bin/fbterm
+#+END_SRC
+
+~注意：~  如果你不是在使用KMS（Kernel mode settings，开源显示驱动），就必须使用root账户来运行fbterm。
+
+** 编辑~/.fbtermrc文件
+
+#+BEGIN_SRC bash
+# 主要配置的是字体
+font-names=Inconsolata,Symbola,WenQuanYi ZenHei Mono:Normal
+font-size=20
+font-width=n
+font-height=n
+color-foreground=7
+color-background=0
+history-lines=1000
+cursor-shape=0
+cursor-interval=500
+word-chars=._-
+screen-rotate=0
+#+END_SRC
+
+** fbterm 相关技术
+
+*** github上 framebuffer相关的资源
+
+https://github.com/topics/framebuffer?o=desc&s=
+
+  - fbida
+
+    https://www.kraxel.org/blog/linux/fbida/
+
+
+** fb*
+
+  - fbi	Image Viewer for the Linux Framebuffer Console
+
+  - fbiterm Internationalized Terminal Emulator for Framebuffers
+
+  - fbpdf Show PDF files on the framebuffer
+
+  - fbreader E-book reader
+
+  - fbterm A fast framebuffer-based terminal emulator
+
+** mplayer
+
+View Images PDF and Video without X - Linux Framebuffer
+
+Run ~mplayer -vo fbdev video.avi~
+
+
+** docs
+
+  - https://www.youtube.com/watch?v=WgFfKpGK2Pg View Images PDF and Video without X - Linux Framebuffer

@@ -1,0 +1,26 @@
+===Source===
+<div class = "wikiheadnote">
+*用于返回系统当前时间
+</div>
+<div class = "wikicode">
+3419 <br/>
+
+3420 &nbsp;&nbsp;&nbsp;&nbsp;gtime()<br/>
+
+3421 &nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+
+3422 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
+
+3423 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[skill:u.u_ar0|u.u_ar0]][R0] = time[0];<br/>
+
+3424 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[skill:u.u_ar0|u.u_ar0]][R1] = time[1];<br/>
+
+3425 &nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+
+3426 /* -------------------------*/
+
+</div>
+
+===Param===
+:(time = 13.)
+:<b>sys time</b>

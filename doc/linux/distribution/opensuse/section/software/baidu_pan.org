@@ -1,0 +1,16 @@
+* Baidu Pan
+
+
+** install
+
+Error in file "/usr/share/applications/org.kde.kfontview.desktop": "font/otf" is an invalid MIME type ("font" is an unregistered media type)                  
+Error in file "/usr/share/applications/org.kde.kfontview.desktop": "font/ttf" is an invalid MIME type ("font" is an unregistered media type)
+
+#+BEGIN_SRC bash
+zypper in desktop-file-utils
+#+END_SRC
+
+
+
+
+

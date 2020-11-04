@@ -1,0 +1,58 @@
+* 源码结构
+
+** src
+
+arch：这个为目录是架构相关，里面存放了许多CPU架构，比如arm，x86，MIPS，PPC等，
+
+block：在linux中block表示块设备（以块（多个字节组成的整体，类似于扇区）为单位来整体访问），譬如说SD卡、iNand、Nand、硬盘等都是块设备。你几乎可以认为块设备就是存储设备。block目录下放的是一些linux存储体系中关于块设备管理的代码。
+
+crypto：英文意思是加密。这个目录下放了一些各种常见的加密算法的C语言代码实现。譬如crc32、md5、sha1等。
+
+Documentation：里面放了一些文档。
+
+drivers：驱动目录，里面分门别类的列出了linux内核支持的所有硬件设备的驱动源代码。
+
+firmware：固件。什么是固件？固件其实是软件，不过这个软件是固话到IC里面运行的叫固件：就像S5PV210里的iROM代码。
+
+fs：fs就是file system，文件系统，里面列出了linux支持的各种文件系统的实现。
+
+include：头文件目录，公共的（各种CPU架构共用的）头文件都在这里。每种CPU架构特有的一些头文件在arch/arm/include目录及其子目录下。
+
+init：init是初始化的意思，这个目录下的代码就是linux内核启动时初始化内核的代码。
+
+ipc：ipc就是inter process commuication，进程间通信，里面都是linux支持的IPC的代码实现。
+
+kernel：kernel就是内核，就是linux内核，所以这个文件夹下放的就是内核本身需要的一些代码文件。
+
+lib：lib是库的意思，这里面都是一些公用的有用的库函数，注意这里的库函数和C语言的库函数不一样的。在内核编程中是不能用C语言标准库函数，这里的lib目录下的库函数就是用来替代那些标准库函数的。譬如在内核中要把字符串转成数字用atoi，但是内核编程中只能用lib目录下的atoi函数，不能用标准C语言库中的atoi。譬如在内核中要打
+
+印信息时不能用printf，而要用printk，这个printk就是我们这个lib目录下的。
+
+mm：mm是memory management，内存管理，linux的内存管理代码都在这里。
+
+net：该目录下是网络相关的代码，譬如TCP/IP协议栈等都在这里。
+
+scripts：脚本，这个目录下全部是脚本文件，这些脚本文件不是linux内核工作时使用的，而是用来辅助对linux内核进行配置编译生产的。我们并不会详细进入分析这个目录下的脚本，而是通过外围来重点学会配置和编译linux内核即可。
+
+security：安全相关的代码。不用去管。
+
+sound：音频处理相关的。
+
+tools：linux中用到的一些有用工具
+
+usr：目录下是initramfs相关的，和linux内核的启动有关，暂时不用去管。
+
+virt：内核虚拟机相关的，暂时不用管。
+
+Kbuild：Kbuild是kernel build的意思，就是内核编译的意思。这个文件就是linux内核特有的内核编译体系需要用到的文件。
+
+Makefile：这个是linux内核的总makefile，整个内核工程用这个Makefile来管理的。
+
+
+** arch
+
+*** IA 64
+
+~IA-64~ (also called Intel Itanium architecture) is the instruction set architecture (ISA) of the Itanium family of 64-bit Intel microprocessors. The basic ISA specification originated at Hewlett-Packard (HP), and was evolved and then implemented in a new processor microarchitecture by Intel with HP's continued partnership and expertise on the underlying EPIC design concepts. In order to establish what was their first new ISA in 20 years and bring an entirely new product line to market, Intel made a massive investment in product definition, design, software development tools, OS, software industry partnerships, and marketing. To support this effort Intel created the largest design team in their history and a new marketing and industry enabling team completely separate from x86. The first Itanium processor, codenamed Merced, was released in 2001.
+
+Intel安腾处理器构建在IA-64（Intel Architecture 64），也就是说“IA-64是一个与x86代码的决裂，它是为未来设计的“。Itanium是专门用在高端企业级64-bit计算环境中竞争的，对抗基于IBM Power4/5，HP PA-RISC，Sun UltraSparc-III及DEC Alpha的服务器。64位只是安腾处理器的一个技术特征。””

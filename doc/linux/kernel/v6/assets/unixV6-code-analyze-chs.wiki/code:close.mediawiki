@@ -1,0 +1,58 @@
+===Source===
+<div class="wikiheadnote">
+*系统调用,用以关闭一个[[code:struct file|file]]结构
+*从用户态传入1个参数:
+**fildes:通过R0传入,是一个文件描述号
+</div>
+
+5842
+
+5843 /*
+
+5844 &nbsp;* close system call
+
+5845 &nbsp;*/
+
+5846 close()
+
+5847 {
+
+5848 &nbsp;&nbsp;&nbsp;&nbsp;register *fp;
+
+5849
+
+5850 &nbsp;&nbsp;&nbsp;&nbsp;fp = [[code:getf|getf]]([[skill:u.u_ar0|u.u_ar0]][R0]);
+
+<blockquote>
+*得到传入的文件描述号对应的[[code:struct file|file]]结构
+</blockquote>
+5851 &nbsp;&nbsp;&nbsp;&nbsp;if(fp == NULL)
+
+5852 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return;
+
+<blockquote>
+*若找不到对应[[code:struct file|file]]结构,直接返回
+</blockquote>
+5853 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_ofile]]<nowiki>[</nowiki>[[skill:u.u_ar0|u.u_ar0]][R0]] = NULL;
+
+5854 &nbsp;&nbsp;&nbsp;&nbsp;[[code:closef|closef]](fp);
+
+<blockquote>
+*对于找到的[[code:struct file|file]]结构
+**清除其在进程打开文件表中的对应项
+**调用closef释放该[[code:struct file|file]]结构
+</blockquote>
+5855 }
+
+5856 /* ------------------------- */
+
+
+
+===Ref===
+*[[内存打开文件结构]]
+*[[文件系统]]
+
+===Param===
+:(close = 6.)
+:(file descriptor in r0)
+:<b>sys close</b>

@@ -1,0 +1,11 @@
+* 安装软件列表
+
+** 开发必用
+
+- ccproxy
+
+- VcXsrv
+
+** 浏览器
+
+Chrome &  Chrome Cannary & Chromium

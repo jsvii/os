@@ -1,0 +1,22 @@
+===Source===
+
+4695 &nbsp;&nbsp;&nbsp;&nbsp;int rootdev <nowiki>{(0<<8)|0}</nowiki>;
+<blockquote>
+*全局变量rootdev,为 根存储设备的设备号
+*rootdev变量值为0
+*此处之所以这么写，为了表明 
+**高字节为主设备号，此处为0，0<<8就是设置主设备号
+**低字节为从设备号，此处为0
+</blockquote>
+4696 &nbsp;&nbsp;&nbsp;&nbsp;int swapdev <nowiki>{(0<<8)|0}</nowiki>;
+<blockquote>
+*全局变量swapdev,为 提供系统盘交换区的设备的设备号
+*swapdev变量值为0
+*此处之所以这么写，为了表明 
+**高字节为主设备号，此处为0，0<<8就是设置主设备号
+**低字节为从设备号，此处为0
+</blockquote>
+4697 &nbsp;&nbsp;&nbsp;&nbsp;int saplo 4000; /* cannot be zero */
+
+4698 &nbsp;&nbsp;&nbsp;&nbsp;int nswap 872;
+

@@ -1,0 +1,270 @@
+===Source===
+<div class="wikiheadnote">
+*向tty输出一个字符
+*输入2个参数 ac , atp
+**ac : 欲输出的字符
+**atp : 指定[[code:struct tty|tty]]
+</div>
+
+8367 /* put character on TTY output queue, adding delays, 
+
+8368 &nbsp;* expanding tabs, and handling the CR/NL bit. 
+
+8369 &nbsp;* It is called both from the top half for output, and from 
+
+8370 &nbsp;* interrupt level for echoing. 
+
+8371 &nbsp;* The arguments are the character and the tty structure. 
+
+8372 &nbsp;*/ 
+
+8373 ttyoutput(ac, tp) 
+
+8374 [[code:struct tty|struct tty]] *tp; 
+
+8375 { 
+
+8376 &nbsp;&nbsp;&nbsp;&nbsp;register int c; 
+
+8377 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct tty|struct tty]] *rtp; 
+
+8378 &nbsp;&nbsp;&nbsp;&nbsp;register char *colp; 
+
+8379 &nbsp;&nbsp;&nbsp;&nbsp;int ctype; 
+
+8380 
+
+8381 &nbsp;&nbsp;&nbsp;&nbsp;rtp= tp; 
+
+8382 &nbsp;&nbsp;&nbsp;&nbsp;c = ac&0177; 
+
+8383 &nbsp;&nbsp;&nbsp;&nbsp;/* Ignore EOT in normal mode to avoid hanging up 
+
+8384 &nbsp;&nbsp;&nbsp;&nbsp; * certain terminals. 
+
+8385 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+8386 &nbsp;&nbsp;&nbsp;&nbsp;if (c==004 && (rtp->t_flags&RAW)==0) 
+
+8387 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+<blockquote>
+*若 c为EOF(文件结束字符)，且tty不是原始模式，则直接返回，不做处理
+</blockquote>
+8388 &nbsp;&nbsp;&nbsp;&nbsp;/* Turn tabs to spaces as required 
+
+8389 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+8390 &nbsp;&nbsp;&nbsp;&nbsp;if (c==’\t’ && rtp->t_flags&XTABS) { 
+
+8391 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;do 
+
+8392 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:ttyoutput|ttyoutput]](’ ’, rtp); 
+
+8393 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;while (rtp->t_col&07); 
+
+8394 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+8395 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 c为制表符，且tty无法处理制表符，则将制表符换成若干空格(对其列 到8的倍数)
+</blockquote>
+8396 &nbsp;&nbsp;&nbsp;&nbsp;/* for upper-case-only terminals, 
+
+8397 &nbsp;&nbsp;&nbsp;&nbsp; * generate escapes. 
+
+8398 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+8399 &nbsp;&nbsp;&nbsp;&nbsp;if (rtp->t_flags&LCASE) { 
+
+8400 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;colp = "<nowiki>({)}!|^~’‘</nowiki>"; 
+
+8401 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;while(*colp++) 
+
+8402 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(c == *colp++) { 
+
+8403 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:ttyoutput|ttyoutput]](’\\’, rtp); 
+
+8404 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   c = colp[-2]; 
+
+8405 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   break; 
+
+8406 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+8407 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (’a’<=c && c<=’z’) 
+
+8408 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;c =+ ’A’ - ’a’; 
+
+8409 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+若 只支持 64字符 ASCII 子集，完成以下字符转义
+**a - z → A - Z
+**<nowiki>{ → \(</nowiki>
+**<nowiki>} → \)</nowiki>
+**<nowiki>| → \!</nowiki>
+**<nowiki>~ → \^</nowiki>
+**<nowiki>‘ → \’</nowiki>
+</blockquote>
+8410 &nbsp;&nbsp;&nbsp;&nbsp;/* turn <nl> to <cr><lf> if desired. 
+
+8411 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+8412 &nbsp;&nbsp;&nbsp;&nbsp;if (c==’
+\n’ && rtp->t_flags&CRMOD) 
+
+8413 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:ttyoutput|ttyoutput]](’\r’, rtp); 
+
+<blockquote>
+*若tty 使用了CR换行，则
+**
+\n → \r
+\n
+</blockquote>
+8414 &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:putc|putc]](c, &rtp->t_outq)) 
+
+8415 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+<blockquote>
+*若 c 输出到tty输出队列失败，直接返回
+</blockquote>
+<blockquote>
+*以下开始计算 输出c 后的 设备延迟 (设备需要一定时间输出字符)
+*详细说明参看 LIONS 源代码分析 25.4.5 (难得LIONS写得那么详细清楚...)
+</blockquote>
+8416 &nbsp;&nbsp;&nbsp;&nbsp;/* Calculate delays. 
+
+8417 &nbsp;&nbsp;&nbsp;&nbsp; * The numbers here represent clock ticks 
+
+8418 &nbsp;&nbsp;&nbsp;&nbsp; * and are not necessarily optimal for all terminals. 
+
+8419 &nbsp;&nbsp;&nbsp;&nbsp; * The delays are indicated by characters above 0200, 
+
+8420 &nbsp;&nbsp;&nbsp;&nbsp; * thus (unfortunately) restricting the transmission 
+
+8421 &nbsp;&nbsp;&nbsp;&nbsp; * path to 7 bits. 
+
+8422 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+8423 &nbsp;&nbsp;&nbsp;&nbsp; colp = &rtp->t_col; 
+
+8424 &nbsp;&nbsp;&nbsp;&nbsp; ctype = [[file:tty.h|partab]][c]; 
+
+8425 &nbsp;&nbsp;&nbsp;&nbsp; c = 0; 
+
+8426 &nbsp;&nbsp;&nbsp;&nbsp;switch(ctype&077) { 
+
+8427 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;/* ordinary */ 
+
+8428 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case 0: 
+
+8429 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   (*colp)++; 
+
+8430 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;/* non-printing */ 
+
+8431 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case 1: 
+
+8432 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   break; 
+
+8433 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;/* backspace */ 
+
+8434 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case 2: 
+
+8435 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if (*colp) 
+
+8436 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  (*colp)--; 
+
+8437 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   break; 
+
+8438 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;/* newline */ 
+
+8439 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case 3: 
+
+8440 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   ctype = (rtp->t_flags >> 8) & 03; 
+
+8441 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(ctype == 1) { /* tty 37 */ 
+
+8442 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  if (*colp) 
+
+8443 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; c = max((*colp>>4) + 3, 6); 
+
+8444 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } else 
+
+8445 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  if(ctype == 2) { /* vt05 */ 
+
+8446 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; c = 6; 
+
+8447 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  } 
+
+8448 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*colp = 0; 
+
+8449 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   break; 
+
+8450 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;/* tab */ 
+
+8451 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case 4: 
+
+8452 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   ctype = (rtp->t_flags >> 10) & 03; 
+
+8453 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(ctype == 1) { /* tty 37 */ 
+
+8454 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  c = 1 - (*colp <nowiki>|</nowiki> ~07); 
+
+8455 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  if(c < 5) 
+
+8456 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; c = 0; 
+
+8457 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } 
+
+8458 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*colp <nowiki>=|</nowiki> 07; 
+
+8459 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   (*colp)++; 
+
+8460 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   break; 
+
+8461 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;/* vertical motion */ 
+
+8462 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case 5: 
+
+8463 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(rtp->t_flags & VTDELAY) /* tty 37 */ 
+
+8464 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   c = 0177; 
+
+8465 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   break; 
+
+8466 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;/* carriage return */ 
+
+8467 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case 6: 
+
+8468 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   ctype = (rtp->t_flags >> 12) & 03; 
+
+8469 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(ctype == 1) { /* tn 300 */ 
+
+8470 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  c = 5; 
+
+8471 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } else 
+
+8472 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  if(ctype == 2) { /* ti 700 */ 
+
+8473 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; c = 10; 
+
+8474 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  } 
+
+8475 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*colp = 0; 
+
+8476 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+8477 &nbsp;&nbsp;&nbsp;&nbsp;if(c) 
+
+8478 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:putc|putc]](c<nowiki>|</nowiki>0200, &rtp->t_outq); 
+
+8479 } 
+
+8480 /* ------------------------- */ 
+
+
+
+===Caller===
+*[[code:ttyinput]]
+*[[code:ttwrite]]

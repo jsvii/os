@@ -1,0 +1,34 @@
+===Source===
+<div class="wikiheadnote">
+*返回当前用户的
+**有效ID uid ，作为返回值的高字节
+**真实ID ruid，作为返回值的低字节
+</div>
+
+3451
+
+3452 getuid()
+
+3453 {
+
+3454
+
+3455 &nbsp;&nbsp;&nbsp;&nbsp;[[skill:u.u_ar0|u.u_ar0]][R0].lobyte = [[code:user|u]].u_ruid;
+
+3456 &nbsp;&nbsp;&nbsp;&nbsp;[[skill:u.u_ar0|u.u_ar0]][R0].hibyte = [[code:user|u]].u_uid;
+
+<blockquote>
+*此处使用了无名结构，参看[[编程技巧#无名结构|编程技巧之无名结构]]
+</blockquote>
+3457 }
+
+3458 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[权限管理]]
+
+===Param===
+:(getuid = 24.)
+:<b>sys getuid</b>

@@ -1,0 +1,67 @@
+===Source===
+<div class="wikiheadnote">
+*将给定的[[code:struct buf|struct buf]]缓存管理结构 从[[自由队列]]取下，置状态为B_BUSY
+*共传入一个参数 bp
+*bp : 给定的[[code:struct buf|struct buf]]缓存管理结构
+</div>
+
+4995 
+
+4996 /* Unlink a buffer from the available list and mark it busy. 
+
+4997 &nbsp;* (internal interface) 
+
+4998 &nbsp;*/ 
+
+4999 notavil(bp) 
+
+5000 [[code:struct buf|struct buf]] *bp; 
+
+5001 { 
+
+5002 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct buf|struct buf]] *rbp; 
+
+5003 &nbsp;&nbsp;&nbsp;&nbsp;register int sps; 
+
+5004 
+
+5005 &nbsp;&nbsp;&nbsp;&nbsp;rbp = bp; 
+
+5006 &nbsp;&nbsp;&nbsp;&nbsp;sps = PS[[skill:integ|->integ]]; 
+
+<blockquote>
+*将[[PS]]备份到sps
+</blockquote>
+5007 &nbsp;&nbsp;&nbsp;&nbsp;[[code:spl|spl6]](); 
+
+<blockquote>
+*处理机优级设为6
+</blockquote>
+5008 &nbsp;&nbsp;&nbsp;&nbsp;rbp->av_back->av_forw = rbp->av_forw; 
+
+5009 &nbsp;&nbsp;&nbsp;&nbsp;rbp->av_forw->av_back = rbp->av_back; 
+
+5010 &nbsp;&nbsp;&nbsp;&nbsp;rbp->b_flags =<nowiki>| </nowiki>B_BUSY; 
+
+<blockquote>
+*将给定的 缓存管理结构 从[[自由队列]]取下
+*置该块状态为B_BUSY
+</blockquote>
+5011 &nbsp;&nbsp;&nbsp;&nbsp;PS[[skill:integ|->integ]] = sps; 
+
+<blockquote>
+*从sps还原[[PS]]
+*还原[[PS]] 相当于 [[开中断]]
+</blockquote>
+5012 } 
+
+5013 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:getblk]]
+*[[code:bflush]]

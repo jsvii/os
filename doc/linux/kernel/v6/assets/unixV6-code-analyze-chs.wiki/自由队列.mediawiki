@@ -1,0 +1,15 @@
+=综述=
+*结构
+**全局定义了 bfreelist 作为自由队列的队列头 ,定义在[[file:buf.h|buf.h]]<div class="wikiheadcode">4567 struct buf bfreelist; </div>
+**每个队列元素 为[[code:struct buf|struct buf]]结构
+**[[code:struct buf|struct buf]]结构 定义了队列指针av-forw,av-back
+**以上结构形成双链表队列,例如 举例图
+*插入/取出元素
+**取出元素从队首取出
+**插入元素从队尾插入,以让buf尽可能长的维持原状,方便重复使用
+=设备队列=
+举例<br/>
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Bfreelist.png"/></p>
+
+=参考=
+[[设备缓存管理]]

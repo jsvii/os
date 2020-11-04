@@ -1,0 +1,93 @@
+===Source===
+<div class="wikiheadnote">
+*将 系统映像(core) 保存到 磁带设备
+*具体实现方法尚未读懂，列入[[遗留问题]]
+*函数入口在 [[file:low.s|low.s]] 0523，调用时机不明，列入[[遗留问题]]
+</div>
+
+1350
+
+1351 /* ------------------------- */ 
+
+1352 .globl dump
+
+1353 dump:
+
+1354 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BIT|bit]] $1,[[code:SSR|SSR0]]
+
+1355 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BNE|bne]] dump
+
+1356
+
+1357 / save regs r0,r1,r2,r3,r4,r5,r6,KIA6
+
+1358 / starting at abs location 4
+
+1359
+
+1360 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r0,4
+
+1361 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $6,r0
+
+1362 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r1,(r0)+
+
+1363 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r2,(r0)+
+
+1364 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r3,(r0)+
+
+1365 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r4,(r0)+
+
+1366 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r5,(r0)+
+
+1367 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] sp,(r0)+
+
+1368 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] KISA6,(r0)+
+
+1369
+
+1370 / dump all of core (ie to first mt error)
+
+1371 / onto mag tape. (9 track or 7 track ’binary’)
+
+1372
+
+1373 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $MTC,r0
+
+1374 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $60004,(r0)+
+
+1375 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] 2(r0)
+
+1376 1:
+
+1377 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $-512.,(r0)
+
+1378 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:INC|inc]] -(r0)
+
+1379 2:
+
+1380 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:TSTB|tstb]] (r0)
+
+1381 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BGE|bge]] 2b
+
+1382 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:TST|tst]] (r0)+
+
+1383 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BGE|bge]] 1b
+
+1384 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RESET|reset]]
+
+1385
+
+1386 / end of file and loop
+
+1387
+
+1388 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $60007,-(r0)
+
+1389 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BR|br]] . 
+
+1390
+
+
+
+===Ref===
+*[[关于汇编函数的说明]]

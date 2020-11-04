@@ -1,0 +1,47 @@
+=综述=
+*为了减少对 存储块设备 的读写次数,提高读写效率,对设备读写采取缓存机制
+*通过三个图解说明 缓存管理机制
+**[[设备缓存管理#缓存机制图解|缓存机制图解]]
+**[[设备缓存管理#数据结构|数据结构]]
+**[[设备缓存管理#标志位改变图解|标志位改变图解]]
+
+=主要函数/数据结构=
+*[[code:bdevsw|bdevsw]]
+*[[code:struct devtab|struct devtab]]
+*[[code:struct buf|struct buf]]
+*[[code:bread|bread]]
+*[[code:breada|breada]]
+*[[code:bwrite|bwrite]]
+*[[code:bdwrite|bdwrite]]
+*[[code:bawrite|bawrite]]
+*[[code:brelse|brelse]]
+*[[code:incore|incore]]
+*[[code:getblk|getblk]]
+*[[code:iowait|iowait]]
+*[[code:notavil|notavil]]
+*[[code:iodone|iodone]]
+*[[code:binit|binit]]
+
+=缓存机制图解=
+*对设备缓存总体机制作以说明
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Read_write_disk.png"/></p>
+=数据结构=
+*说明设备缓存 的物理结构
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Buf_structure.png"/></p>
+*[[code:bdevsw|bdevsw]]
+*[[code:struct devtab|struct devtab]]
+*[[File:buf.h|bfreelist]]
+*[[code:struct buf|struct buf]]
+*[[File:bio.c|buffers]]
+*[[设备队列]]
+*[[设备I/O队列]]
+*[[设备队列#NODEV设备队列|NODEV设备队列]]
+*[[自由队列]]
+=标志位改变图解=
+*设备缓存块 都具有标志位，从标志位的改变可以看出整个运行流程
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Buf_signals.png"/></p>
+=参考=
+*[[设备队列]]
+*[[设备队列|NODEV设备队列]]
+*[[设备I/O队列]]
+*[[自由队列]]

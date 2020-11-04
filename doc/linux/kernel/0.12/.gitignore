@@ -1,0 +1,10 @@
+\#.*
+*.aux
+*.log
+*.out
+*.toc
+*.tex
+*.bbl
+*.pdf
+*.dvi
+.DS_Store

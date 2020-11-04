@@ -1,0 +1,27 @@
+* Terms
+
+
+** DDR
+
+DDR是一种计算机内存规格。它属于SDRAM家族的内存产品，提供了相较于DDR2 SDRAM更高的运行效能与更低的电压，是DDR2 SDRAM（同步动态动态随机存取内存）的后继者（增加至八倍），也是现时流行的内存产品规格。
+
+
+https://en.wikipedia.org/wiki/DDR4_SDRAM
+
+Double Data Rate 4 Synchronous Dynamic Random-Access Memory, officially abbreviated as DDR4 SDRAM, is a type of synchronous dynamic random-access memory with a high bandwidth ("double data rate") interface.
+
+Released to the market in 2014,[1][2][3] it is one of the latest variants of dynamic random-access memory (DRAM), of which some have been in use since the early 1970s,[4] and a higher-speed successor to the DDR2 and DDR3 technologies.
+
+DDR4 is not compatible with any earlier type of random-access memory (RAM) due to different signaling voltage and physical interface, besides other factors.
+
+DDR4 SDRAM was released to the public market in Q2 2014, focusing on ECC memory,[5] while the non-ECC DDR4 modules became available in Q3 2014, accompanying the launch of Haswell-E processors that require DDR4 memory.[6]
+
+
+** SuperScalar 超标量
+
+超标量（superscalar）试图在一个周期取出多条指令并行执行，是通过内置多条流水线来同时执行多个处理，其实质是以空间换取时间。但由于指令之间的相关性，即后一条指令需要前一条指令的结果，超标量CPU的性能是一个周期能执行1.2条指令，而为了取得这20%的性能改善，超标量CPU需要增加大量的硬件电路来调度这些同时取出的指令，比如寄存器重命名，预约站，重排序缓冲区等 [1]  。
+
+
+** SMT
+
+Simulate MultiThreading（SMT，同步多线程技术），SMT是超线程技术的学术名称

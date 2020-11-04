@@ -1,0 +1,153 @@
+===Source===
+<div class="wikiheadnote">
+*向字符缓存池写入一个字符
+*传入2个参数
+**参数1:一个字符
+**参数2:[[code:struct clist|struct clist]]的地址
+*返回值
+**若成功写入,返回0
+**否则返回一个非零值
+</div>
+
+0967 _putc:
+
+0968 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 2(sp),r0
+
+0969 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 4(sp),r1
+
+0970 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] PS,-(sp)
+
+0971 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r2,-(sp)
+
+0972 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r3,-(sp)
+
+0973 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BIS|bis]] $340,PS					
+
+0974 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BIC|bic]] $100,PS &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  / spl 5
+
+0975 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 4(r1),r2 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  / last ptr
+
+0976 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BNE|bne]] 1f
+
+<blockquote>
+*判断clist.c-cl是否为空指针,若不是,跳到983行执行,否则继续
+</blockquote>
+0977 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] _cfreelist,r2
+
+<blockquote>
+*从[[字符设备管理#自由字符缓存队列|自由字符缓存队列]]取出位于队首的缓存,并将其指针赋给R2
+</blockquote>
+0978 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BEQ|beq]] 9f
+
+<blockquote>
+*若cfreelist为空指针,表明[[字符设备管理#自由字符缓存队列|自由字符缓存队列]]为空,分配失败,跳转至1001行,否则继续
+</blockquote>
+0979 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (r2),_cfreelist
+
+<blockquote>
+*cfreelist 指向 原先[[字符设备管理#自由字符缓存队列|自由字符缓存队列]]中的第二个缓存
+</blockquote>
+0980 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] (r2)
+
+<blockquote>
+*新分配缓存的c_next 置为 NULL
+*同时 R2指向新分配缓存块的第一个字符存放的位置
+</blockquote>
+0981 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r2,2(r1)+ &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  / first ptr
+
+0982 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BR|br]] 2f
+
+
+<blockquote>
+*[[code:struct clist|struct clist]].c-cf 指向 新分配缓存的第一个字符
+</blockquote>
+0983 1:
+
+0984 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BIT|bit]] $7,r2
+
+0985 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BNE|bne]] 2f
+
+<blockquote>
+*判断寄存器R2的值最后三位是否为000
+**若为000,表明[[字符设备管理#I/O字符缓存队列|I/O字符缓存队列]]队尾的缓存已被用完,需要新分配缓存,原因请参考[[字符设备管理#缓存池的改造|缓存池的改造]]
+**否则,无需分配新缓存,则直接跳至992行
+</blockquote>
+0986 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] _cfreelist,r3
+
+0987 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BEQ|beq]] 9f
+
+0988 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (r3),_cfreelist
+
+<blockquote>
+*986 - 998行类似于977 -979行,此处不再赘述
+</blockquote>
+0989 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r3,-10(r2)
+
+0990 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r3,r2
+
+<blockquote>
+*队尾缓存块的c_next → R3,R3 → R2
+*于是当前R2中存放的是新分配缓存块的首地址 
+</blockquote>
+0991 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] (r2)+
+
+<blockquote>
+*新分配缓存的c_next 置为 NULL
+*同时 R2指向新分配缓存块的第一个字符存放的位置
+</blockquote>
+0992 2:
+
+0993 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOVB|movb]] r0,(r2)+
+
+0994 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r2,4(r1)
+
+0995 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:INC|inc]] (r1)							/ count
+
+<blockquote>
+*将字符c写入[[字符设备管理#I/O字符缓存队列|I/O字符缓存队列]]的队尾
+*更新队尾指针
+*[[code:struct clist|struct clist]].c-cc加1
+</blockquote>
+0996 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] r0
+
+<blockquote>
+*0 → R0,用于返回0,表明字符写入缓存池成功
+</blockquote>
+0997 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,r3
+
+0998 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,r2
+
+0999 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,PS
+
+1000 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc
+
+<blockquote>
+*以下为缓存分配失败后的处理
+</blockquote>
+1001 9:
+
+1002 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] pc,r0
+
+<blockquote>
+*0 → R0,用于返回一个非0值,表明字符写入缓存池失败
+</blockquote>
+1003 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,r3
+
+1004 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,r2
+
+1005 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,PS
+
+1006 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc
+
+
+===Extend===
+=附图=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_putc.png"/></p>
+===Ref===
+*[[字符设备管理]]
+*[[关于汇编函数的说明]]
+
+===Caller===
+*[[code:canon]]
+*[[code:ttyinput]]
+*[[code:ttyoutput]]

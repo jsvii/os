@@ -1,0 +1,588 @@
+* Advanced Programming in the UNIX® Environment, Second Edition
+
+
+- Introduction
+
+- Chapter 1. UNIX System Overview
+
+  - Section 1.1. Introduction
+
+  - Section 1.2. UNIX Architecture
+
+  - Section 1.3. Logging In
+
+  - Section 1.4. Files and Directories
+
+  - Section 1.5. Input and Output
+
+  - Section 1.6. Programs and Processes
+
+  - Section 1.7. Error Handling
+
+  - Section 1.8. User Identification
+
+  - Section 1.9. Signals
+
+  - Section 1.10. Time Values
+
+  - Section 1.11. System Calls and Library Functions
+
+  - Section 1.12. Summary
+
+
+- Chapter 2. UNIX Standardization and Implementations
+
+  - Section 2.1. Introduction
+
+  - Section 2.2. UNIX Standardization
+
+  - Section 2.3. UNIX System Implementations
+
+  - Section 2.4. Relationship of Standards and Implementations
+
+  - Section 2.5. Limits
+
+  - Section 2.6. Options
+
+  - Section 2.7. Feature Test Macros
+
+  - Section 2.8. Primitive System Data Types
+
+  - Section 2.9. Conflicts Between Standards
+
+  - Section 2.10. Summary
+
+
+- Chapter 3. File I/O
+
+  - Section 3.1. Introduction
+
+  - Section 3.2. File Descriptors
+
+  - Section 3.3. open Function
+
+  - Section 3.4. creat Function
+
+  - Section 3.5. close Function
+
+  - Section 3.6. lseek Function
+
+  - Section 3.7. read Function
+
+  - Section 3.8. write Function
+
+  - Section 3.9. I/O Efficiency
+
+  - Section 3.10. File Sharing
+
+  - Section 3.11. Atomic Operations
+
+  - Section 3.12. dup and dup2 Functions
+
+  - Section 3.13. sync, fsync, and fdatasync Functions
+
+  - Section 3.14. fcntl Function
+
+  - Section 3.15. ioctl Function
+
+  - Section 3.16. /dev/fd
+
+  - Section 3.17. Summary
+
+
+- Chapter 4. Files and Directories
+
+  - Section 4.1. Introduction
+
+  - Section 4.2. stat, fstat, and lstat Functions
+
+  - Section 4.3. File Types
+
+  - Section 4.4. Set-User-ID and Set-Group-ID
+
+  - Section 4.5. File Access Permissions
+
+  - Section 4.6. Ownership of New Files and Directories
+
+  - Section 4.7. access Function
+
+  - Section 4.8. umask Function
+
+  - Section 4.9. chmod and fchmod Functions
+
+  - Section 4.10. Sticky Bit
+
+  - Section 4.11. chown, fchown, and lchown Functions
+
+  - Section 4.12. File Size
+
+  - Section 4.13. File Truncation
+
+  - Section 4.14. File Systems
+
+  - Section 4.15. link, unlink, remove, and rename Functions
+
+  - Section 4.16. Symbolic Links
+
+  - Section 4.17. symlink and readlink Functions
+
+  - Section 4.18. File Times
+
+  - Section 4.19. utime Function
+
+  - Section 4.20. mkdir and rmdir Functions
+
+  - Section 4.21. Reading Directories
+
+  - Section 4.22. chdir, fchdir, and getcwd Functions
+
+  - Section 4.23. Device Special Files
+
+  - Section 4.24. Summary of File Access Permission Bits
+
+  - Section 4.25. Summary
+
+
+- Chapter 5. Standard I/O Library
+
+  - Section 5.1. Introduction
+
+  - Section 5.2. Streams and FILE Objects
+
+  - Section 5.3. Standard Input, Standard Output, and Standard Error
+
+  - Section 5.4. Buffering
+
+  - Section 5.5. Opening a Stream
+
+  - Section 5.6. Reading and Writing a Stream
+
+  - Section 5.7. Line-at-a-Time I/O
+
+  - Section 5.8. Standard I/O Efficiency
+
+  - Section 5.9. Binary I/O
+
+  - Section 5.10. Positioning a Stream
+
+  - Section 5.11. Formatted I/O
+
+  - Section 5.12. Implementation Details
+
+  - Section 5.13. Temporary Files
+
+  - Section 5.14. Alternatives to Standard I/O
+
+  - Section 5.15. Summary
+
+
+- Chapter 6. System Data Files and Information
+
+  - Section 6.1. Introduction
+
+  - Section 6.2. Password File
+
+  - Section 6.3. Shadow Passwords
+
+  - Section 6.4. Group File
+
+  - Section 6.5. Supplementary Group IDs
+
+  - Section 6.6. Implementation Differences
+
+  - Section 6.7. Other Data Files
+
+  - Section 6.8. Login Accounting
+
+  - Section 6.9. System Identification
+
+  - Section 6.10. Time and Date Routines
+
+  - Section 6.11. Summary
+
+
+- Chapter 7. Process Environment
+
+  - Section 7.1. Introduction
+
+  - Section 7.2. main Function
+
+  - Section 7.3. Process Termination
+
+  - Section 7.4. Command-Line Arguments
+
+  - Section 7.5. Environment List
+
+  - Section 7.6. Memory Layout of a C Program
+
+
+  - Section 7.7. Shared Libraries
+
+  - Section 7.8. Memory Allocation
+
+  - Section 7.9. Environment Variables
+
+  - Section 7.10. setjmp and longjmp Functions
+
+  - Section 7.11. getrlimit and setrlimit Functions
+
+  - Section 7.12. Summary
+
+
+- Chapter 8. Process Control
+
+  - Section 8.1. Introduction
+
+  - Section 8.2. Process Identifiers
+
+  - Section 8.3. fork Function
+
+  - Section 8.4. vfork Function
+
+  - Section 8.5. exit Functions
+
+  - Section 8.6. wait and waitpid Functions
+
+  - Section 8.7. waitid Function
+
+  - Section 8.8. wait3 and wait4 Functions
+
+  - Section 8.9. Race Conditions
+
+  - Section 8.10. exec Functions
+
+  - Section 8.11. Changing User IDs and Group IDs
+
+  - Section 8.12. Interpreter Files
+
+  - Section 8.13. system Function
+
+  - Section 8.14. Process Accounting
+
+  - Section 8.15. User Identification
+
+  - Section 8.16. Process Times
+
+  - Section 8.17. Summary
+
+
+- Chapter 9. Process Relationships
+
+  - Section 9.1. Introduction
+
+  - Section 9.2. Terminal Logins
+
+  - Section 9.3. Network Logins
+
+  - Section 9.4. Process Groups
+
+  - Section 9.5. Sessions
+
+  - Section 9.6. Controlling Terminal
+
+  - Section 9.7. tcgetpgrp, tcsetpgrp, and tcgetsid Functions
+
+  - Section 9.8. Job Control
+
+  - Section 9.9. Shell Execution of Programs
+
+  - Section 9.10. Orphaned Process Groups
+
+  - Section 9.11. FreeBSD Implementation
+
+  - Section 9.12. Summary
+
+
+- Chapter 10. Signals
+
+  - Section 10.1. Introduction
+
+  - Section 10.2. Signal Concepts
+
+  - Section 10.3. signal Function
+
+  - Section 10.4. Unreliable Signals
+
+  - Section 10.5. Interrupted System Calls
+
+
+  - Section 10.6. Reentrant Functions
+
+  - Section 10.7. SIGCLD Semantics
+
+  - Section 10.8. Reliable-Signal Terminology and Semantics
+
+  - Section 10.9. kill and raise Functions
+
+  - Section 10.10. alarm and pause Functions
+
+  - Section 10.11. Signal Sets
+
+  - Section 10.12. sigprocmask Function
+
+  - Section 10.13. sigpending Function
+
+  - Section 10.14. sigaction Function
+
+  - Section 10.15. sigsetjmp and siglongjmp Functions
+
+  - Section 10.16. sigsuspend Function
+
+  - Section 10.17. abort Function
+
+  - Section 10.18. system Function
+
+  - Section 10.19. sleep Function
+
+  - Section 10.20. Job-Control Signals
+
+  - Section 10.21. Additional Features
+
+  - Section 10.22. Summary
+
+
+- Chapter 11. Threads
+
+  - Section 11.1. Introduction
+
+  - Section 11.2. Thread Concepts
+
+  - Section 11.3. Thread Identification
+
+  - Section 11.4. Thread Creation
+
+  - Section 11.5. Thread Termination
+
+  - Section 11.6. Thread Synchronization
+
+  - Section 11.7. Summary
+
+
+- Chapter 12. Thread Control
+
+  - Section 12.1. Introduction
+
+  - Section 12.2. Thread Limits
+
+  - Section 12.3. Thread Attributes
+
+  - Section 12.4. Synchronization Attributes
+
+  - Section 12.5. Reentrancy
+
+  - Section 12.6. Thread-Specific Data
+
+  - Section 12.7. Cancel Options
+
+  - Section 12.8. Threads and Signals
+
+  - Section 12.9. Threads and fork
+
+  - Section 12.10. Threads and I/O
+
+  - Section 12.11. Summary
+
+
+- Chapter 13. Daemon Processes
+
+  - Section 13.1. Introduction
+
+  - Section 13.2. Daemon Characteristics
+
+  - Section 13.3. Coding Rules
+
+  - Section 13.4. Error Logging
+
+  - Section 13.5. Single-Instance Daemons
+
+  - Section 13.6. Daemon Conventions
+
+  - Section 13.7. ClientServer Model
+
+  - Section 13.8. Summary
+
+
+- Chapter 14. Advanced I/O
+
+  - Section 14.1. Introduction
+
+  - Section 14.2. Nonblocking I/O
+
+  - Section 14.3. Record Locking
+
+  - Section 14.4. STREAMS
+
+  - Section 14.5. I/O Multiplexing
+
+  - Section 14.6. Asynchronous I/O
+
+  - Section 14.7. readv and writev Functions
+
+  - Section 14.8. readn and writen Functions
+
+  - Section 14.9. Memory-Mapped I/O
+
+  - Section 14.10. Summary
+
+
+- Chapter 15. Interprocess Communication
+
+  - Section 15.1. Introduction
+
+  - Section 15.2. Pipes
+
+  - Section 15.3. popen and pclose Functions
+
+  - Section 15.4. Coprocesses
+
+  - Section 15.5. FIFOs
+
+  - Section 15.6. XSI IPC
+
+  - Section 15.7. Message Queues
+
+  - Section 15.8. Semaphores
+
+  - Section 15.9. Shared Memory
+
+  - Section 15.10. ClientServer Properties
+
+  - Section 15.11. Summary
+
+
+- Chapter 16. Network IPC: Sockets
+
+  - Section 16.1. Introduction
+
+  - Section 16.2. Socket Descriptors
+
+  - Section 16.3. Addressing
+
+  - Section 16.4. Connection Establishment
+
+  - Section 16.5. Data Transfer
+
+  - Section 16.6. Socket Options
+
+  - Section 16.7. Out-of-Band Data
+
+  - Section 16.8. Nonblocking and Asynchronous I/O
+
+  - Section 16.9. Summary
+
+
+- Chapter 17. Advanced IPC
+
+  - Section 17.1. Introduction
+
+  - Section 17.2. STREAMS-Based Pipes
+
+  - Section 17.3. UNIX Domain Sockets
+
+  - Section 17.4. Passing File Descriptors
+
+  - Section 17.5. An Open Server, Version 1
+
+
+  - Section 17.6. An Open Server, Version 2
+
+  - Section 17.7. Summary
+
+
+- Chapter 18. Terminal I/O
+
+  - Section 18.1. Introduction
+
+  - Section 18.2. Overview
+
+  - Section 18.3. Special Input Characters
+
+  - Section 18.4. Getting and Setting Terminal Attributes
+
+  - Section 18.5. Terminal Option Flags
+
+  - Section 18.6. stty Command
+
+  - Section 18.7. Baud Rate Functions
+
+  - Section 18.8. Line Control Functions
+
+  - Section 18.9. Terminal Identification
+
+  - Section 18.10. Canonical Mode
+
+  - Section 18.11. Noncanonical Mode
+
+  - Section 18.12. Terminal Window Size
+
+  - Section 18.13. termcap, terminfo, and curses
+
+  - Section 18.14. Summary
+
+
+- Chapter 19. Pseudo Terminals
+
+  - Section 19.1. Introduction
+
+  - Section 19.2. Overview
+
+  - Section 19.3. Opening Pseudo-Terminal Devices
+
+  - Section 19.4. pty_fork Function
+
+  - Section 19.5. pty Program
+
+  - Section 19.6. Using the pty Program
+
+  - Section 19.7. Advanced Features
+
+  - Section 19.8. Summary
+
+
+- Chapter 20. A Database Library
+
+  - Section 20.1. Introduction
+
+  - Section 20.2. History
+
+  - Section 20.3. The Library
+
+  - Section 20.4. Implementation Overview
+
+  - Section 20.5. Centralized or Decentralized?
+
+  - Section 20.6. Concurrency
+
+  - Section 20.7. Building the Library
+
+  - Section 20.8. Source Code
+
+  - Section 20.9. Performance
+
+  - Section 20.10. Summary
+
+
+- Chapter 21. Communicating with a Network Printer
+
+  - Section 21.1. Introduction
+
+  - Section 21.2. The Internet Printing Protocol
+
+  - Section 21.3. The Hypertext Transfer Protocol
+
+  - Section 21.4. Printer Spooling
+
+  - Section 21.5. Source Code
+
+  - Section 21.6. Summary
+
+
+- Appendix A. Function Prototypes
+
+- Appendix B. Miscellaneous Source Code
+
+  - Section B.1. Our Header File
+
+  - B.2 Standard Error Routines
+
+- Appendix C. Solutions to Selected

@@ -1,0 +1,43 @@
+===Source===
+<div class="wikiheadnote">
+*输出 设备错误
+*共传入两个参数 str,dev
+**str : 错误字串
+**dev : 发出错误的设备
+</div>
+
+2426 
+
+2427 /* 
+
+2428 &nbsp;* prdev prints a warning message of the 
+
+2429 &nbsp;* form "mesg on dev x/y". 
+
+2430 &nbsp;* x and y are the major and minor parts of 
+
+2431 &nbsp;* the device argument. 
+
+2432 &nbsp;*/ 
+
+2433 prdev(str, dev) 
+
+2434 { 
+
+2435 
+
+2436 &nbsp;&nbsp;&nbsp;&nbsp;[[code:printf|printf]]("%s on dev %l/%l
+\n", str, dev[[skill:.d_major|.d_major]], dev[[skill:.d_minor|.d_minor]]); 
+
+2437 } 
+
+2438 /* ------------------------- */ 
+
+
+
+===Caller===
+*[[code:deverror]]
+*[[code:alloc]]
+*[[code:badblock]]
+*[[code:ialloc]]
+*[[code:getfs]]

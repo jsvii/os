@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===BIT<br/>BITB[字节版本]
+===Code===■3SSDD
+===Operation===(src)∧(dst)
+===Coden===若 运算结果<0（最高位[符号位]被置位），则置位<br/>否则，清位
+===Codez===若 运算结果=0，则置位<br/>否则，清位
+===Codev===清
+===Codec===无影响
+===Description=== 将源地址的数据和目标地址的数据做逻辑与运算，并置相应标志位，原地址的数据与目标地址的数据并不发生改变
+===Example===<p>BIT_#30,R3<br/>若_标志位Z被置，则A=0_且_B=0<br/>否则，不然<br/>常用于测试目标地址某些数位是否全为0<br/><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_instruction_Bit_30_r3.png"/></p>

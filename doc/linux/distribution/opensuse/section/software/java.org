@@ -1,0 +1,16 @@
+* java
+
+** jvm
+
+#+BEGIN_SRC shell
+cd /usr/lib
+mkdir jvm
+tar -xf jdk-x.xx.xx.tar.gz
+#+END_SRC
+
+
+** emacs
+
+  - 安装lsp-java
+
+  - https://github.com/mopemope/meghanada-emacs

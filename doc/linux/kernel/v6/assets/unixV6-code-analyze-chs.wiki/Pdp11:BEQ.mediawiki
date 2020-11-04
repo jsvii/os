@@ -1,0 +1,12 @@
+{{pdp11:instruction
+===Instruction===BEQ
+===Code===001400 + 偏移[offset]
+===Operation===PC ← PC + ( 2 * offset ) if Z = 1
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===若标志位Z被置位，进行程序控制转移<br/>互补操作为[[pdp11:BNE|BNE]]
+===Example===CMP A , B ;比较A , B<br/>BEQ C ;若 A　=　B，则程序控制跳转到C
+----
+ADD A ,B ;A , B相加<br/>BEQ C ;若　A + B = 0，则程序控制跳转到C

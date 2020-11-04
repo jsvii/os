@@ -1,0 +1,28 @@
+* start/stop/restart
+
+  - docker start :启动一个或多少已经被停止的容器
+
+  - docker stop :停止一个运行中的容器
+
+  - docker restart :重启容器
+
+语法
+
+#+BEGIN_SRC sh
+docker start [OPTIONS] CONTAINER [CONTAINER...]
+docker stop [OPTIONS] CONTAINER [CONTAINER...]
+docker restart [OPTIONS] CONTAINER [CONTAINER...]
+#+END_SRC
+
+实例
+
+#+BEGIN_SRC sh
+//启动已被停止的容器myrunoob
+docker start myrunoob
+
+//停止运行中的容器myrunoob
+docker stop myrunoob
+
+//重启容器myrunoob
+docker restart myrunoob
+#+END_SRC

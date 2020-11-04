@@ -1,0 +1,38 @@
+===Source===
+<div class="wikiheadnote">
+*错误设备函数，抛出错误
+*用于设备表(如 [[code:bdevsw|bdevsw]])中 声明 错误设备函数
+</div>
+
+6561 
+
+6562 /* 
+
+6563 &nbsp;* Routine which sets a user error; placed in 
+
+6564 &nbsp;* illegal entries in the bdevsw and cdevsw tables. 
+
+6565 &nbsp;*/ 
+
+6566 nodev() 
+
+6567 { 
+
+6568 
+
+6569 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = ENODEV; 
+
+<blockquote>
+*参考 [[错误代码]]
+</blockquote>
+6570 } 
+
+6571 /* ------------------------- */ 
+
+
+===Ref===
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:cdevsw]]
+*[[code:bdevsw]]

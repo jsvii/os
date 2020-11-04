@@ -1,0 +1,88 @@
+===Source===
+<div class="wikiheadnote">
+*此函数 为 [[code:gtty|gtty]] 和 [[code:stty|stty]] 的"公共部分"(名不副实...)
+*传入2个参数 atp , av
+**atp : 指定 的 [[code:struct tty|struct tty]]
+**av : 一个缓存区，用来交换tty状态
+*对该函数作用说明如下
+** av = 0 时，本函数由[[code:stty|stty]]调用
+[ [[code:stty|stty]] 调用 [[code:sgtty|sgtty(0)]] 调用 d_sgtty(0)(比如[[code:klsgtty|klsgtty(dev,0)]]) 调用 [[code:ttystty|ttystty(dev,0)]] ]，
+用于从[[code:user|u.u_arg[]]]传入tty参数
+** av != 0 时，本函数由[[code:gtty|gtty]]调用
+[ [[code:gtty|gtty]] 调用 [[code:sgtty|sgtty(av)]] 调用 d_sgtty(av)(比如[[code:klsgtty|klsgtty(dev,av)]]) 调用 [[code:ttystty|ttystty(dev,av)]] ]，
+用于向av传送tty参数
+</div>
+
+8571 /* Common code for gtty and stty functions on typewriters. 
+
+8572 &nbsp;* If v is non-zero then gtty is being done and information 
+
+8573 &nbsp;* is passed back therein; 
+
+8574 &nbsp;* if it is zero stty is being done and the input inform- 
+
+8575 &nbsp;* ation is in the u_arg array. 
+
+8576 &nbsp;*/ 
+
+8577 ttystty(atp, av) 
+
+8578 int *atp, *av; 
+
+8579 { 
+
+8580 &nbsp;&nbsp;&nbsp;&nbsp;register *tp, *v; 
+
+8581 &nbsp;&nbsp;&nbsp;&nbsp;tp = atp; 
+
+8582 &nbsp;&nbsp;&nbsp;&nbsp;if(v = av) { 
+
+8583 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;*v++ = tp->t_speeds; 
+
+8584 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;v->lobyte = tp->t_erase; 
+
+8585 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;v->hibyte = tp->t_kill; 
+
+8586 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;v[1] = tp->t_flags; 
+
+8587 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return(1); 
+
+<blockquote>
+[[code:gtty|gtty]]调用的部分
+*向v中 传入 tty 参数
+*返回1
+</blockquote>
+8588 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+8589 &nbsp;&nbsp;&nbsp;&nbsp;[[code:wflushtty|wflushtty]](tp); 
+
+8590 &nbsp;&nbsp;&nbsp;&nbsp;v = [[code:user|u.u_arg]]; 
+
+8591 &nbsp;&nbsp;&nbsp;&nbsp;tp->t_speeds = *v++; 
+
+8592 &nbsp;&nbsp;&nbsp;&nbsp;tp->t_erase = v->lobyte; 
+
+8593 &nbsp;&nbsp;&nbsp;&nbsp;tp->t_kill = v->hibyte; 
+
+8594 &nbsp;&nbsp;&nbsp;&nbsp;tp->t_flags = v[1]; 
+
+8595 &nbsp;&nbsp;&nbsp;&nbsp;return(0); 
+
+<blockquote>
+[[code:stty|stty]]调用的部分
+*"清空" tp 的队列
+*从v中 设置 tty 参数
+*返回0
+</blockquote>
+8596 } 
+
+8597 /* ------------------------- */ 
+
+8598 
+
+8599 
+
+
+
+===Caller===
+*[[code:klsgtty]]

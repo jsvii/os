@@ -1,0 +1,8 @@
+[repo-source]
+name=openSUSE-Leap-15.0-Source
+enabled=0
+autorefresh=1
+baseurl=http://download.opensuse.org/source/distribution/leap/15.0/repo/oss/
+path=/
+type=NONE
+keeppackages=0

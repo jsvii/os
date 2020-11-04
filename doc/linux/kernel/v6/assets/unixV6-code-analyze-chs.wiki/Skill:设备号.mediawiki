@@ -1,0 +1,5 @@
+*举例<div class="wikicode">dev.d_major<br/>dev.d_minor</div>
+*使用了[[编程技巧#无名结构|编程技巧之无名结构]]，结构定义在 [[file:conf.h|conf.h]]
+*从 设备号 分离出 主设备号 和 从设备号
+*.d_major 为主设备号
+*.d_minor 为从设备号

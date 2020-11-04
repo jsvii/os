@@ -1,0 +1,51 @@
+===Source===
+
+8000 #
+
+8001 /* KL/DL-11 driver */
+
+8002 #include "../param.h"
+
+8003 #include "../conf.h"
+
+8004 #include "../user.h"
+
+8005 #include "../tty.h"
+
+8006 #include "../proc.h"
+
+8007 /* base address */
+
+8008 #define KLADDR 0177560 /* console */
+
+8009 #define KLBASE 0176500 /* kl and dl11-a */
+
+8010 #define DLBASE 0175610 /* dl-e */
+
+8011 #define NKL11 1
+
+8012 #define NDL11 0
+
+8013 #define DSRDY 02
+
+8014 #define RDRENB 01
+
+8015 struct [[code:struct tty|tty]] [[code:kl11|kl11]][NKL11+NDL11];
+
+<blockquote>
+*kl11/DL11接口设备表
+</blockquote>
+8016 struct klregs {
+
+8017 &nbsp;&nbsp;&nbsp;&nbsp;int klrcsr;
+
+8018 &nbsp;&nbsp;&nbsp;&nbsp;int klrbuf;
+
+8019 &nbsp;&nbsp;&nbsp;&nbsp;int kltcsr;
+
+8020 &nbsp;&nbsp;&nbsp;&nbsp;int kltbuf;
+
+8021 }
+
+8022 /* ------------------------- */
+

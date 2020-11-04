@@ -1,0 +1,20 @@
+
+===Source===
+
+3000 #
+
+3001 #include "../param.h"
+
+3002 #include "../systm.h"
+
+3003 #include "../user.h"
+
+3004 #include "../proc.h"
+
+3005 #include "../buf.h"
+
+3006 #include "../reg.h"
+
+3007 #include "../inode.h"
+
+

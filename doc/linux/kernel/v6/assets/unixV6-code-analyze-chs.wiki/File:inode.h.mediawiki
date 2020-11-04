@@ -1,0 +1,86 @@
+
+===Source===
+
+5677
+
+5678 /* flags */
+
+5679 #define ILOCK 01 /* inode is locked */
+
+<blockquote>
+*INODE块锁标志
+</blockquote>
+5680 #define IUPD 02 /* inode has been modified */
+
+<blockquote>
+*INODE块被修改标志
+</blockquote>
+5681 #define IACC 04 /* inode access time to be updated */
+
+<blockquote>
+*INODE块被读取标志
+</blockquote>
+5682 #define IMOUNT 010 /* inode is mounted on */
+
+<blockquote>
+*该INODE块 装载 子文件系统 
+</blockquote>
+5683 #define IWANT 020 /* some process waiting on lock */
+
+<blockquote>
+*有进程在等待使用该INODE块
+</blockquote>
+5684 #define ITEXT 040 /* inode is pure text prototype */
+
+<blockquote>
+*该文件是某程序的正文
+</blockquote>
+5685
+
+5686 /* modes */
+
+5687 #define IALLOC 0100000 /* file is used */
+
+<blockquote>
+*该 INODE 块已被分配使用
+</blockquote>
+5688 #define IFMT 060000 /* type of file */
+
+5689 #define IFDIR 040000 /* directory */
+
+5690 #define IFCHR 020000 /* character special */
+
+5691 #define IFBLK 060000 /* block special, 0 is regular */
+
+<blockquote>
+*参看 [[文件系统#inode类型|文件系统之inode类型]]
+</blockquote>
+5692 #define ILARG 010000 /* large addressing algorithm */
+
+5693 #define ISUID 04000 /* set user id on execution */
+
+5694 #define ISGID 02000 /* set group id on execution */
+
+5695 #define ISVTX 01000 /* save swapped text even after use */
+
+<blockquote>
+*该 INODE 块 为[[共享正文段]]的INODE，且不可被释放
+</blockquote>
+5696 #define IREAD 0400 /* read, write, execute permissions */
+
+<blockquote>
+*读权限
+</blockquote>
+5697 #define IWRITE 0200
+
+<blockquote>
+*写权限
+</blockquote>
+5698 #define IEXEC 0100
+
+<blockquote>
+*执行权限
+</blockquote>
+5699
+
+

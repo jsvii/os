@@ -1,0 +1,6 @@
+=进程状态转换=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Proc_stat.png"/></p>
+*SRUN → SSLEEP/SWAIT ，参看[[code:sleep|sleep]]
+*SSLEEP/SWAIT → SRUN ，参看[[code:wakeup|wakeup]]
+*SRUN → SZOMB ，参看[[code:exit|exit]]
+*SRUN ←→ SSTOP ，参看[[跟踪]]

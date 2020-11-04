@@ -1,0 +1,22 @@
+===Source===
+<div class = "wikiheadnote">
+*用于返回SW -> integ的值
+</div>
+<div class = "wikicode">
+3413 &nbsp;&nbsp;&nbsp;&nbsp;getswit()<br/>
+
+3414 &nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+
+3415<br/>
+
+3416 &nbsp;&nbsp;&nbsp;&nbsp;[[skill:u.u_ar0|u.u_ar0]][R0] = SW->integ;<br/>
+
+3417 &nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+
+3418 /* ------------------------- */
+
+</div>
+
+===Param===
+:(csw = 38.; not in assembler)
+:<b>sys	csw</b>

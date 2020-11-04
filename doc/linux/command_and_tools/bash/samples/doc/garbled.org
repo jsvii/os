@@ -1,0 +1,21 @@
+* 乱码
+
+** windows
+
+windows下txt文件直接保存，有中文字符，到linux时是乱码
+
+#+BEGIN_SRC shell
+less demo.txt
+"demo.txt" may be a binary file.  See it anyway?
+326320316Ĳ342312324
+#+END_SRC
+
+*** 解决方案
+
+#+BEGIN_SRC shell
+iconv -f GBK -t UTF8 demo.txt
+#+END_SRC
+
+windows自身采用的编码格式是gbk(而gbk和gb2312基本上是一样的编码方式)。
+
+IDE中Encode不修改的话，默认是utf-8的编码，这就是为什么会出现乱码的原因。当在OS下手工创建并写入的txt文件（gbk），用程序直接去读（utf-8），就会乱码

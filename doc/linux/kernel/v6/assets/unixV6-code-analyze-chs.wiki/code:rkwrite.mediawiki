@@ -1,0 +1,47 @@
+===Source===
+<div class="wikiheadnote">
+*RK 磁盘的驱动函数(写)
+</div>
+
+5482
+
+5483 rkwrite(dev)
+
+5484 {
+
+5485
+
+5486 &nbsp;&nbsp;&nbsp;&nbsp;[[code:physio|physio]]([[code:rkstrategy|rkstrategy]], &rrkbuf, dev, B_WRITE);
+
+5487 }
+
+5488 /* ------------------------- */ 
+
+5489
+
+5490
+
+5491
+
+5492
+
+5493
+
+5494
+
+5495
+
+5496
+
+5497
+
+5498
+
+5499
+
+
+
+===Ref===
+*[[RK磁盘]]
+===Caller===
+*[[code:cdevsw]]

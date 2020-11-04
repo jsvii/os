@@ -1,0 +1,8 @@
+* wallet
+
+Edit ~/.config/kwalletrc (see note below), and add
+
+#+BEGIN_SRC bash
+[Wallet]
+Enabled=false
+#+END_SRC

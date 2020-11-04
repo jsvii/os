@@ -1,0 +1,16 @@
+* curl
+
+#+BEGIN_SRC bash
+curl 'http://localhost:3001/AITemplateManagement/iam-user' -H 'Connection: keep-alive' -H 'Cache-Control: max-age=0' -H 'Upgrade-Insecure-Requests: 1' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.3993.0 Safari/537.36' -H 'Sec-Fetch-Dest: document' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9' -H 'Sec-Fetch-Site: none' -H 'Sec-Fetch-Mode: navigate' -H 'Sec-Fetch-User: ?1' -H 'Accept-Language: zh-CN,zh;q=0.9' -H 'Cookie: IAMAppsession_482BC7EB5B2C46DA9997D28DEF5077F0=96CE989D30DB439484DAFB4EA8F46E2B; IAMAppsession_33931445F1FF46E1862EF5A0711DF25D=DEC602E9C50B468B8945709544A88F01' --compressed
+#+END_SRC
+
+
+** methods
+
+*** head 方法比较特殊，必须用 -I
+ --head (-I)
+
+
+** FAQ
+
+*** SSL certificate problem: certificate is not yet valid

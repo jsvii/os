@@ -1,0 +1,19 @@
+=综述=
+*KISA6 逻辑上 指向 现行进程的PPDA区
+*进程的 [[code:user|user]]结构等，地址都是虚地址，需要经过[[pdp11:内存管理|pdp11的虚实地址转换]]
+**转换过程中，使用KISA6寻址，所以可以寻址到现行进程的[[code:user|user]]结构
+*进程下台时，KISA6 保存到[[code:proc|proc.p_addr]]
+*进程上台时，[[code:proc|proc.p_addr]] 直接恢复到 KISA6
+上台进程的 [[code:user|user]]结构 通过KISA6，经过[[pdp11:内存管理|pdp11的虚实地址转换]]进行寻址
+
+=举例=
+寻址 [[code:user|当前进程的user结构u]]
+*[[code:user|u]] 载点在 [[file:m40.s|m40.s]]，值为140000
+*u=140000 为虚地址，经过[[pdp11:内存管理|虚实地址转换]]，实地址为KISA6第一块第一个字节，即现行进程的PPDA区首址([[code:user|user]]结构在PPDA区首)
+
+=讨论=
+*操作系统 只能使用 虚地址，经过[[pdp11:内存管理|pdp11的虚实地址转换]]，进行寻址
+*而 [[code:proc|proc.p_addr]] 直接管理 实地址(页起始块号)，破坏了以上规则，途径如下：
+**在UNIX 初始化时 ([[code:main|main]])，通过读取KISA寄存器的值，将内存实地址载入[[空闲块管理|coremap]]进行管理
+**创建进程时，从[[空闲块管理|coremap]]分配地址，直接返回内存实地址，赋予[[code:proc|proc.p_addr]]
+*通过以上途径，操作系统才突破了使用虚地址的限制

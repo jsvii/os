@@ -1,0 +1,62 @@
+#+TITLE: zinit
+
+* 入门
+
+** 帮助
+
+~-h~ 会显示命令项
+
+#+BEGIN_SRC zsh
+zinit -h
+#+END_SRC
+
+
+** 插件加载
+
+
+~load~ 会启用分析功能——你可以通过 zinit report {plugin-spec} 跟踪插件具体做了什么，也可以使用 zinit unload {plugin-spec} 卸载插件。
+
+~light~ 不会跟踪加载过程，可以提升加载速度，但是会导致失去查看插件报告和动态卸载插件的能力。
+
+
+** Turbo mode
+
+开启 Turbo mode 后跟踪插件所耗费的时间可以忽略不计
+
+
+** snippet
+
+为了加载 Oh My Zsh 和 Prezto 插件，可以使用 snippet 功能加载代码片段。代码片段是指通过 curl、wget 等工具下载的单个文件。后面直接跟 URL 即可（会自动判断下载工具）
+
+
+** as"program"
+
+插件并不一定是需要被 source 的脚本，也可以是需要添加到 $PATH 中的命令。为了实现这种效果，需要以 program 为参数调用 as ice （或者以 command 为参数也可以）
+
+
+
+
+* 主题
+
+
+https://github.com/romkatv/powerlevel10k
+
+#+BEGIN_SRC zsh
+zinit ice depth=1; zinit light romkatv/powerlevel10k
+#+END_SRC
+
+
+
+https://github.com/sindresorhus/pure
+
+
+* arch
+
+1. zinit目录中 ~zcompile~ 将 ~.zsh~ 文件编译为 ~zwc~ 文件
+
+1. zmodules
+
+
+** ref
+
+https://www.aloxaf.com/2019/11/zplugin_tutorial/

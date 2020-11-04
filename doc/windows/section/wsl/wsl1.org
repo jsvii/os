@@ -1,0 +1,60 @@
+* wsl
+
+** 手动安装
+
+#+BEGIN_SRC powershell
+Add-AppxPackage .\app_name.appx
+#+END_SRC
+
+*** 出现错误
+
+#+BEGIN_SRC powershell
+Add-AppxPackage : 部署失败，原因是 HRESULT: 0x800B0109, 已处理证书链，但是在不受信任提供程序信任的根证书中终止。
+错误 0x800B0109: 应用包或捆绑包中的签名的根证书必须是受信任的证书。
+注意: 有关其他信息，请在事件日志中查找 [ActivityId] 8d2ba6b5-1db9-0006-c95b-2c8db91dd601，或使用命令行 Get-AppPackageLo
+g -ActivityID 8d2ba6b5-1db9-0006-c95b-2c8db91dd601
+所在位置 行:1 字符: 1
++ Add-AppxPackage .\openSUSE-Leap-15.1-x64-Build20.31.appx
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\z67325...Build20.31.appx:String) [Add-AppxPackage], Exception
+    + FullyQualifiedErrorId : DeploymentError,Microsoft.Windows.Appx.PackageManager.Commands.AddAppxPackageCommand
+#+END_SRC
+
+因为忘记安装证书了。
+
+参考图片 https://en.opensuse.org/WSL/Manual_Installation
+
+
+*** 打开时初始化
+
+在powershell中，新建user时关闭输入法，不然无法输入名字。不要选中 ~auto login~ ，否则登录时用户不用密码就可以进入系统，不安全。
+
+*** 设置默认用户
+
+#+BEGIN_SRC bash
+openSUSE-Leap-15.1 config --default-user leo
+
+ubuntu config --default-user new_user_name
+#+END_SRC
+
+系统名称，可以打开 ~任务管理器~ 比如看到opensuse时，打开折叠，
+
+** ref
+
+- Manually download Windows Subsystem for Linux distro packages https://docs.microsoft.com/en-us/windows/wsl/install-manual
+
+- opensuse WSL/Manual Installation https://en.opensuse.org/WSL/Manual_Installation
+
+
+
+** 如何解决权限问题
+
+参考: [[http://zuyunfei.com/2018/06/15/file-system-configuration-in-wsl/]]
+
+#+BEGIN_SRC json
+[automount]
+enabled = true
+root = /mnt/
+options = "metadata,umask=22,fmask=11"
+mountFsTab = false
+#+END_SRC

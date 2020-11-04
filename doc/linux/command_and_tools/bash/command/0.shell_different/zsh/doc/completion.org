@@ -1,0 +1,33 @@
+* Completion 
+
+The shell's ~programmable completion mechanism~ can be manipulated in two ways 
+
+- Completion Widgets
+
+- Completion System
+
+here the low-level features supporting the newer, function-based mechanism are defined.
+
+A complete set of shell functions based on these
+features is described in the next chapter, *note Completion System::,
+and users with no interest in adding to that system
+
+#+BEGIN_SRC bash
+git clone https://git.code.sf.net/p/zsh/code zsh-code
+#+END_SRC
+
+
+- Completion Special Parameters
+
+- Completion Builtin Commands
+
+- Completion Condition Codes
+
+- Completion Matching Control
+
+- Completion Widget Example
+
+
+Completion widgets are defined by the -C option to the zle builtin command provided by the zsh/zle module (see *note The zsh/zle Module::). For example,
+
+zle -C complete expand-or-complete completer

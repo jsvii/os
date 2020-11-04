@@ -1,0 +1,315 @@
+===Source===
+
+0400 /*
+
+0401 &nbsp;* The user structure.
+
+0402 &nbsp;* One allocated per process.
+
+0403 &nbsp;* Contains all per process data
+
+0404 &nbsp;* that doesn’t need to be referenced
+
+0405 &nbsp;* while the process is swapped.
+
+0406 &nbsp;* The user block is USIZE*64 bytes
+
+0407 &nbsp;* long; resides at virtual kernel
+
+0408 &nbsp;* loc 140000; contains the system
+
+0409 &nbsp;* stack per user; is cross referenced
+
+0410 &nbsp;* with the proc structure for the
+
+0411 &nbsp;* same process.
+
+0412 &nbsp;*/
+
+0413 struct user
+
+0414 {
+
+0415  int u_rsav[2];  /* save r5,r6 when exchanging stacks */ 
+
+0416  int u_fsav[25]; /* save fp registers */
+
+<blockquote>
+*[[code:procxmt|procxmt]]中 使用 u_fsav
+</blockquote>
+0417 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;/* rsav and fsav must be first in structure */ 
+
+0418  char u_segflg; /* flag for IO; user or kernel space */ 
+
+<blockquote>
+*用于 声明 当前I/O 所使用的地址空间
+** 0 : [[用户态]]地址空间
+** 1 : [[核心态]]地址空间
+</blockquote>
+0419  char u_error; /* return error code */
+
+<blockquote>
+*用于返回[[错误代码]]
+*参看[[错误代码]]
+</blockquote>
+0420  char u_uid; /* effective user id */ 
+
+0421  char u_gid; /* effective group id */ 
+
+0422  char u_ruid; /* real user id */ 
+
+0423  char u_rgid; /* real group id */ 
+
+<blockquote>
+*分别为 
+**有效用户ID
+**有效组ID
+**真实用户ID
+**真实组ID
+*参看[[权限管理]]
+</blockquote>
+0424  int u_procp; /* pointer to proc structure */ 
+
+<blockquote>
+*指向 对应的 [[code:struct proc|proc 结构]]
+*参看[[进程图像]]
+</blockquote>
+0425  char *u_base; /* base address for IO */
+
+<blockquote>
+*当前 I/O 的基地址
+</blockquote>
+0426  char *u_count; /* bytes remaining for IO */
+
+<blockquote>
+*当前 I/O 的 剩余字节数
+</blockquote>
+0427  char *u_offset[2]; /* offset in file for IO */ 
+
+<blockquote>
+*当前 I/O 的 文件偏移量
+</blockquote>
+0428  int *u_cdir; /* pointer to inode for current directory */ 
+
+<blockquote>
+*指向 当前目录 的[[code:struct inode|inode块]]
+</blockquote>
+0429  char u_dbuf[DIRSIZ]; /* current pathname component */ 
+
+0430  char *u_dirp; /* current pointer to inode */
+
+<blockquote>
+*在 [[code:namei|namei]] 调用时， 指向 文件路径字符串
+</blockquote>
+0431  struct { /* current directory entry */ 
+
+0432 &nbsp;&nbsp;&nbsp;&nbsp; int u_ino; 
+
+0433 &nbsp;&nbsp;&nbsp;&nbsp; char u_name[DIRSIZ];
+
+0434  } u_dent;
+
+<blockquote>
+*当前目录项 的 信息
+**u_ino : 目录项对应的 INODE 号
+**u_name : 目录项的文件名
+</blockquote>
+0435  int *u_pdir; /* inode of parent directory of dirp */ 
+
+<blockquote>
+*指向 目录的父目录的INODE
+</blockquote>
+0436  int u_uisa[16]; /* prototype segmentation addresses */ 
+
+0437  int u_uisd[16]; /* prototype segmentation descriptors */ 
+
+<blockquote>
+*与 UISA UISD 对应的相对地址映照表
+*参看 [[内存管理]]
+</blockquote>
+0438  int u_ofile[NOFILE]; /* pointers to file structures of
+
+0439 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  open files */ 
+
+<blockquote>
+*进程打开文件表
+*参看[[内存打开文件结构]]
+</blockquote>
+0440  int u_arg[5]; /* arguments to current system call */ 
+
+<blockquote>
+*参与 系统调用的参数传递
+*参看[[系统调用]]
+</blockquote>
+0441  int u_tsize; /* text size (*64) */ 
+
+0442  int u_dsize; /* data size (*64) */ 
+
+0443  int u_ssize; /* stack size (*64) */ 
+
+<blockquote>
+*分别是进程的
+**共享正文段 大小
+**数据段 大小
+**用户栈 大小
+*都以 内存块 为单位(64字节/块)
+*参看 [[进程图像]]
+</blockquote>
+0444  int u_sep; /* flag for I and D separation */ 
+
+<blockquote>
+*指令空间 和 数据空间 的 分离标志
+*对于 pdp11/40 始终为0
+</blockquote>
+0445  int u_qsav[2]; /* label variable for quits & interrupts */ 
+
+0446  int u_ssav[2]; /* label variable for swapping */
+
+0447  int u_signal[NSIG]; /* disposition of signals */ 
+
+<blockquote>
+*信号处理函数 入口表
+</blockquote>
+0448  int u_utime; /* this process user time */ 
+
+<blockquote>
+*进程 [[用户态]] 运行时间
+</blockquote>
+0449  int u_stime; /* this process system time */ 
+
+<blockquote>
+*进程 [[核心态]] 运行时间
+</blockquote>
+0450  int u_cutime[2]; /* sum of childs’ utimes */
+
+0451  int u_cstime[2]; /* sum of childs’ stimes */
+
+<blockquote>
+分别是
+*子进程 [[用户态]] 总运行时间
+*子进程 [[核心态]] 总运行时间
+</blockquote>
+0452  int *u_ar0; /* address of users saved R0 */ 
+
+<blockquote>
+关于u_ar0的使用，参考[[skill:u.u_ar0|关于u_ar0的使用]]
+</blockquote>
+0453  int u_prof[4]; /* profile arguments */
+
+<blockquote>
+*[[程序统计直方图]] 的参数
+</blockquote>
+0454  char u_intflg; /* catch intr from sys */
+
+<blockquote>
+*系统调用 出错标志
+</blockquote>
+0455  /* kernel stack per user 
+
+0456  &nbsp;* extends from u + USIZE*64 
+
+0457  &nbsp;* backward not to reach here 
+
+0458  &nbsp;*/ 
+
+0459 } u;
+
+0460 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[进程图像]]
+
+===Caller===
+*[[code:main]]
+*[[code:estabur]]
+*[[code:newproc]]
+*[[code:sleep]]
+*[[code:swtch]]
+*[[code:expand]]
+*[[code:trap]]
+*[[code:trap1]]
+*[[code:nosys]]
+*[[code:exec]]
+*[[code:rexit]]
+*[[code:exit]]
+*[[code:wait]]
+*[[code:fork]]
+*[[code:sbreak]]
+*[[code:getswit]]
+*[[code:gtime]]
+*[[code:stime]]
+*[[code:setuid]]
+*[[code:getuid]]
+*[[code:setgid]]
+*[[code:getgid]]
+*[[code:getpid]]
+*[[code:nice]]
+*[[code:unlink]]
+*[[code:chdir]]
+*[[code:chmod]]
+*[[code:chown]]
+*[[code:smdate]]
+*[[code:ssig]]
+*[[code:kill]]
+*[[code:times]]
+*[[code:profil]]
+*[[code:clock]]
+*[[code:issig]]
+*[[code:stop]]
+*[[code:psig]]
+*[[code:core]]
+*[[code:grow]]
+*[[code:ptrace]]
+*[[code:procxmt]]
+*[[code:xfree]]
+*[[code:xalloc]]
+*[[code:physio]]
+*[[code:geterror]]
+*[[code:rdwr]]
+*[[code:open]]
+*[[code:creat]]
+*[[code:open1]]
+*[[code:close]]
+*[[code:seek]]
+*[[code:link]]
+*[[code:mknod]]
+*[[code:sslep]]
+*[[code:fstat]]
+*[[code:stat]]
+*[[code:dup]]
+*[[code:smount]]
+*[[code:sumount]]
+*[[code:getmdev]]
+*[[code:readi]]
+*[[code:writei]]
+*[[code:iomove]]
+*[[code:bmap]]
+*[[code:passc]]
+*[[code:cpass]]
+*[[code:nodev]]
+*[[code:getf]]
+*[[code:openi]]
+*[[code:access]]
+*[[code:suser]]
+*[[code:ufalloc]]
+*[[code:falloc]]
+*[[code:iinit]]
+*[[code:alloc]]
+*[[code:ialloc]]
+*[[code:iget]]
+*[[code:maknode]]
+*[[code:wdir]]
+*[[code:namei]]
+*[[code:schar]]
+*[[code:uchar]]
+*[[code:pipe]]
+*[[code:writep]]
+*[[code:klopen]]
+*[[code:gtty]]
+*[[code:stty]]
+*[[code:sgtty]]
+*[[code:ttystty]]
+*[[code:mmread]]
+*[[code:mmwrite]]

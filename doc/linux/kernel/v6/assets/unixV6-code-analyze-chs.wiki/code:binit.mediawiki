@@ -1,0 +1,107 @@
+===Source===
+<div class="wikiheadnote">
+*进行I/O块设备 及 缓存机构的初始化
+</div>
+
+5051 
+
+5052 /* Initialize the buffer I/O system by freeing 
+
+5053 &nbsp;* all buffers and setting all device buffer lists to empty. 
+
+5054 &nbsp;*/ 
+
+5055 binit() 
+
+5056 { 
+
+5057 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct buf|struct buf]] *bp; 
+
+5058 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct devtab|struct devtab]] *dp; 
+
+5059 &nbsp;&nbsp;&nbsp;&nbsp;register int i; 
+
+5060 &nbsp;&nbsp;&nbsp;&nbsp;struct [[code:bdevsw|bdevsw]] *bdp; 
+
+5061 
+
+5062 &nbsp;&nbsp;&nbsp;&nbsp;[[code:bfreelist|bfreelist]].b_forw = [[code:bfreelist|bfreelist]].b_back = 
+
+5063 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:bfreelist|bfreelist]].av_forw = [[code:bfreelist|bfreelist]].av_back = &[[code:bfreelist|bfreelist]]; 
+
+<blockquote>
+*清空
+**[[自由队列]]
+**[[设备队列#NODEV设备队列|NODEV设备队列]]
+</blockquote>
+5064 &nbsp;&nbsp;&nbsp;&nbsp;for (i=0; i&lt;NBUF; i++) { 
+
+5065 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bp = &buf[i]; 
+
+5066 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bp->b_dev = -1; 
+
+5067 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bp->b_addr = buffers[i]; 
+
+5068 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bp->b_back = &[[code:bfreelist|bfreelist]]; 
+
+5069 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bp->b_forw = [[code:bfreelist|bfreelist]].b_forw; 
+
+5070 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:bfreelist|bfreelist]].b_forw->b_back = bp; 
+
+5071 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:bfreelist|bfreelist]].b_forw = bp; 
+
+<blockquote>
+*初始化 缓存管理结构
+*将 该缓存 挂入[[设备队列#NODEV设备队列|NODEV设备队列]]
+</blockquote>
+5072 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bp->b_flags = B_BUSY; 
+
+5073 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:brelse|brelse]](bp); 
+
+<blockquote>
+*目的是将 该缓存 挂入[[自由队列]]
+*5072 句不是很必要(引自 Lions源代码分析)
+</blockquote>
+5074 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+5075 &nbsp;&nbsp;&nbsp;&nbsp;i = 0; 
+
+<blockquote>
+*以下循环遍历[[code:bdevsw]]块设备数组
+*bdp->d_open == 0 为数组结束条件
+</blockquote>
+5076 &nbsp;&nbsp;&nbsp;&nbsp;for (bdp = [[code:bdevsw|bdevsw]]; bdp->d_open; bdp++) { 
+
+5077 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;dp = bdp->d_tab; 
+
+5078 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(dp) { 
+
+5079 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   dp->b_forw = dp; 
+
+5080 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   dp->b_back = dp; 
+
+5081 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*将每个块设备的[[设备队列]]清空
+</blockquote>
+5082 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;i++; 
+
+5083 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+5084 &nbsp;&nbsp;&nbsp;&nbsp;[[code:nblkdev|nblkdev]] = i; 
+
+<blockquote>
+*将 nblkdev 初始化为 块设备总数
+</blockquote>
+5085 } 
+
+5086 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:main]]

@@ -1,0 +1,95 @@
+* kvm
+
+
+** 配置步骤
+
+*** 1. 安装kvm
+
+
+**** 依赖安装
+
+#+BEGIN_SRC sh
+zypper in libvirt
+zypper in qemu
+zypper in bridge-utils bridge-utils-devel
+zypper in libguestfs-devel
+#+END_SRC
+
+**** 开启libvirtd service
+
+#+BEGIN_SRC sh
+systemctl enable libvirtd
+systemctl start libvirtd
+#+END_SRC
+
+**** 查看kvm 模块是否安装
+
+
+#+BEGIN_SRC shell
+lsmod | grep -i kvm
+#+END_SRC
+
+output is:
+
+#+BEGIN_SRC shell
+kvm_intel             241664  0
+kvm                   724992  1 kvm_intel
+irqbypass              16384  1 kvm
+#+END_SRC
+
+**** 查看网卡
+
+By default dhcpd based network bridge configured by libvirtd. You can verify that with the following commands:
+
+默认情况下 libvirtd会有一个网卡的
+
+#+BEGIN_SRC shell
+brctl show
+virsh net-list
+#+END_SRC
+
+输出如下内容：
+
+#+BEGIN_SRC shell
+ Name      State    Autostart   Persistent
+--------------------------------------------
+ default   active   yes         yes
+#+END_SRC
+
+***** 如果没有网卡
+
+list files in
+
+网卡都在这些文件夹下
+
+  - =/etc/libvirt/qemu/networks/=
+
+  - =/etc/libvirt/qemu/networks/autostart/=
+
+如果没有，用下面的命令来生成：
+
+#+BEGIN_SRC shell
+virsh net-start default
+# or
+virsh net-autostart default
+# or
+virsh net-destroy default
+virsh net-undefine default
+service libvirtd restart
+#+END_SRC
+
+
+
+
+
+**** .kvm
+
+** enable libvirtd
+
+
+
+qemu-img create -f qcow2 ./centos6.qcow2 20G
+
+
+
+virt-install --virt-type=kvm --name centos6 --ram 2048 --vcpus=1 --os-variant=centos6.10 --cdrom=/home/leo/libvirt/iso/CentOS-6.10-x86_64-minimal.iso --network=bridge=br0,model=virtio --graphics vnc --disk path=/home/leo/libvirt/images/centos6.qcow2,size=40,bus=virtio,format=qcow2

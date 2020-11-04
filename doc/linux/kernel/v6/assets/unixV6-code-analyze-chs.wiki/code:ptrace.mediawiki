@@ -1,0 +1,152 @@
+===Source===
+<div class="wikiheadnote">
+*[[跟踪]]系统 重要的函数
+*ptrace 的 系统调用函数
+*共使用4个参数 request, pid, addr, data
+**request : 跟踪请求 类型，参看[[code:procxmt|procxmt]]说明，保存在 [[code:user|u.u_arg[2]]]
+**pid : 子进程的进程号，保存在 [[code:user|u.u_arg[0]]]
+**addr : 跟踪的 地址参数，保存在 [[code:user|u.u_arg[1]]]
+**data : 跟踪的 数据参数，保存在 [[skill:u.u_ar0|u.u_ar0]][R0]
+*一般情况下，子进程调用ptrace(0,0,0,0)
+其他情况 由父进程调用ptrace
+</div>
+
+4160 
+
+4161 /* 
+
+4162 &nbsp;* sys-trace system call. 
+
+4163 &nbsp;*/ 
+
+4164 ptrace() 
+
+4165 { 
+
+4166 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct proc|struct proc]] *p; 
+
+4167 
+
+4168 &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:user|u.u_arg]][2] <= 0) { 
+
+4169 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_procp]]->p_flag <nowiki>=|</nowiki> STRC; 
+
+4170 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+4171 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+4168 - 4171
+*由子进程运行(参看[[跟踪]])
+*子进程 置 STRC (跟踪标志)
+</blockquote>
+<blockquote>
+*以下由 父进程 运行
+</blockquote>
+4172 &nbsp;&nbsp;&nbsp;&nbsp;for (p=[[code:proc|proc]]; p < &[[code:proc|proc]][NPROC]; p++) 
+
+4173 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (p->p_stat==SSTOP 
+
+4174 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   && p->p_pid==[[code:user|u.u_arg]][0] 
+
+4175 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   && p->p_ppid==[[code:user|u.u_procp]]->p_pid) 
+
+4176 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   goto found; 
+
+<blockquote>
+*查找 匹配的子进程
+**状态 为 SSTOP
+**进程号 为 pid
+**当前进程 的 子进程
+</blockquote>
+4177 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = ESRCH; 
+
+<blockquote>
+*找不到指定的子进程，则抛出错误
+**[[错误代码]] : ESRCH
+</blockquote>
+4178 &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+4179 
+
+4180 &nbsp;&nbsp;&nbsp;&nbsp;found: 
+
+4181 &nbsp;&nbsp;&nbsp;&nbsp;while ([[code:ipc|ipc]].ip_lock) 
+
+4182 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:sleep|sleep]](&[[code:ipc|ipc]], IPCPRI); 
+
+<blockquote>
+*父进程 等待 [[code:ipc|ipc]] 而睡眠
+**[[睡眠原因]] : [[code:ipc|ipc]]
+**[[睡眠优先级]] : IPCPRI
+</blockquote>
+4183 &nbsp;&nbsp;&nbsp;&nbsp;[[code:ipc|ipc]].ip_lock = p->p_pid; 
+
+4184 &nbsp;&nbsp;&nbsp;&nbsp;[[code:ipc|ipc]].ip_data = [[skill:u.u_ar0|u.u_ar0]][R0]; 
+
+4185 &nbsp;&nbsp;&nbsp;&nbsp;[[code:ipc|ipc]].ip_addr = [[code:user|u.u_arg]][1] & ~01;
+
+<blockquote>
+
+LIONS 源代码为<code>[[code:ipc|ipc]].ip_addr - u.u_arg[1] & ~01;</code>
+疑为笔误
+</blockquote>
+
+4186 &nbsp;&nbsp;&nbsp;&nbsp;[[code:ipc|ipc]].ip_req = [[code:user|u.u_arg]][2]; 
+
+<blockquote>
+4183 - 4186
+*填写 [[code:ipc|ipc]] 参数(跟踪请求参数)
+</blockquote>
+4187 &nbsp;&nbsp;&nbsp;&nbsp;p->p_flag =& ~SWTED; 
+
+4188 &nbsp;&nbsp;&nbsp;&nbsp;[[code:setrun|setrun]](p); 
+
+<blockquote>
+*子进程 清 SWTED 标志
+*唤醒 子进程
+</blockquote>
+4189 &nbsp;&nbsp;&nbsp;&nbsp;while ([[code:ipc|ipc]].ip_req > 0) 
+
+4190 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:sleep|sleep]](&[[code:ipc|ipc]], IPCPRI); 
+
+<blockquote>
+*父进程 睡眠 ，等待 子进程 处理跟踪请求
+**[[睡眠原因]] : [[code:ipc|ipc]]
+**[[睡眠优先级]] : IPCPRI
+</blockquote>
+4191 &nbsp;&nbsp;&nbsp;&nbsp;[[skill:u.u_ar0|u.u_ar0]][R0] = [[code:ipc|ipc]].ip_data; 
+
+<blockquote>
+*返回值 置 跟踪请求处理后的数据
+</blockquote>
+4192 &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:ipc|ipc]].ip_req &lt; 0) 
+
+4193 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = EIO; 
+
+<blockquote>
+*请求处理 错误，则抛出错误
+**[[错误代码]] : EIO
+</blockquote>
+4194 &nbsp;&nbsp;&nbsp;&nbsp;[[code:ipc|ipc]].ip_lock = 0; 
+
+4195 &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]](&[[code:ipc|ipc]]); 
+
+<blockquote>
+*解锁 [[code:ipc|ipc]]
+*唤醒 等待 [[code:ipc|ipc]] 的进程
+</blockquote>
+4196 } 
+
+4197 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[跟踪]]
+
+===Param===
+:(ptrace = 26.; not in assembler)
+:(data in r0)
+:<b>sys	ptrace; pid; addr; request</b>
+:(value in r0)

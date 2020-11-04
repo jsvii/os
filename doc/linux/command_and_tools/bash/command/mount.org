@@ -1,0 +1,9 @@
+* mount
+
+** 如何把一个文件夹排除
+
+find . -path ./dir4 -prune -o -print
+
+
+
+find . -type f -not -path "./dir1/*" -not -path "./dir4/*" -exec cp '{}' /tmp \;

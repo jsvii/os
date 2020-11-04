@@ -1,0 +1,35 @@
+* RPM
+
+**  commands
+
+*** rpm -ivh {rpm-file}
+
+   Install the package
+
+   rpm -ivh mozilla-mail-1.7.5-17.i586.rpm
+   rpm -ivh --test mozilla-mail-1.7.5-17.i586.rpm
+
+*** rpm -Uvh {rpm-file}
+
+    Upgrade package
+
+    rpm -Uvh mozilla-mail-1.7.6-12.i586.rpm
+          rpm -Uvh --test
+          mozilla-mail-1.7.6-12.i586.rpm
+
+   - rpm -ev {package}  Erase/remove/ an installed package  rpm -ev mozilla-mail
+
+   - rpm -qa  query  all installed packages  rpm -qa
+          rpm -qa | less
+   -  rpm -qi {package}  Display installed information along with  rpm -qi mozilla-mail
+        package version and short description
+   - rpm -qf {/path/to/file}  Find out what package a file belongs to  rpm -qf /etc/passwd
+        i.e. find what package owns the file  rpm -qf /bin/bash
+   - rpm -qc {pacakge-name}  Display list of configuration file(s) for  rpm -qc httpd
+        a package
+   - rpm -qcf {/path/to/file}  Display list of configuration files for a  rpm -qcf /usr/X11R6/bin/xeyes
+        command
+      rpm -qa --last  Display list of all recently installed  rpm -qa --last
+        RPMs  rpm -qa --last | less
+      rpm -qpR {.rpm-file}  Find out what dependencies a rpm file has  rpm -qpR mediawiki-1.4rc1-4.i586.rpm
+      rpm -qR {package}    rpm -qR bash

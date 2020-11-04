@@ -1,0 +1,9 @@
+{
+	"server": "host",
+	"server_port": 443,
+	"local_address": "0.0.0.0",
+	"local_port": 1086,
+	"password": "password",
+	"timeout": 300,
+	"workers": 4
+}

@@ -1,0 +1,18 @@
+* lspci
+
+
+** 什么是PCI
+
+https://zh.wikipedia.org/zh-cn/%E5%A4%96%E8%AE%BE%E7%BB%84%E4%BB%B6%E4%BA%92%E8%BF%9E%E6%A0%87%E5%87%86
+
+
+外部链接（Peripheral Component Interconnect）标准，或称个人电脑接口（Personal Computer Interface），实际应用中简称为PCI，是一种连接电脑主板和外部设备的总线标准。一般PCI设备可分为以下两种形式：
+
+- 直接内置于主板上的集成电路，在PCI规范中称作“嵌入设备”（planar device）；或者
+
+- 安装在插槽上的扩展界面卡。
+
+
+PCI bus常见于现代的个人电脑中，并已取代了ISA和VESA局部总线，成为了标准扩展总线。PCI总线亦常见于其他电脑类型中。PCI总线最终将被PCI Express和其他更先进的技术取代，这些技术现在已经被用于最新款的电脑中。
+
+PCI规范规定了该总线的物理尺寸（包括线宽）、电气特性、总线时序和协议。

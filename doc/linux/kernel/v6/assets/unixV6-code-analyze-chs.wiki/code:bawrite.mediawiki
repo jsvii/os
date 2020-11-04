@@ -1,0 +1,47 @@
+===Source===
+<div class="wikiheadnote">
+*将 给定缓存块 异步写回设备
+*共传入一个参数 bp
+**bp : 给定缓存块的控制块
+</div>
+
+4852 
+
+4853 /* Release the buffer, start I/O on it, but don’t wait 
+
+4854 &nbsp;* for completion */ 
+
+4855 
+
+4856 bawrite(bp) 
+
+4857 [[code:struct buf|struct buf]] *bp; 
+
+4858 { 
+
+4859 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct buf|struct buf]] *rbp; 
+
+4860 
+
+4861 &nbsp;&nbsp;&nbsp;&nbsp;rbp = bp; 
+
+4862 &nbsp;&nbsp;&nbsp;&nbsp;rbp->b_flags <nowiki>=| </nowiki>B_ASYNC; 
+
+4863 &nbsp;&nbsp;&nbsp;&nbsp;[[code:bwrite|bwrite]](rbp); 
+
+<blockquote>
+*置 B_ASYNC 异步写标志
+*调用[[code:bwrite|bwrite]]进行写操作
+</blockquote>
+4864 } 
+
+4865 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:bdwrite]]
+*[[code:writei]]

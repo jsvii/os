@@ -1,0 +1,100 @@
+===Source===
+<div class="wikiheadnote">
+*"释放" 指定的INODE ip
+**若ip为普通INODE，该函数与[[code:iput|iput]]作用相同
+**若ip为 设备装载INODE，且"释放"的是对ip的最后一个引用，则同时关闭设备(d_close())
+**参看[[文件系统#装载文件系统]]
+*传入2个参数 ip,rw
+**ip : 指向指定的INODE
+**rw : 读写模式，模式常量参看[[file:file.h|file.h]]
+***读写模式只在调用 d_close()时使用，含义不明，列入[[遗留问题]]
+</div>
+
+6660 
+
+6661 /* 
+
+6662 &nbsp;* Decrement reference count on an 
+
+6663 &nbsp;* inode due to the removal of a 
+
+6664 &nbsp;* referencing file structure. 
+
+6665 &nbsp;* On the last closei, switchout 
+
+6666 &nbsp;* to the close entry point of special 
+
+6667 &nbsp;* device handler. 
+
+6668 &nbsp;* Note that the handler gets called 
+
+6669 &nbsp;* on every open and only on the last 
+
+6670 &nbsp;* close. 
+
+6671 &nbsp;*/ 
+
+6672 closei(ip, rw) 
+
+6673 int *ip; 
+
+6674 { 
+
+6675 &nbsp;&nbsp;&nbsp;&nbsp;register *[[code:struct inode|rip]]; 
+
+6676 &nbsp;&nbsp;&nbsp;&nbsp;register dev, maj; 
+
+6677 
+
+6678 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|rip]] = ip; 
+
+6679 &nbsp;&nbsp;&nbsp;&nbsp;dev = [[code:struct inode|rip]]->i_addr[0]; 
+
+6680 &nbsp;&nbsp;&nbsp;&nbsp;maj = [[code:struct inode|rip]]->i_addr[0][[skill:.d_major|.d_major]]; 
+
+<blockquote>
+*仅当 ip 为设备装载INODE时
+**dev ← 设备号
+**maj ← 主设备号
+**参看[[文件系统#装载文件系统]]
+*当ip为普通INODE，dev,maj 没有意义
+</blockquote>
+6681 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct inode|rip]]->i_count &lt;= 1) 
+
+6682 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;switch([[code:struct inode|rip]]->i_mode&IFMT) { 
+
+6683 
+
+6684 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   case IFCHR: 
+
+6685 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  (*[[code:cdevsw|cdevsw]][maj].d_close)(dev, rw); 
+
+6686 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  break; 
+
+6687 
+
+6688 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   case IFBLK: 
+
+6689 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  (*[[code:bdevsw|bdevsw]][maj].d_close)(dev, rw); 
+
+6690 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*仅当 ip 为设备装载INODE时
+**若"释放"的是对ip的最后一个引用，则试图关闭设备
+**参看[[文件系统#装载文件系统]]
+**6682的用法 参看 [[文件系统#inode类型]]
+*当ip为普通INODE，以上部分没有意义
+</blockquote>
+6691 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]]([[code:struct inode|rip]]); 
+
+6692 } 
+
+6693 /* ------------------------- */ 
+
+
+===Ref===
+*[[文件系统#装载文件系统]]
+
+===Caller===
+*[[code:closef]]

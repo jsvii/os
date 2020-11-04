@@ -1,0 +1,57 @@
+===Source===
+<div class="wikiheadnote">
+*改变文件的拥有者和拥有组
+*传入两个参数
+**参数1:name 文件或者目录路径名 
+**参数2:owner 低八位为文件拥有者,高八位为文件的拥有组
+</div>
+
+3574
+
+3575 chown()
+
+3576 {
+
+3577 &nbsp;&nbsp;&nbsp;&nbsp;register *ip;
+
+3578
+
+3579 &nbsp;&nbsp;&nbsp;&nbsp;if (![[code:suser|suser]]() <nowiki>||</nowiki> (ip = [[code:owner|owner]]()) == NULL)
+
+3580 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return;
+
+<blockquote>
+*若当前用户不是超级用户或者不是当前文件的拥有者或者由name指示的INODE不存在
+**直接返回
+*否则
+**[[code:struct inode|ip]] = 文件名为name的INODE
+</blockquote>
+3581 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]]->i_uid = [[code:user|u.u_arg]][1].lobyte;
+
+3582 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]]->i_gid = [[code:user|u.u_arg]][1].hibyte;
+
+3583 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]]->i_flag =<nowiki>|</nowiki> IUPD;
+
+<blockquote>
+*ip->i_uid = owner的低8位(文件拥有者)
+*ip->i_gid = owner的高8位(文件拥有组)
+**此处使用了[[编程技巧#无名结构|编程技巧之无名结构]]
+*置IUPD标志
+</blockquote>
+3584 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]]([[code:struct inode|ip]]);
+
+<blockquote>
+*调用iput对ip进行i_count减1操作,这是因为在3579行调用owner时间接调用了namei,使得i_count加了1
+</blockquote>
+3585 }
+
+3586 /* ------------------------- */
+
+
+
+===Ref===
+*[[文件系统]]
+
+===Param===
+:(chmod = 16.)
+:<b>sys chown; name; owner</b>

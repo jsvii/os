@@ -1,0 +1,52 @@
+* xshell
+
+** session设置
+
+alt + p 会调出properties窗口
+
+terminal
+
+- keyboard
+
+  backspace key sequence 选择 ASCII 127 （Ctrl + ?）
+
+  meta key emulation
+
+     use left alt key as meta key 选中
+
+       ctrl + alt works as atl Gr 选不选无所谓
+
+- Apperance
+
+  color scheme 选择 Ansi colors on black
+
+** x11
+
+在windows上显示linux里面的图片。原理是利用xming的服务，传输文件给他显示
+
+- 安装Xming server https://sourceforge.net/projects/xming/
+
+- xshell中的 properties
+
+  1. properties -> connection -> ssh -> tunneling
+
+  1. X Display localhost:0.0
+
+https://github.com/netsarang/Xshell-ColorScheme
+
+** 字体设置
+
+- Monaco mac 默认字体
+
+  FiraCode https://github.com/tonsky/FiraCode/tree/master/distr/ttf
+
+- https://github.com/Microsoft/vscode/files/555425/yahei_mono.zip
+
+** links
+
+  玩转 Xshell  https://www.tony-yin.site/2019/06/20/Best-Practice-Of-Xshell/ 这篇比较全面。
+
+
+** 设置项
+
+  - 查看 - 会话选项卡

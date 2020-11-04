@@ -1,0 +1,100 @@
+===Source===
+<div class="wikiheadnote">
+*当 [[RK磁盘]] I/O完成或发生错误时被调用
+**进行错误处理
+**处理已完成缓存块
+**启动设备处理下一个在[[设备I/O队列]]的缓存块
+</div>
+
+5450 
+
+5451 rkintr() 
+
+5452 { 
+
+5453 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct buf|struct buf]] *bp; 
+
+5454 
+
+5455 &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:struct devtab|rktab]].d_active == 0) 
+
+5456 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+<blockquote>
+*若设备未启动，则此次函数调用无意义，函数直接返回
+*并不清楚什么时候会发生此情况，列入[[遗留问题]]
+</blockquote>
+5457 &nbsp;&nbsp;&nbsp;&nbsp;bp = [[code:struct devtab|rktab]].d_actf; 
+
+5458 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct devtab|rktab]].d_active = 0; 
+
+<blockquote>
+*清设备启动标志(此时设备I/O已完成，可以清标志)
+</blockquote>
+5459 &nbsp;&nbsp;&nbsp;&nbsp;if ([[skill:rk无名结构|RKADDR->rkcs]] &lt; 0) { /* error bit */ 
+
+<blockquote>
+*RKCS最高位为错误位
+*RKCS<0，最高位为1，即错误位为1
+*若 本次I/O出错，则执行以下操作
+</blockquote>
+5460 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:deverror|deverror]](bp, RKADDR->rker, RKADDR->rkds); 
+
+<blockquote>
+*在控制台显示错误消息
+</blockquote>
+5461 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;RKADDR->rkcs = <nowiki>RESET|GO;</nowiki> 
+
+<blockquote>
+*重置[[RK磁盘#RKCS|RKCS寄存器]]，并重启[[RK磁盘]]
+*常量定义见 [[file:rk.c|rk.c]]
+</blockquote>
+5462 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;while((RKADDR->rkcs&CTLRDY) == 0) ; 
+
+<blockquote>
+*等待RK磁盘，直到RK磁盘准备接受指令
+</blockquote>
+5463 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (++[[code:struct devtab|rktab]].d_errcnt &lt;= 10) { 
+
+5464 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:rkstart|rkstart]](); 
+
+5465 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return; 
+
+5466 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若RK磁盘积累错误次数<=10，则
+**再次启动磁盘执行[[设备I/O队列]]任务
+**函数返回
+</blockquote>
+5467 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bp->b_flags<nowiki> =| </nowiki>B_ERROR; 
+
+<blockquote>
+*若RK磁盘积累错误次数>10，则
+**缓存块 置 错误标志
+</blockquote>
+5468 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+5469 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct devtab|rktab]].d_errcnt = 0; 
+
+5470 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct devtab|rktab]].d_actf = bp->av_forw; 
+
+5471 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iodone|iodone]](bp); 
+
+<blockquote>
+*RK磁盘积累错误次数 清零
+*[[设备I/O队列]] 当前完成任务移除队列
+*释放 已I/O完成的缓存块
+</blockquote>
+5472 &nbsp;&nbsp;&nbsp;&nbsp;[[code:rkstart|rkstart]](); 
+
+<blockquote>
+*启动RK磁盘，执行下一个任务
+</blockquote>
+5473 } 
+
+5474 /* ------------------------- */ 
+
+
+===Ref===
+*[[RK磁盘]]

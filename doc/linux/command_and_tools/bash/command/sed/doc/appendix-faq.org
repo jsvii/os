@@ -1,0 +1,43 @@
+* FAQ
+
+** 单引号无法出现在sed替换模式中
+
+#+BEGIN_SRC bash
+echo '
+# 无法打印出单引号
+#+END_SRC
+
+#+BEGIN_SRC bash
+echo \'
+#+END_SRC
+
+使用 ~'\''~
+
+本质上是利用了shell的字符串拼接，有三个部分
+
+- 第一个单引号 ~'~ (end quote) 上个字符串的结束
+
+- 转义的单引号 ~\'~ (escaped quote)  要替换为 ~'~
+
+- 第三个单引号 ~'~ (start quote) 下个字符串的开始
+
+'hello, ''world' 会产生 ~hello, world~
+
+案例
+
+#+BEGIN_SRC bash
+sed -i '
+s/&#39;/\'\''/g
+' file.txt
+#+END_SRC
+
+
+** 替换操作中依赖变量，变量中有 slash ~/~
+
+换一下regex delimiter就行。
+
+#+BEGIN_SRC bash
+sed "s~$var~replace~g" $file
+#+END_SRC
+
+Use an alternate regex delimiter as sed allows you to use any delimiter (including control characters):

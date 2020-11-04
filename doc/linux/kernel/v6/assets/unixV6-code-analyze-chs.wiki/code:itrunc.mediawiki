@@ -1,0 +1,138 @@
+===Source===
+<div class="wikiheadnote">
+*将 指定INODE结构(指定文件)所有相关的磁盘块 全部释放
+*释放顺序为逆序释放(保证任意时候INODE结构完整)
+*共传入一个参数 ip
+**ip : 指向给定INODE结构，INODE结构类型为 [[code:struct inode|struct inode]]
+</div>
+
+7404 
+
+7405 /* 
+
+7406 &nbsp;* Free all the disk blocks associated 
+
+7407 &nbsp;* with the specified inode structure. 
+
+7408 &nbsp;* The blocks of the file are removed 
+
+7409 &nbsp;* in reverse order. This FILO 
+
+7410 &nbsp;* algorithm will tend to maintain 
+
+7411 &nbsp;* a contiguous free list much longer 
+
+7412 &nbsp;* than FIFO. 
+
+7413 &nbsp;*/ 
+
+7414 itrunc(ip) 
+
+7415 int *ip; 
+
+7416 { 
+
+7417 &nbsp;&nbsp;&nbsp;&nbsp;register *rp, *bp, *cp; 
+
+7418 &nbsp;&nbsp;&nbsp;&nbsp;int *dp, *ep; 
+
+7419 
+
+7420 &nbsp;&nbsp;&nbsp;&nbsp;rp = ip; 
+
+7421 &nbsp;&nbsp;&nbsp;&nbsp;if((rp->i_mode&(IFCHR&IFBLK)) != 0) 
+
+7422 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+<blockquote>
+*若 指定INODE 不是 设备装载INODE，不进行任何操作
+</blockquote>
+7423 &nbsp;&nbsp;&nbsp;&nbsp;for(ip = &rp->i_addr[7]; ip >= &rp->i_addr[0]; ip--) 
+
+<blockquote>
+*逆序遍历i_addr，遍历变量为ip
+</blockquote>
+7424 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(*ip) { 
+
+7425 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if((rp->i_mode&ILARG) != 0) { 
+
+<blockquote>
+*若 指定文件 是大文件或巨型文件，则...
+</blockquote>
+7426 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  bp = [[code:bread|bread]](rp->i_dev, *ip); 
+
+<blockquote>
+*从磁盘读取 ip 指向的盘块 (索引块 或 间接索引块)
+</blockquote>
+7427 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  for(cp = bp->b_addr+512; cp >= bp->b_addr; 
+
+7428 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  cp--) 
+
+7429 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  if(*cp) { 
+
+7430 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; if(ip == &rp->i_addr[7]) { 
+
+7431 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;dp = [[code:bread|bread]](rp->i_dev, *cp); 
+
+7432 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for(ep = dp->b_addr+512; 
+
+7433 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ep >= dp->b_addr; ep--) 
+
+7434 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(*ep) 
+
+7435 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:free|free]](rp->i_dev, *ep); 
+
+7436 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:brelse|brelse]](dp); 
+
+7437 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; } 
+
+<blockquote>
+*若文件类型为巨型文件，则
+**从磁盘读取索引块
+**逆序释放 索引块 指向的盘块
+</blockquote>
+7438 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; [[code:free|free]](rp->i_dev, *cp); 
+
+7439 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  } 
+
+7440 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:brelse|brelse]](bp); 
+
+7441 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } 
+
+7442 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:free|free]](rp->i_dev, *ip); 
+
+7443 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*ip = 0; 
+
+7444 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+7445 &nbsp;&nbsp;&nbsp;&nbsp;rp->i_mode =& ~ILARG; 
+
+7446 &nbsp;&nbsp;&nbsp;&nbsp;rp->i_size0 = 0; 
+
+7447 &nbsp;&nbsp;&nbsp;&nbsp;rp->i_size1 = 0; 
+
+7448 &nbsp;&nbsp;&nbsp;&nbsp;rp->i_flag <nowiki>=| </nowiki>IUPD; 
+
+<blockquote>
+*清 大文件/巨型文件 标志
+*文件长度 置0
+*置IUPD标志，用于更新该INODE块
+</blockquote>
+7449 } 
+
+7450 /* ------------------------- */ 
+
+
+
+===Extend===
+=附图=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_itrunc.png"/></p>
+
+===Ref===
+*[[文件系统#文件索引结构|文件系统之文件索引结构]]
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:core]]
+*[[code:open1]]
+*[[code:iput]]

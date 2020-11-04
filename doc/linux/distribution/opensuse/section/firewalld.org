@@ -1,0 +1,13 @@
+* firewall
+
+** ports
+
+  - sshd  22
+
+  - 27017 mongodb
+
+  - shadowsocks 3128
+
+  - privoxy 8118
+
+  - squid

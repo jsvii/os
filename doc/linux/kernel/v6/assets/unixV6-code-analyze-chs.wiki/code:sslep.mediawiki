@@ -1,0 +1,93 @@
+===Source===
+<div class="wikiheadnote">
+*令当前进程进入睡眠，睡眠指定秒数
+*共传入一个参数，设为t
+*t : 指定秒数，令进程睡眠t秒
+</div>
+
+5976 /* sleep system call 
+
+5977 &nbsp;* not to be confused with the sleep internal routine. 
+
+5978 &nbsp;*/ 
+
+5979 sslep() 
+
+5980 { 
+
+5981 &nbsp;&nbsp;&nbsp;&nbsp;char *d[2]; 
+
+5982 
+
+5983 &nbsp;&nbsp;&nbsp;&nbsp;[[code:spl|spl7]](); 
+
+<blockquote>
+*[[关中断]]
+</blockquote>
+5984 &nbsp;&nbsp;&nbsp;&nbsp;d[0] = time[0]; 
+
+5985 &nbsp;&nbsp;&nbsp;&nbsp;d[1] = time[1]; 
+
+5986 &nbsp;&nbsp;&nbsp;&nbsp;[[code:dpadd|dpadd]](d, [[Skill:u.u ar0|u.u_ar0]][R0]); 
+
+<blockquote>
+*令 d = time + t
+*d 为 睡眠到期时间
+</blockquote>
+5987 
+
+5988 &nbsp;&nbsp;&nbsp;&nbsp;while([[code:dpcmp|dpcmp]](d[0], d[1], time[0], time[1]) > 0) { 
+
+5989 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if([[code:dpcmp|dpcmp]](tout[0], tout[1], time[0], time[1]) <nowiki> <= 0 || </nowiki>
+
+5990 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:dpcmp|dpcmp]](tout[0], tout[1], d[0], d[1]) > 0) { 
+
+5991 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   tout[0] = d[0]; 
+
+5992 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   tout[1] = d[1]; 
+
+5993 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*tout为所有调用sslep睡眠的进程中最早的到期时间，参考[[睡眠原因#tout|睡眠原因]]
+*更新tout( tout = min(tout , d) )
+</blockquote>
+5994 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:sleep|sleep]](tout, PSLEP); 
+
+<blockquote>
+*若睡眠未到期，则继续睡眠
+*[[睡眠原因#tout|睡眠原因为tout]]
+*[[进程优先级|优先级 为 PSLEP]]
+</blockquote>
+5995 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+5996 &nbsp;&nbsp;&nbsp;&nbsp;spl0(); 
+
+<blockquote>
+*[[开中断]]
+</blockquote>
+5997 } 
+
+5998 /* ------------------------- */ 
+
+5999 
+
+
+
+===Extend===
+=原理=
+*调用内核函数 [[code:sslep|sslep]]
+**更新tout (tout为所有调用sleep睡眠的进程中最早的睡眠到期时间)
+**令进程睡眠，[[睡眠原因]]tout
+*[[时钟]]中断发生，调用[[code:clock|clock]]函数
+**判断是否有进程睡眠到期(tout == 当前系统时间)
+**若有，则唤醒所有睡眠在tout上的进程
+*进程被唤醒，继续执行[[code:sslep|sslep]]
+**若睡眠到期，则函数返回
+**若睡眠未到期，则再度睡眠，[[睡眠原因]]tout
+
+===Param===
+
+:(sleep = 35.; not in assembler)
+:(seconds in r0)
+:<b>sys sleep</b>

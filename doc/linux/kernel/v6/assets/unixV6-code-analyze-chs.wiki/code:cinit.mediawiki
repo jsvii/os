@@ -1,0 +1,64 @@
+===Source===
+<div class="wikiheadnote">
+*本过程仅由[[code:main|main]]函数调用一次
+*作用为:
+**1.初始化[[字符设备管理#自由字符缓存队列|自由字符缓存队列]],并进行了[[字符设备管理#缓存池的改造|缓存池的改造]]
+**2.统计字符设备类型数
+</div>
+
+8231 /* Initialize clist by freeing all character blocks, & count 8281
+
+8232 &nbsp;* number of character devices. (Once-only routine)
+
+8233 &nbsp;*/
+
+8234 cinit()
+
+8235 {
+
+8236 &nbsp;&nbsp;&nbsp;&nbsp;register int ccp;
+
+8237 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct cblock|struct cblock]] *cp;
+
+8238 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:cdevsw|struct cdevsw]] *cdp;
+
+8239 &nbsp;&nbsp;&nbsp;&nbsp;ccp = cfree;
+
+<blockquote>
+*ccp 指向 [[code:cfree|cfree]]数组的头部
+</blockquote>
+8240 &nbsp;&nbsp;&nbsp;&nbsp;for (cp=(ccp+07)&~07; cp &lt;= &[[code:cfree|cfree]][NCLIST-1]; cp++) {
+
+8241 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  cp->c_next = [[code:cfreelist|cfreelist]];
+
+8242 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:cfreelist|cfreelist]] = cp;
+
+8243 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+<blockquote>
+*寻找[[code:cfree|cfree]]数组中第一个为8整数倍的地址
+*将该地址作为第一个字符缓存的起始地址,并顺次构成接下来的缓存,依次加入到[[字符设备管理#自由字符缓存队列|自由字符缓存队列]]中
+*参看[[字符设备管理#缓存池的改造|缓存池的改造]]
+</blockquote>
+8244 &nbsp;&nbsp;&nbsp;&nbsp;ccp = 0;
+
+8245 &nbsp;&nbsp;&nbsp;&nbsp;for(cdp = [[code:cdevsw|cdevsw]]; cdp->d_open; cdp++)
+
+8246 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   ccp++;
+
+8247 &nbsp;&nbsp;&nbsp;&nbsp;[[code:nchrdev|nchrdev]] = ccp;
+
+<blockquote>
+*遍历[[code:cdevsw|cdevsw]]数组,统计字符设备 数,并赋给 [[code:nchrdev|nchrdev]]
+</blockquote>
+8248 }
+
+8249 /* ------------------------- */
+
+
+
+===Ref===
+*[[字符设备管理]]
+
+===Caller===
+*[[code:main]]

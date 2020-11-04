@@ -1,0 +1,61 @@
+* development-tools
+
+** build essential
+
+#+BEGIN_SRC shell
+sudo zypper install --type pattern devel_basis
+#+END_SRC
+
+** zeal
+
+** git
+
+全局的 =.gitconfig= 配置
+
+#+BEGIN_SRC txt
+[user]
+        name = Leo Zhang
+        email = leozhang@cmbchina.com
+[color]
+        diff = auto
+        status = auto
+        branch = auto
+        interactive = auto
+        ui = true
+        pager = true
+#[http]
+#	proxy = http://127.0.0.1:3087
+[core]
+        gitproxy = gitproxy
+[http]
+        sslVerify = false
+[credential]
+        helper = cache --timeout=360000
+#+END_SRC
+
+#+BEGIN_SRC shell
+# config
+touch ~/.tmux.conf
+#+END_SRC
+
+** node.js
+
+  - nvm
+
+#+BEGIN_SRC bash
+nvm install 10
+nvm install 8
+yarn
+#+END_SRC
+
+
+
+** golang
+
+  golang [[https://dl.google.com/go/go1.11.4.linux-amd64.tar.gz]]
+
+** sdcv
+
+  - zyyper in sdcv
+
+  - 安装百度网盘词典

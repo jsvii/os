@@ -1,0 +1,9 @@
+* latext
+
+不要按需安装textlive，会造成很多问题，直接安装textlive-scheme-full，对中文支持非常好！
+
+#+BEGIN_SRC shell
+#never use following commad
+#zypper install texlive-latex  # not the better
+zypper in texlive-scheme-full # good
+#+END_SRC

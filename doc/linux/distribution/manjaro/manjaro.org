@@ -1,0 +1,14 @@
+#+TITLE: manjaro
+
+
+#+BEGIN_SRC bash
+sudo pacman-mirrors -f 5 && sudo pacman -Syyu
+
+
+sudo pacman -Syyu
+
+
+sudo pacman -S base-devel
+
+sudo pacman -Syyu
+#+END_SRC

@@ -1,0 +1,21 @@
+* shell数组黑科技
+
+length
+
+#+BEGIN_SRC bash
+arr=("hello" "world" "leo") 
+echo ${#arr[@]}
+#+END_SRC
+
+IN="bla@some.com;john@home.com"
+
+
+
+#+BEGIN_SRC bash
+#!/bin/bash
+echo "pwd: `pwd`"
+echo "\$0: $0"
+echo "basename: `basename $0`"
+echo "dirname: `dirname $0`"
+echo "dirname/readlink: $(dirname $(readlink -f $0))"
+#+END_SRC

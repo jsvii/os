@@ -1,0 +1,88 @@
+
+|source =
+<div class="wikiheadnote">
+*用于分配指定大小的空闲块，给程序使用
+*共传入两个参数 : mp 和 size
+*mp : 用于管理空闲块的链表
+*size : 请求分配的空闲块的大小
+*若分配成功，返回分配空闲块的首地址；否则，返回0
+</div>
+
+2521 
+
+2522 /*
+
+2523 &nbsp;* Allocate size units from the given
+
+2524 &nbsp;* map. Return the base of the allocated
+
+2525 &nbsp;* space.
+
+2526 &nbsp;* Algorithm is first fit.
+
+2527 &nbsp;*/
+
+2528 malloc(mp, size)
+
+2529 [[code:struct map|struct map]] *mp;
+
+2530 {
+
+2531 &nbsp;&nbsp;&nbsp;&nbsp;register int a;
+
+2532 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct map|struct map]] *bp;
+
+2533 
+
+2534 &nbsp;&nbsp;&nbsp;&nbsp;for (bp = mp; bp->m_size; bp++) {
+
+<blockquote>遍历空闲块链表所有元素，m_size = 0 为链表结束标志</blockquote>
+2535 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (bp->m_size >= size) { 
+
+<blockquote>若某一空闲块可供分配</blockquote>
+2536 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   a = bp->m_addr; 
+
+2537 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   bp->m_addr =+ size; 
+
+<blockquote>修正该空闲块大小</blockquote>
+2538 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if ((bp->m_size =- size) == 0) 
+
+2539 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   do { 
+
+2540 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  bp++; 
+
+2541 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  (bp-1)->m_addr = bp->m_addr; 
+
+2542 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } while((bp-1)->m_size = bp->m_size); 
+
+<blockquote>若分配后该空闲块大小为0，将其从链表删除</blockquote>
+2543 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return(a); 
+
+<blockquote>分配成功，返回分配空闲块的首地址</blockquote>
+2544 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+2545 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+2546 &nbsp;&nbsp;&nbsp;&nbsp;return(0);
+
+<blockquote>分配失败，返回0</blockquote>
+2547 }
+
+2548 /*---------------------- */
+
+ 
+
+
+===Extend===
+=举例=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_code_malloc.png"/></p>
+===Ref===
+*[[空闲块管理|空闲块管理]]
+
+===Caller===
+*[[code:newproc]]
+*[[code:sched]]
+*[[code:expand]]
+*[[code:exit]]
+*[[code:xswap]]
+*[[code:xalloc]]

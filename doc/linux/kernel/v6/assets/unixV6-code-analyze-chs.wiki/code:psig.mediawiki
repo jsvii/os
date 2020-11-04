@@ -1,0 +1,143 @@
+===Source===
+
+4035 
+
+4036 /* 
+
+4037 &nbsp;* Perform the action specified by 
+
+4038 &nbsp;* the current signal. 
+
+4039 &nbsp;* The usual sequence is: 
+
+4040 &nbsp;* if(issig()) 
+
+4041 &nbsp;* psig(); 
+
+4042 &nbsp;*/ 
+
+4043 psig() 
+
+4044 { 
+
+4045 &nbsp;&nbsp;&nbsp;&nbsp;register n, p; 
+
+4046 &nbsp;&nbsp;&nbsp;&nbsp;register *rp; 
+
+4047 
+
+4048 &nbsp;&nbsp;&nbsp;&nbsp;rp = [[code:user|u.u_procp]]; 
+
+4049 &nbsp;&nbsp;&nbsp;&nbsp;n = rp->p_sig; 
+
+4050 &nbsp;&nbsp;&nbsp;&nbsp;rp->p_sig = 0; 
+
+<blockquote>
+*清 信号
+</blockquote>
+4051 &nbsp;&nbsp;&nbsp;&nbsp;if((p=[[code:user|u.u_signal]][n]) != 0) { 
+
+<blockquote>
+*若 信号处理 不为 缺省，则...
+</blockquote>
+4052 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = 0; 
+
+4053 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(n != SIGINS && n != SIGTRC) 
+
+4054 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:user|u.u_signal]][n] = 0; 
+
+<blockquote>
+*信号 不为 SIGINS 或 SIGTRC，则信号处理方式 置为 缺省
+</blockquote>
+4055 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n = [[skill:u.u_ar0|u.u_ar0]][R6] - 4; 
+
+4056 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:grow|grow]](n); 
+
+4057 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:suword|suword]](n+2, [[skill:u.u_ar0|u.u_ar0]][RPS]); 
+
+4058 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:suword|suword]](n, [[skill:u.u_ar0|u.u_ar0]][R7]); 
+
+<blockquote>
+*向 用户栈 压入 当前中断保护的pc,ps
+*设为 pc0,ps0
+*参看 [[code:psig|说明]]
+</blockquote>
+4059 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[skill:u.u_ar0|u.u_ar0]][R6] = n; 
+
+4060 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[skill:u.u_ar0|u.u_ar0]][RPS] =& ~TBIT; 
+
+4061 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[skill:u.u_ar0|u.u_ar0]][R7] = p; 
+
+<blockquote>
+*将 当前中断保护 的pc 置为 信号处理函数的入口
+*将 当前中断保护 的ps 清 T(陷入) 位
+*设为 pc1,ps1
+*修正 用户栈栈顶
+*参看 [[code:psig|说明]]
+</blockquote>
+4062 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+4063 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*当 使用缺省的信号处理方式，执行以下代码
+</blockquote>
+4064 &nbsp;&nbsp;&nbsp;&nbsp;switch(n) { 
+
+4065 
+
+4066 &nbsp;&nbsp;&nbsp;&nbsp;case SIGQIT: 
+
+4067 &nbsp;&nbsp;&nbsp;&nbsp;case SIGINS: 
+
+4068 &nbsp;&nbsp;&nbsp;&nbsp;case SIGTRC: 
+
+4069 &nbsp;&nbsp;&nbsp;&nbsp;case SIGIOT: 
+
+4070 &nbsp;&nbsp;&nbsp;&nbsp;case SIGEMT: 
+
+4071 &nbsp;&nbsp;&nbsp;&nbsp;case SIGFPT: 
+
+4072 &nbsp;&nbsp;&nbsp;&nbsp;case SIGBUS: 
+
+4073 &nbsp;&nbsp;&nbsp;&nbsp;case SIGSEG: 
+
+4074 &nbsp;&nbsp;&nbsp;&nbsp;case SIGSYS: 
+
+4075 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_arg]][0] = n; 
+
+4076 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if([[code:core|core]]()) 
+
+4077 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   n =+ 0200; 
+
+<blockquote>
+*生成 内存映像文件，方便debug
+</blockquote>
+4078 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+4079 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_arg]][0] = ([[skill:u.u_ar0|u.u_ar0]][R0]&lt;&lt;8) <nowiki>|</nowiki> n; 
+
+<blockquote>
+*[[code:user|u.u_arg]][0] 
+**高字节 为 [[skill:u.u_ar0|u.u_ar0]][R0]的低字节
+**低字节 为 信号 以及 [[code:core|core]]的成功标志
+</blockquote>
+4080 &nbsp;&nbsp;&nbsp;&nbsp;[[code:exit|exit]](); 
+
+<blockquote>
+*终止 本进程
+</blockquote>
+4081 } 
+
+4082 /* ------------------------- */ 
+
+
+===Extend===
+=说明=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_psig.png"/></p>
+
+===Ref===
+*[[信号系统]]
+===Caller===
+*[[code:trap]]
+*[[code:clock]]

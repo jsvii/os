@@ -1,0 +1,8 @@
+[openSUSE-Leap-15.0-1]
+name=openSUSE-Leap-15.0-1
+enabled=0
+autorefresh=1
+baseurl=hd:///?device=/dev/disk/by-id/usb-Kingston_DataTraveler_3.0_60A44CB2B34EE2C0C71AAA42-0:0-part1
+path=/
+type=rpm-md
+keeppackages=0

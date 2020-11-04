@@ -1,0 +1,3 @@
+* complete
+
+https://www.infoq.cn/article/bash-programmable-completion-tutorial

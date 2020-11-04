@@ -1,0 +1,49 @@
+*[[Pdp11:SBC]]中标志位C的改变与常识不符
+*[[Pdp11:SBC]]中标志位V的改变与原文不符,原文有纰漏
+*[[Pdp11:SXT]]中标志位Z的清位未有源文档
+*[[Pdp11:MOV]]中关于MOVB的一段话难翻译
+*[[Pdp11:CMP]]中标志位C的改变与常识不符
+*[[Pdp11:SUB]]中标志位C的改变与常识不符
+*[[pdp11:汇编指令]]符号约定 XXX符号约定难翻译
+*[[Pdp11:MUL]]原文不清楚
+*[[pdp11:DIV]]中标志位V的清位未有原文档
+*[[Pdp11:ASHC]]中描述对于寄存器地址为单地址的情况，未翻译
+*[[pdp11:JMP]]中描述节未翻译
+*[[pdp11:JSR]]中描述节关于地址部分未翻译
+*[[pdp11:RTS]]中描述节关于地址部分未翻译
+*[[pdp11:Trap]]未完成
+*[[pdp11:EMT]]不常用，未填写
+*[[pdp11:BPT]]描述由于无法理解，未翻译
+*[[pdp11:HALT]] [[pdp11:RESET]] 由于不常用，未填写
+*[[pdp11:MFPI]]操作原文不合逻辑,翻译纠正;原文描述未理解,未翻译
+*[[pdp11:MTPI]]原文描述未理解,未翻译
+*[[code:putchar]]中的代码2391未成功解释
+*[[code:getblk]]中的代码第4925行,声明了外部变量lbolt,用途不明
+*[[code:breada]]的讨论问题
+*[[Rk磁盘交叉存储]]不作讨论
+*[[code:rkintr]] 5455 - 5456
+*[[code:free]] 7005 行无法解释
+*[[code:namei]] 7609 行无法解释
+*[[code:nofault|nofault]] 压栈无法解释
+*[[code:copyseg|copyseg]]701,702行,从堆栈中取值,与应该取得的值有偏差,无法解释
+*[[code:newproc|newproc]]1883行,为什么要将[[code:user|u.u_cdir]]->i_count++,子进程会新产生[[code:struct file|file结构]]?
+*[[code:open1|open1]] 5832行，意图不明
+*[[code:openi|openi]] 意图不明
+*[[code:clock|clock]] 3734 必要性不明,3803 含义不明
+*[[code:exec|exec]] 一大堆的遗留问题...
+*[[code:openi|openi]] [[code:closei|closei]] 中rw含义不明
+*[[code:closef|closef]] 6656 标志位参数 含义不明
+*[[code:rexit|rexit]] 3208 为什么左移8位,含义不明
+*[[code:wait|wait]] 对于SSTOP的子进程的处理，含义不明
+*[[code:ssig|ssig]]第3625 3626行意义不明
+*[[code:procxmt|procxmt]] 4213 唤醒父进程 正确性不明；4247 意图不明
+*[[code:putc|putc]] 961 含义不明
+*[[code:ttyinput|ttyinput]] 8353 折腾的原因不明
+*[[code:ttwrite|ttwrite]] 8562行,置ASLEEP标识位的意义不明
+*[[code:klrint|klrint]] 8085 诡异
+*[[code:dump|dump]] 未读懂
+*[[code:dump|dump]] 入口 不明
+*[[code:backup|backup]] 未读懂,功能按LIONS代码分析说明
+*[[进程调度]] 存在未完成
+*[[code:main|main]]1599,1600行,用意不明
+*[[code:smount|smount]] 6113 参数不明

@@ -1,0 +1,12 @@
+{{pdp11:instruction
+===Instruction===BLOS
+===Code===101400 + 偏移[offset]
+===Operation===PC ← PC + ( 2 * offset ) if C ∨ Z = 1 
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===若标志位满足 C ∨ Z = 1 ，进行程序控制转移 <br/>互补操作为[[pdp11:BHI|BHI]]<br/>若指令位于[[pdp11:CMP|CMP]]后，则若(src)表示的无符号数 <nowiki><= (dst)</nowiki>表示的无符号数，发生跳转
+
+===Example===
+无

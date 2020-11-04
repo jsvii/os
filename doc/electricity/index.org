@@ -1,0 +1,27 @@
+|
+| 电位 | 电势 |  Electric potential|
+
+
+- 电位
+
+电势，Electric potential
+
+- 电压，电势差
+
+Voltage, electric potential difference, electric pressure or electric tension
+
+
+- 电路状态
+
+a) Open circuit means the wires are cut off so there will be no current flow, but there is voltage.
+b) Closed circuit means the wires are connected so there will be flow of current, but there is no voltage
+c) Short circuit also refers closed circuit.
+
+
+
+electromagnetic shield  | Electromagnetic Susceptibility
+
+
+
+
+质量 是 随 速度 的 增大 而 增大 的， 但是 要 质量 有 明显 的 增大， 则要 求 速度 接近 于 光速。 正确 的 定律 是： 如果 一个 物体 以 小于 每秒 一百 多 千米 的 速率 运动， 其 质量 在 百万 分之一 的 精度 内 是 不变 的。 在某 种 这样 的 近似 形式 下， 这是 一条 正确 的 定律。 因此

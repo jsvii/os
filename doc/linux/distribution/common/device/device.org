@@ -1,0 +1,140 @@
+#+TITLE: 程序员设备心得
+
+* 心得
+
+** 设备用途
+
+  1. 开发
+
+  1. 记录
+
+  1. linux研究
+
+*** 外设购买
+
+1. 不要蓝牙版产品，有线版虽然不方便，但好歹能用，而蓝牙在linux下有各种问题，且受usb 3.0的干扰太多
+
+1. 也不要在IOS和android上进行生产力开发，太过鸡肋，好的系统是经过了多年检验的，不是几个广告、吹嘘就能搞定的
+
+1. 电子设备使用一模一样的，用户习惯不是随便就换的，自己轻松最重要。要捡漏，不要买年月久远的
+
+*** 手机购买
+
+1. ios 系统做得好，但电池性能太弱，使用两年和一般android的一样，都会老化，价格上却贵了2.5倍以上
+
+1. 购买手机必须128G以上，要以空间换时间，你的时间很宝贵
+
+*** 电脑购买
+
+1. 除非开发ios应用，否则mac真是累赘，系统不自由，价格又高，xps装linux反而最适合我
+
+*** 系统
+
+1. opensuse
+
+   - 桌面好看
+
+   - fbterm 可以满足打字、coding的需求
+
+*** 书籍
+
+1. web上有很多书籍
+
+1. 如果有好的新书，肯定有影印本，还不如慢慢领悟
+
+1. 编译原理涵盖了很多高深的知识，且与我的工作最接近
+
+* 硬件信息
+
+** 手机类
+
+*** iphone 6
+
+** 电脑类
+
+*** 公司2019年配置电脑
+
+型号：ThinkCentre M920s
+
+联想：1.宽度：9.25厘米 2.深度：29.05厘米 3.高度：34.35厘米
+
+
+以前的集成显卡： intel hd graphics 4600
+
+我电脑的集显： intel uhd graphics 630
+
+性能对比:
+
+https://www.game-debate.com/gpu/index.php?gid=4096&gid2=1438&compare=intel-uhd-graphics-630-vs-intel-hd-graphics-4600-desktop
+
+**** intel uhd graphics 630 显卡性能显示
+
+https://www.intel.com/content/www/us/en/support/products/98909/graphics-drivers/graphics-for-7th-generation-intel-processors/intel-hd-graphics-630.html
+
+
+*** macbook pro
+
+
+*** dell
+
+  XPS 13 9350
+
+  显卡： Intel HD 520
+
+  网卡：
+
+
+Intel-HD-Graphics-Driver_V997F_WIN_21.20.16.4821_A11.EXE
+
+#+BEGIN_SRC sh
+$ sudo /usr/sbin/hwinfo --gfxcard
+17: PCI 02.0: 0300 VGA compatible controller (VGA)
+  [Created at pci.386]
+  Unique ID: _Znp.PYehq73Kj88
+  SysFS ID: /devices/pci0000:00/0000:00:02.0
+  SysFS BusID: 0000:00:02.0
+  Hardware Class: graphics card
+  Device Name: "Onboard IGD"
+  Model: "Intel Iris Graphics 540"
+  Vendor: pci 0x8086 "Intel Corporation"
+  Device: pci 0x1926 "Iris Graphics 540"
+  SubVendor: pci 0x1028 "Dell"
+  SubDevice: pci 0x0704
+  Revision: 0x0a
+  Driver: "i915"
+  Driver Modules: "i915"
+  Memory Range: 0xdb000000-0xdbffffff (rw,non-prefetchable)
+  Memory Range: 0x90000000-0x9fffffff (ro,non-prefetchable)
+  I/O Ports: 0xf000-0xf03f (rw)
+  Memory Range: 0x000c0000-0x000dffff (rw,non-prefetchable,disabled)
+  IRQ: 130 (46367 events)
+  Module Alias: "pci:v00008086d00001926sv00001028sd00000704bc03sc00i00"
+  Driver Info #0:
+  Driver Status: i915 is active
+  Driver Activation Cmd: "modprobe i915"
+  Config Status: cfg=new, avail=yes, need=no, active=unknown
+
+Primary display adapter: #17
+#+END_SRC
+
+** usb 网卡
+
+  绿联 CR111 传输速度: 1000Mbps  AX88179芯片 接口类型:RJ45 网络标准: 10/100/1000Mbps
+
+  绿联USB千兆网卡AX88179芯片驱动（Linux+Windows系统）20256|20255|20258|20260|20265|30203|20248|20249 https://www.lulian.cn/download/44-cn.html
+
+**  申请类
+
+  - f8:a4:5f:70:ed:11 [待确认]
+
+  - 34:36:3B:C6:83:8C [待确认]
+
+  - 34:36:3B:C6:83:8C [待确认]
+
+  - 30:B4:9E:77:6F:1E  [有用的，似乎是我的mac]
+
+  - 30:35:AD:48:12:6E  [iphone 6]
+
+  - 54:8C:A0:A2:CF:E1  [dell xps 使用的地址]
+
+  - D0:65:CA:B7:9C:19

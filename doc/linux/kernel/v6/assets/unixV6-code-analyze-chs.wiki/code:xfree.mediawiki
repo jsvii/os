@@ -1,0 +1,71 @@
+===Source===
+<div class="wikiheadnote">
+*释放 当前进程 的[[共享正文段]]
+</div>
+
+4393 
+
+4394 /* 
+
+4395 &nbsp;* relinquish use of the shared text segment 
+
+4396 &nbsp;* of a process. 
+
+4397 &nbsp;*/ 
+
+4398 xfree() 
+
+4399 { register *xp, *ip; 
+
+4400 
+
+4401 &nbsp;&nbsp;&nbsp;&nbsp;if((xp=[[code:user|u.u_procp]]->p_textp) != NULL) { 
+
+4402 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_procp]]->p_textp == NULL; 
+
+4403 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:xccdec|xccdec]](xp); 
+
+<blockquote>
+*释放 当前内存 [[共享正文段]] 的内存引用
+</blockquote>
+4404 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(--xp->x_count == 0) { 
+
+4405 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   ip = xp->x_iptr; 
+
+4406 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if((ip->i_mode&ISVTX) == 0) { 
+
+4407 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  xp->x_iptr = NULL; 
+
+4408 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:mfree|mfree]](swapmap, (xp->x_size+7)/8, 
+
+4409 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; xp->x_daddr); 
+
+4410 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  ip->i_flag =& ~ITEXT; 
+
+4411 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:iput|iput]](ip); 
+
+4412 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } 
+
+4413 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*释放 [[共享正文段]] 的引用
+*若 释放引用后 引用数为0，且未置ISVTX([[file:inode.h|inode.h]])
+**释放 盘交换区空间
+**释放 INODE
+</blockquote>
+4414 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+4415 } 
+
+4416 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[进程图像]]
+
+===Caller===
+*[[code:exec]]
+*[[code:exit]]
+|

@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===SEC
+===Code===000261
+===Operation===Set C
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===置
+===Description===置标志位C 
+===Example===无

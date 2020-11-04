@@ -1,0 +1,83 @@
+===Source===
+<div class="wikiheadnote">
+*对两个双字长数据进行比较大小
+*共输入四个参数，设为A,a,B,b
+*A : 第一个数据的高位
+*a : 第一个数据的低位
+*B : 第二个数据的高位
+*b : 第二个数据的低位
+*返回值 : 在 -512 ~ 512 的范围内返回Aa - Bb，规则如下
+**若 Aa - Bb > 512 ，则返回512
+**若 Aa - Bb < -512 ，则返回-512
+**否则， 返回Aa - Bb
+</div>
+
+<div class="wikiheadnote">
+*具体分析请参考[[code:dpcmp#附图|附图]]
+
+1325 /* ------------------------- */ <br/>
+
+1326 .globl _dpcmp<br/>
+
+1327 _dpcmp:<br/>
+
+1328 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 2(sp),r0<br/>
+
+1329 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 4(sp),r1<br/>
+
+1330 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:SUB|sub]] 6(sp),r0<br/>
+
+1331 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:SUB|sub]] 8(sp),r1<br/>
+
+<blockquote>
+*参数传递参考 [[汇编函数调用的现场保护]]
+</blockquote>
+1332 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:SBC|sbc]] r0<br/>
+
+1333 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BGE|bge]] 1f<br/>
+
+1334 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CMP|cmp]] r0,$-1<br/>
+
+1335 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BNE|bne]] 2f<br/>
+
+1336 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CMP|cmp]] r1,$-512.<br/>
+
+1337 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BHI|bhi]] 3f<br/>
+
+1338 2:<br/>
+
+1339 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $-512.,r0<br/>
+
+1340 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc<br/>
+
+1341 1:<br/>
+
+1342 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BNE|bne]] 2f<br/>
+
+1343 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CMP|cmp]] r1,$512.<br/>
+
+1344 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BLO|blo]] 3f<br/>
+
+1345 2:<br/>
+
+1346 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $512.,r1<br/>
+
+1347 3:<br/>
+
+1348 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r1,r0<br/>
+
+1349 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc<br/>
+
+</div>
+
+===Extend===
+=附图=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_dpcmp.png"/></p>
+
+===Ref===
+*[[关于汇编函数的说明]]
+
+===Caller===
+*[[code:sslep]]
+*[[code:readi]]
+*[[code:writei]]

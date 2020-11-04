@@ -1,0 +1,112 @@
+===Source===
+<div class="wikiheadnote">
+*返回 指定设备 的超级块，参考[[文件系统]]
+*共传入一个参数 dev
+**dev : 指定设备 的设备号
+*返回 对应的超级块，类型为 [[code:struct filsys|struct filsys]]
+*若无匹配，则抛出错误
+</div>
+
+7149 /* 
+
+7150 &nbsp;* getfs maps a device number into 
+
+7151 &nbsp;* a pointer to the incore super 
+
+7152 &nbsp;* block. 
+
+7153 &nbsp;* The algorithm is a linear 
+
+7154 &nbsp;* search through the mount table. 
+
+7155 &nbsp;* A consistency check of the 
+
+7156 &nbsp;* in core free-block and i-node 
+
+7157 &nbsp;* counts. 
+
+7158 &nbsp;* 
+
+7159 &nbsp;* bad count on dev x/y -- the count 
+
+7160 &nbsp;* check failed. At this point, all 
+
+7161 &nbsp;* the counts are zeroed which will 
+
+7162 &nbsp;* almost certainly lead to "no space" 
+
+7163 &nbsp;* diagnostic 
+
+7164 &nbsp;* panic: no fs -- the device is not mounted. 
+
+7165 &nbsp;* this "cannot happen" 
+
+7166 &nbsp;*/ 
+
+7167 getfs(dev) 
+
+7168 { 
+
+7169 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct mount|struct mount]] *p; 
+
+7170 &nbsp;&nbsp;&nbsp;&nbsp;register char *n1, *n2; 
+
+7171 
+
+7172 &nbsp;&nbsp;&nbsp;&nbsp;for([[code:struct mount|p]] = &[[code:struct mount|mount]][0]; [[code:struct mount|p]] < &[[code:struct mount|mount]][NMOUNT]; [[code:struct mount|p]]++) 
+
+<blockquote>
+*遍历 mount 数组，寻找匹配的文件系统
+*参考[[文件系统]]
+</blockquote>
+7173 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct mount|p]]->m_bufp != NULL && [[code:struct mount|p]]->m_dev == dev) { 
+
+7174 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct filsys|p]] = [[code:struct mount|p]]->m_bufp->b_addr; 
+
+7175 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n1 = [[code:struct filsys|p]]->s_nfree; 
+
+7176 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n2 = [[code:struct filsys|p]]->s_ninode; 
+
+7177 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(n1 > 100<nowiki> || </nowiki>n2 > 100) { 
+
+7178 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:prdev|prdev]]("bad count", dev); 
+
+7179 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:struct filsys|p]]->s_nfree = 0; 
+
+7180 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:struct filsys|p]]->s_ninode = 0; 
+
+7181 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若参数错误(s_nfree s_ninode)，则输出错误，并修正错误
+</blockquote>
+7182 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return([[code:struct filsys|p]]); 
+
+<blockquote>
+*返回[[code:struct filsys|超级块结构]]
+</blockquote>
+7183 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+7184 &nbsp;&nbsp;&nbsp;&nbsp;[[code:panic|panic]]("no fs"); 
+
+<blockquote>
+*若无匹配，抛出错误
+</blockquote>
+7185 } 
+
+7186 /* ------------------------- */ 
+
+7187 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[文件系统]]
+
+===Caller===
+*[[code:access]]
+*[[code:alloc]]
+*[[code:free]]
+*[[code:ialloc]]
+*[[code:ifree]]
+*[[code:iupdat]]

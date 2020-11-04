@@ -1,0 +1,18 @@
+{{pdp11:instruction
+===Instruction===ADC
+ADCB[字节版本]
+===Code===■055DD
+===Operation===(dst)← (dst)+(C)
+===Coden===若 运算结果<0，则置位
+否则，清位
+===Codez===若 运算结果=0，则置位
+否则，清位
+===Codev===若 (dst)=077777 且 (C)=1，则置位
+否则，清位
+===Codec===若 (dst)=177777 且 (C)=1，则置位
+否则，清位
+===Description===对目标位置的数据处理进位，将进位加入目标
+===Example===进行两个字长的加运算，A1A0 + B1B0
+ADD A0,B0 ;计算低位字加
+ADC B1 ;处理进位
+ADD A1,B1 ;计算高位字加

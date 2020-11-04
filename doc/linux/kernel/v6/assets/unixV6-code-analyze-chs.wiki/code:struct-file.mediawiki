@@ -1,0 +1,63 @@
+===Source===
+<div class="wikiheadnote">
+*打开文件结构
+</div>
+
+5500 /* 
+
+5501 &nbsp;* One file structure is allocated 
+
+5502 &nbsp;* for each open/creat/pipe call. 
+
+5503 &nbsp;* Main use is to hold the read/write 
+
+5504 &nbsp;* pointer associated with each open 
+
+5505 &nbsp;* file. 
+
+5506 &nbsp;*/ 
+
+5507 struct file 
+
+5508 { 
+
+5509 &nbsp;&nbsp;&nbsp;&nbsp;char f_flag; 
+
+<blockquote>
+*标志位
+*标志常量参看[[file:file.h|file.h]]
+</blockquote>
+5510 &nbsp;&nbsp;&nbsp;&nbsp;char f_count; /* reference count */ 
+
+<blockquote>
+*指向该file结构的进程数
+</blockquote>
+5511 &nbsp;&nbsp;&nbsp;&nbsp;int f_inode; /* pointer to inode structure */ 
+
+<blockquote>
+*指向 对应的INODE结构
+</blockquote>
+5512 &nbsp;&nbsp;&nbsp;&nbsp;char *f_offset[2]; /* read/write character pointer */ 
+
+<blockquote>
+*文件的I/O偏移量
+</blockquote>
+5513 } file[NFILE]; 
+
+5514 /* ------------------------- */ 
+
+
+===Ref===
+*[[内存打开文件结构]]
+===Caller===
+*[[code:rdwr]]
+*[[code:open1]]
+*[[code:seek]]
+*[[code:fstat]]
+*[[code:dup]]
+*[[code:closef]]
+*[[code:falloc]]
+*[[code:pipe]]
+*[[code:readp]]
+*[[code:writep]]
+*[[code:sgtty]]

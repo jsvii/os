@@ -1,0 +1,67 @@
+===Source===
+<div class="wikiheadnote">
+*设置某类型进程信号的处理函数
+*从用户态传入两个参数:
+**参数1(u_arg[0]):sig,信号类型号 
+**参数2(u_arg[1]):*func,信号处理函数入口地址
+</div>
+
+3613
+
+3614 ssig()
+
+3615 {
+
+3616 &nbsp;&nbsp;&nbsp;&nbsp;register a;
+
+3617
+
+3618 &nbsp;&nbsp;&nbsp;&nbsp;a = [[code:user|u.u_arg]][0];
+
+<blockquote>
+*a = 信号类型号
+</blockquote>
+3619 &nbsp;&nbsp;&nbsp;&nbsp;if(a&lt;=0 <nowiki>||</nowiki> a>=NSIG <nowiki>||</nowiki> a ==SIGKIL) {
+
+3620 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:user|u.u_error]] = EINVAL;
+
+<blockquote>
+*若类型号越界或为类型9(自我终止信号)
+**抛出错误
+**[[错误代码]]:EINVAL
+</blockquote>
+3621 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return;
+
+3622 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+3623 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_ar0]][R0] = [[code:user|u.u_signal]][a];
+
+<blockquote>
+*原信号处理函数入口地址暂存入R0,向用户态返回
+</blockquote>
+3624 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_signal]][a] = [[code:user|u.u_arg]][1];
+
+<blockquote>
+*将信号a的处理函数置为参数2
+</blockquote>
+3625 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_procp]]->p_sig == a)
+
+3626 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_procp]]->p_sig = 0;
+
+<blockquote>
+*若当前进程 接受到的信号 为 a，则 清信号
+**信号处理方式不一样了...原先的信号不再处理了
+</blockquote>
+3627 }
+
+3628 /* ------------------------- */
+
+
+
+===Ref===
+*[[信号系统]]
+
+===Param===
+:(signal = 48.)
+:<b>sys signal; sig; label</b>
+:(old value in r0)

@@ -1,0 +1,12 @@
+* android studio
+
+** 下载sdkmanager
+
+https://developer.android.com/studio/command-line/sdkmanager
+
+*** 下载sdk
+
+#+BEGIN_SRC bash
+./sdkmanager "platform-tools" --proxy=socks --proxy_port=8118 --proxy_host=localhost 
+#+END_SRC
+

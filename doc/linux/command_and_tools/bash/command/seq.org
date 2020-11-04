@@ -1,0 +1,10 @@
+* seq
+
+找印数字序列
+
+#+BEGIN_SRC shell
+seq 10
+# 输出1 - 10
+seq 10 20
+# 输出10 - 20
+#+END_SRC

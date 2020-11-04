@@ -1,0 +1,66 @@
+===Source===
+<div class="wikiheadnote">
+*chmod 系统调用 的 实现函数
+*改变指定文件或目录的访问权限
+*从用户态传入2个参数
+**参数1: name ,文件或目录的路径名 -> u.u_arg[0]
+**参数2: mode ,希望变成的访问模式 -> u.u_arg[1]
+</div>
+
+3559
+
+3560 chmod()
+
+3561 {
+
+3562 &nbsp;&nbsp;&nbsp;&nbsp;register *ip;
+
+3563
+
+3564 &nbsp;&nbsp;&nbsp;&nbsp;if (([[code:struct inode|ip]] = [[code:owner|owner]]()) == NULL)
+
+3565 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return;
+
+<blockquote>
+*检查当前用户是否是文件的拥有者或者是超级用户
+**若不是或者无法根据name指示的路径找到相应INODE,直接返回
+**否则,ip=通过name得到的INODE
+</blockquote>
+3566 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip->i_mode]] =& ~07777;
+
+<blockquote>
+*将ip->i_mode的最后12位(与访问权限有关的位)清空
+</blockquote>
+3567 &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:user|u.u_uid]])
+
+3568 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_arg]][1] =& ~ISVTX;
+
+<blockquote>
+*若当前用户不是超级用户
+**清除传入参数mode中的ISVTX标志,参看[[file:inode.h|inode.h]]
+</blockquote>
+3569 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip->i_mode]] =<nowiki>|</nowiki> [[code:user|u.u_arg]][1]&07777;
+
+<blockquote>
+*将传入的参数mode的后12位赋给ip->i_mode
+</blockquote>
+3570 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip->i_flag]] =<nowiki>|</nowiki> IUPD;
+
+3571 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]]([[code:struct inode|ip]]);
+
+<blockquote>
+*ip->i_flag置上IUPD标志,表明该INODE被修改过
+*调用iput使ip->i_count -1,(抵消3564调用owner时间接调用namei而 导致的ip->i_count +1)
+</blockquote>
+3572 }
+
+3573 /* ------------------------- */
+
+
+
+===Ref===
+*[[文件系统]]
+
+===Param===
+:(chmod = 15.)
+:<b>sys chmod; name; mode</b>

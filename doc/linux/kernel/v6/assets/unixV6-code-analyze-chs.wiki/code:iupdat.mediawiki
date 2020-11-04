@@ -1,0 +1,124 @@
+===Source===
+<div class="wikiheadnote">
+*将内存中inode的内容写回到相应的磁盘inode上
+*传入两个参数 p,tm
+**p :指向内存中某一[[code:struct inode|INODE结构变量]]的指针
+**tm : 为该[[code:struct inode|INODE结构变量]]的最后修改时间
+</div>
+
+7366
+
+7367  /*
+
+7368 &nbsp;* Check accessed and update flags on
+
+7369 &nbsp;* an inode structure.
+
+7370 &nbsp;* If either is on, update the inode
+
+7371 &nbsp;* with the corresponding dates
+
+7372 &nbsp;* set to the argument tm.
+
+7373 &nbsp;*/
+
+7374  iupdat(p, tm)
+
+7375  int *p;
+
+7376  int *tm;
+
+7377  {
+
+7378 &nbsp;&nbsp;&nbsp;&nbsp;register *ip1, *ip2, *rp;
+
+7379 &nbsp;&nbsp;&nbsp;&nbsp;int *bp, i;
+
+7380
+
+7381 &nbsp;&nbsp;&nbsp;&nbsp;rp = p;
+
+7382 &nbsp;&nbsp;&nbsp;&nbsp;if((rp->i_flag&(IUPD<nowiki>|</nowiki>IACC)) != 0) {
+
+<blockquote>
+*判断该内存中的[[code:struct inode|INODE]]是否包含IUPD或IACC标志,若不包含,则直接返回
+*关于IUPD与IACC标志,参看[[File:inode.h|inode.h]]
+</blockquote>
+7383 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if([[code:getfs|getfs]](rp->i_dev)->s_ronly)
+
+7384 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return;
+
+<blockquote>
+*获取对应磁盘[[code:struct inode|INODE]]所在文件分区的[[code:struct filsys|filsys]]
+*判断该文件分区是否包含只读标志,若有则直接返回
+</blockquote>
+7385 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;i = rp->i_number+31;
+
+7386 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bp = [[code:bread|bread]](rp->i_dev, [[code:ldiv|ldiv]](i,16));
+
+<blockquote>
+*由于inode区是从磁盘的第2块开始的,参看[[文件系统]]
+*rp->i_number表示磁盘上对应[[code:struct inode|INODE]]在磁盘inode区的号码,且从1开始计数
+*故(i_number + 31)/16即可得到磁盘上对应[[code:struct inode|INODE]]所处的块号
+*从磁盘上读入该块内容到缓存块bp
+</blockquote>
+7387 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ip1 = bp->b_addr + 32*[[code:lrem|lrem]](i, 16);
+
+7388 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ip2 = &rp->i_mode;
+
+7389 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;while(ip2 < &rp->i_addr[8])
+
+7390 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*ip1++ = *ip2++;
+
+<blockquote>
+*ip1为bp中[[code:struct inode|INODE]]的起始地址
+*将内存[[code:struct inode|INODE]]中从i_mode至i_address[7]的所有内容拷贝到bp中的[[code:struct inode|INODE]]相应位置
+</blockquote>
+7391 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(rp->i_flag&IACC) {
+
+7392 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*ip1++ = time[0];
+
+7393 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*ip1++ = time[1];
+
+<blockquote>
+*如果内存上的[[code:struct inode|INODE]]含有IACC标志,则bp中相应[[code:struct inode|INODE]]的i_atime置为当前系统时间
+</blockquote>
+7394 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} else
+
+7395 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ip1 =+ 2;
+
+<blockquote>
+*如果内存上的[[code:struct inode|INODE]]不含IACC标志,则bp中相应[[code:struct inode|INODE]]的i_atime保持不变,ip1向后移两个字节,来到i_mtime的地址起始处
+</blockquote>
+7396 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(rp->i_flag&IUPD) {
+
+7397 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*ip1++ = *tm++;
+
+7398 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*ip1++ = *tm;
+
+7399 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;}
+
+<blockquote>
+*如果内存上的[[code:struct inode|INODE]]包含IUPD(被修改过标志),则bp中相应[[code:struct inode|INODE]]的i_mtime置为传入的最近修改时间
+</blockquote>
+7400 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:bwrite|bwrite]](bp);
+
+<blockquote>
+*将bp写回磁盘
+</blockquote>
+7401 &nbsp;&nbsp;&nbsp;&nbsp; }
+
+7402  }
+
+7403  /* -------------------------*/
+
+
+===Ref===
+*[[文件系统]]
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:smdate]]
+*[[code:stat1]]
+*[[code:update]]
+*[[code:iput]]

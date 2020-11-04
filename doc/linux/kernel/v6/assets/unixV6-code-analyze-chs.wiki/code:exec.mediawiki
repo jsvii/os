@@ -1,0 +1,508 @@
+===Source===
+<div class="wikiheadnote">
+*exec 的系统调用函数
+*将 现行进程 转化为 运行某一程序的进程
+*传入参数
+**name : 欲运行程序的文件路径，保存在
+***u.u_arg[0]
+***u.u_dirp ，原因参看[[code:trap|trap]] 2770
+**argv : 参数数组指针（指向[[用户态]]地址空间中参数数组的位置）
+***参数数组 : 每项 指向 一个参数字符串 ( [[用户态]]地址空间 )
+</div>
+
+3008 
+
+3009 /* 
+
+3010 &nbsp;* exec system call. 
+
+3011 &nbsp;* Because of the fact that an I/O buffer is used 
+
+3012 &nbsp;* to store the caller’s arguments during exec, 
+
+3013 &nbsp;* and more buffers are needed to read in the text file, 
+
+3014 &nbsp;* deadly embraces waiting for free buffers are possible. 
+
+3015 &nbsp;* Therefore the number of processes simultaneously 
+
+3016 &nbsp;* running in exec has to be limited to NEXEC. 
+
+3017 &nbsp;*/ 
+
+3018 #define EXPRI -1 
+
+3019 
+
+3020 exec() 
+
+3021 { 
+
+3022 &nbsp;&nbsp;&nbsp;&nbsp;int ap, na, nc, *bp; 
+
+3023 &nbsp;&nbsp;&nbsp;&nbsp;int ts, ds, sep; 
+
+3024 &nbsp;&nbsp;&nbsp;&nbsp;register c, *ip; 
+
+3025 &nbsp;&nbsp;&nbsp;&nbsp;register char *cp; 
+
+3026 &nbsp;&nbsp;&nbsp;&nbsp;extern uchar; 
+
+3027 
+
+3028 &nbsp;&nbsp;&nbsp;&nbsp;/* 
+
+3029 &nbsp;&nbsp;&nbsp;&nbsp; * pick up file names 
+
+3030 &nbsp;&nbsp;&nbsp;&nbsp; * and check various modes 
+
+3031 &nbsp;&nbsp;&nbsp;&nbsp; * for execute permission 
+
+3032 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+3033 
+
+3034 &nbsp;&nbsp;&nbsp;&nbsp;ip = [[code:namei|namei]](&[[code:uchar|uchar]], 0); 
+
+3035 &nbsp;&nbsp;&nbsp;&nbsp;if(ip == NULL) 
+
+3036 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+<blockquote>
+*ip ← 程序文件的INODE
+</blockquote>
+3037 &nbsp;&nbsp;&nbsp;&nbsp;while(execnt >= NEXEC) 
+
+3038 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:sleep|sleep]](&execnt, EXPRI); 
+
+<blockquote>
+*execnt 定义在 [[file:systm.h|systm.h]]
+*若 同时执行[[code:exec|exec]]的进程过多，则睡眠
+**[[睡眠原因]] : &execnt
+**[[睡眠优先级]] : EXPRI
+*此举的解释在3010
+**[[code:exec|exec]]需要使用大量的INODE缓存
+若同时执行[[code:exec|exec]]进程过多，INODE耗尽，形成资源死锁
+</blockquote>
+3039 &nbsp;&nbsp;&nbsp;&nbsp;execnt++; 
+
+3040 &nbsp;&nbsp;&nbsp;&nbsp;bp = [[code:getblk|getblk]](NODEV); 
+
+<blockquote>
+*申请 临时缓存块 bp，用于保存参数
+</blockquote>
+3041 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:access|access]](ip, IEXEC) <nowiki>||</nowiki> (ip->i_mode&IFMT)!=0) 
+
+3042 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto bad; 
+
+<blockquote>
+*检查 ip 的执行权限
+*检查 ip 是否是特殊文件
+</blockquote>
+3043 
+
+3044 &nbsp;&nbsp;&nbsp;&nbsp;/* 
+
+3045 &nbsp;&nbsp;&nbsp;&nbsp; * pack up arguments into 
+
+3046 &nbsp;&nbsp;&nbsp;&nbsp; * allocated disk buffer 
+
+3047 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+3048 
+
+3049 &nbsp;&nbsp;&nbsp;&nbsp;cp = bp->b_addr; 
+
+3050 &nbsp;&nbsp;&nbsp;&nbsp;na = 0; 
+
+3051 &nbsp;&nbsp;&nbsp;&nbsp;nc = 0; 
+
+<blockquote>
+*na : 参数个数
+*nc : 参数包含的字符数
+</blockquote>
+<blockquote>
+3052 - 3074
+*将 参数 从[[用户态]]地址空间 读出，写入bp
+</blockquote>
+3052 &nbsp;&nbsp;&nbsp;&nbsp;while(ap = [[code:fuword|fuword]]([[code:user|u.u_arg]][1])) { 
+
+3053 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;na++; 
+
+3054 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(ap == -1) 
+
+3055 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   goto bad; 
+
+3056 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_arg]][1] =+ 2; 
+
+3057 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for(;;) { 
+
+3058 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   c = [[code:fubyte|fubyte]](ap++); 
+
+3059 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(c == -1) 
+
+3060 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  goto bad; 
+
+3061 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*cp++ = c; 
+
+3062 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   nc++; 
+
+3063 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(nc > 510) { 
+
+3064 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:user|u.u_error]] = E2BIG; 
+
+3065 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  goto bad; 
+
+<blockquote>
+*若 参数字符数 超过 bp大小，则抛出错误
+**[[错误代码]] : E2BIG
+</blockquote>
+3066 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } 
+
+3067 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(c == 0) 
+
+3068 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  break; 
+
+3069 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+3070 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+3071 &nbsp;&nbsp;&nbsp;&nbsp;if((nc&1) != 0) { 
+
+3072 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;*cp++ = 0; 
+
+3073 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;nc++; 
+
+3074 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 字符数为奇数，则加入空字符补齐
+*此处含义不明，列入[[遗留问题]]
+</blockquote>
+3075 
+
+<blockquote>
+*3076 - 3109
+*从 程序代码文件 读取 前4个字w[]，保存到u.u_arg[0-3]
+**w[0] : 特殊位，用于标识程序特殊性，参看3079，及 man a.out
+**w[1] : 正文段大小
+**w[2] : 数据段大小
+**w[3] : bss区大小
+*根据 特殊位，作相关设置
+这里不详细说明，请参看 man a.out
+</blockquote>
+3076 &nbsp;&nbsp;&nbsp;&nbsp;/* read in first 8 bytes 
+
+3077 &nbsp;&nbsp;&nbsp;&nbsp; * of file for segment 
+
+3078 &nbsp;&nbsp;&nbsp;&nbsp; * sizes: 
+
+3079 &nbsp;&nbsp;&nbsp;&nbsp; * w0 = 407/410/411 (410 -> RO text) (411 -> sep ID) 
+
+3080 &nbsp;&nbsp;&nbsp;&nbsp; * w1 = text size 
+
+3081 &nbsp;&nbsp;&nbsp;&nbsp; * w2 = data size 
+
+3082 &nbsp;&nbsp;&nbsp;&nbsp; * w3 = bss size 
+
+3083 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+3084 
+
+3085 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_base]] = &[[code:user|u.u_arg]][0]; 
+
+3086 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_count]] = 8; 
+
+3087 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_offset[1]]] = 0; 
+
+3088 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_offset[0]]] = 0; 
+
+3089 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_segflg]] = 1; 
+
+3090 &nbsp;&nbsp;&nbsp;&nbsp;[[code:readi|readi]](ip); 
+
+3091 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_segflg]] = 0; 
+
+3092 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_error]]) 
+
+3093 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto bad; 
+
+3094 &nbsp;&nbsp;&nbsp;&nbsp;sep = 0; 
+
+3095 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_arg[0]]] == 0407) { 
+
+3096 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_arg]][2] =+ [[code:user|u.u_arg]][1]; 
+
+3097 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_arg]][1] = 0; 
+
+3098 &nbsp;&nbsp;&nbsp;&nbsp;} else 
+
+3099 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_arg]][0] == 0411) 
+
+3100 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   sep++; else 
+
+3101 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if([[code:user|u.u_arg]][0] != 0410) { 
+
+3102 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:user|u.u_error]] = ENOEXEC; 
+
+3103 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  goto bad; 
+
+3104 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } 
+
+3105 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_arg]][1]!=0&&(ip->i_flag&ITEXT)==0&&ip->i_count!=1){ 
+
+3106 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = ETXTBSY; 
+
+3107 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto bad; 
+
+3108 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 程序文件含有正文段 ([[code:user|u.u_arg]][1]!=0)
+且 该文件作为数据文件被其他进程打开((ip->i_flag&ITEXT)==0&&ip->i_count!=1)，则抛出错误
+**[[错误代码]] : ETXTBSY
+**原因 : 正文段不可被修改
+</blockquote>
+3109 
+
+3110 &nbsp;&nbsp;&nbsp;&nbsp;/* 
+
+3111 &nbsp;&nbsp;&nbsp;&nbsp; * find text and data sizes 
+
+3112 &nbsp;&nbsp;&nbsp;&nbsp; * try them out for possible 
+
+3113 &nbsp;&nbsp;&nbsp;&nbsp; * exceed of max sizes 
+
+3114 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+3115 
+
+3116 &nbsp;&nbsp;&nbsp;&nbsp;ts = (([[code:user|u.u_arg]][1]+63)>>6) & 01777; 
+
+3117 &nbsp;&nbsp;&nbsp;&nbsp;ds = (([[code:user|u.u_arg]][2]+[[code:user|u.u_arg]][3]+63)>>6) & 0177; 
+
+3118 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:estabur|estabur]](ts, ds, SSIZE, sep)) 
+
+3119 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto bad; 
+
+<blockquote>
+*ts ← 正文段占用内存块数
+*ds ← 数据段占用内存块数
+*调用[[code:estabur|estabur]]，不是为了 将参数装载到地址映照表，而是为了 检验ts,ds是否超出内存限制
+**SSIZE 定义在 [[File:param.h|param.h]]
+</blockquote>
+3120 
+
+3121 &nbsp;&nbsp;&nbsp;&nbsp;/* 
+
+3122 &nbsp;&nbsp;&nbsp;&nbsp; * allocate and clear core 
+
+3123 &nbsp;&nbsp;&nbsp;&nbsp; * at this point, committed 
+
+3124 &nbsp;&nbsp;&nbsp;&nbsp; * to the new image 
+
+3125 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+3126 
+
+3127 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_prof]][3] = 0; 
+
+<blockquote>
+*停止统计 [[程序统计直方图]] 
+</blockquote>
+3128 &nbsp;&nbsp;&nbsp;&nbsp;[[code:xfree|xfree]](); 
+
+<blockquote>
+*释放 当前进程 的[[共享正文段]]
+</blockquote>
+3129 &nbsp;&nbsp;&nbsp;&nbsp;[[code:expand|expand]](USIZE); 
+
+<blockquote>
+*内存图像空间 收缩到 PPDA区大小
+*必要性 值得 讨论...(列入[[遗留问题]])
+</blockquote>
+3130 &nbsp;&nbsp;&nbsp;&nbsp;[[code:xalloc|xalloc]](ip); 
+
+<blockquote>
+*分配 [[共享正文段]]
+</blockquote>
+3131 &nbsp;&nbsp;&nbsp;&nbsp;c = USIZE+ds+SSIZE; 
+
+3132 &nbsp;&nbsp;&nbsp;&nbsp;[[code:expand|expand]](c); 
+
+3133 &nbsp;&nbsp;&nbsp;&nbsp;while(--c >= USIZE) 
+
+3134 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:clearseg|clearseg]]([[code:user|u.u_procp]]->p_addr+c); 
+
+<blockquote>
+*分配 内存图像空间
+*除PPDA区外，全部清零
+</blockquote>
+3135 
+
+3136 &nbsp;&nbsp;&nbsp;&nbsp;/* read in data segment */ 
+
+3137 
+
+3138 &nbsp;&nbsp;&nbsp;&nbsp;[[code:estabur|estabur]](0, ds, 0, 0); 
+
+3139 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_base]] = 0; 
+
+3140 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_offset]][1] = 020+[[code:user|u.u_arg]][1]; 
+
+3141 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_count]] = [[code:user|u.u_arg]][2]; 
+
+3142 &nbsp;&nbsp;&nbsp;&nbsp;[[code:readi|readi]](ip); 
+
+<blockquote>
+*从 程序文件 读入数据段
+*与[[code:xalloc|xalloc]] 4460 类似
+</blockquote>
+3143 
+
+3144 &nbsp;&nbsp;&nbsp;&nbsp;/* 
+
+3145 &nbsp;&nbsp;&nbsp;&nbsp; * initialize stack segment 
+
+3146 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+3147 
+
+3148 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_tsize]] = ts; 
+
+3149 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_dsize]] = ds; 
+
+3150 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_ssize]] = SSIZE; 
+
+3151 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_sep]] = sep; 
+
+3152 &nbsp;&nbsp;&nbsp;&nbsp;[[code:estabur|estabur]]([[code:user|u.u_tsize]], [[code:user|u.u_dsize]], [[code:user|u.u_ssize]], [[code:user|u.u_sep]]); 
+
+<blockquote>
+*置 新的参数，并置 地址映照表
+</blockquote>
+3153 &nbsp;&nbsp;&nbsp;&nbsp;cp = bp->b_addr; 
+
+3154 &nbsp;&nbsp;&nbsp;&nbsp;ap = -nc - na*2 - 4; 
+
+3155 &nbsp;&nbsp;&nbsp;&nbsp;[[skill:u.u_ar0|u.u_ar0]][R6] = ap; 
+
+3156 &nbsp;&nbsp;&nbsp;&nbsp;[[code:suword|suword]](ap, na); 
+
+3157 &nbsp;&nbsp;&nbsp;&nbsp;c = -nc; 
+
+3158 &nbsp;&nbsp;&nbsp;&nbsp;while(na--) { 
+
+3159 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:suword|suword]](ap=+2, c); 
+
+3160 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;do 
+
+3161 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:subyte|subyte]](c++, *cp); 
+
+3162 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;while(*cp++); 
+
+3163 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+3164 &nbsp;&nbsp;&nbsp;&nbsp;[[code:suword|suword]](ap+2, -1); 
+
+3165 
+
+<blockquote>
+3153 - 3165
+*新用户栈 赋值 为以下形式
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_exec.png"/></p>
+*寻址方式: 参看[[编程技巧#负数表示堆栈区]]
+</blockquote>
+3166 &nbsp;&nbsp;&nbsp;&nbsp;/* 
+
+3167 &nbsp;&nbsp;&nbsp;&nbsp; * set SUID/SGID protections, if no tracing 
+
+3168 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+3169 
+
+3170 &nbsp;&nbsp;&nbsp;&nbsp;if (([[code:user|u.u_procp]]->p_flag&STRC)==0) { 
+
+3171 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(ip->i_mode&ISUID) 
+
+3172 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if([[code:user|u.u_uid]] != 0) { 
+
+3173 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:user|u.u_uid]] = ip->i_uid; 
+
+3174 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:user|u.u_procp]]->p_uid = ip->i_uid; 
+
+3175 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } 
+
+3176 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(ip->i_mode&ISGID) 
+
+3177 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_gid]] = ip->i_gid; 
+
+3178 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*[[遗留问题]]
+</blockquote>
+3179 
+
+3180 &nbsp;&nbsp;&nbsp;&nbsp;/* clear sigs, regs, and return */ 
+
+3181 
+
+3182 &nbsp;&nbsp;&nbsp;&nbsp;c = ip; 
+
+3183 &nbsp;&nbsp;&nbsp;&nbsp;for(ip = &[[code:user|u.u_signal]][0]; ip < &[[code:user|u.u_signal]][NSIG]; ip++) 
+
+3184 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if((*ip & 1) == 0) 
+
+3185 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*ip = 0; 
+
+<blockquote>
+*清 用户 信号处理函数
+*参看 [[信号系统]]
+</blockquote>
+3186 &nbsp;&nbsp;&nbsp;&nbsp;for(cp = &[[code:regloc|regloc]][0]; cp < &[[code:regloc|regloc]][6];) 
+
+3187 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[skill:u.u_ar0|u.u_ar0]][*cp++] = 0; 
+
+3188 &nbsp;&nbsp;&nbsp;&nbsp;[[skill:u.u_ar0|u.u_ar0]][R7] = 0; 
+
+<blockquote>
+*将 核心栈 中保存的寄存器值全部置0
+*R6的值不被清，在3155被置
+</blockquote>
+3189 &nbsp;&nbsp;&nbsp;&nbsp;for(ip = &[[code:user|u.u_fsav]][0]; ip < &[[code:user|u.u_fsav]][25];) 
+
+3190 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;*ip++ = 0; 
+
+3191 &nbsp;&nbsp;&nbsp;&nbsp;ip = c; 
+
+3192 
+
+3193 bad: 
+
+3194 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]](ip); 
+
+3195 &nbsp;&nbsp;&nbsp;&nbsp;[[code:brelse|brelse]](bp); 
+
+3196 &nbsp;&nbsp;&nbsp;&nbsp;if(execnt >= NEXEC) 
+
+3197 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]](&execnt); 
+
+3198 &nbsp;&nbsp;&nbsp;&nbsp;execnt--; 
+
+3199 } 
+
+3200 /* ------------------------- */ 
+
+
+
+===Param===
+:(exec = 11.)
+:<b>sys exec; name; args</b>
+:...
+:name: <...\0>
+:...
+:args: arg0; arg1; ...; 0
+:arg0: <...\0>
+:arg1: <...\0>
+:...

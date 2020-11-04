@@ -1,0 +1,341 @@
+* shell语法
+
+** 变量
+
+在 ~=~ 两侧不可有空格
+
+#+BEGIN_SRC bash
+var1=10
+var2="test, string"
+var3=hello
+#+END_SRC
+
+#+BEGIN_SRC bash
+#给变量var赋值
+var="value"
+echo $var
+# or
+echo ${var}
+#+END_SRC
+
+
+*** 获得字符串长度
+
+可以用下面的方法获得变量值的长度：
+#+BEGIN_SRC bash
+length=${#var}
+#+END_SRC
+
+*** 识别当前所使用的shell
+
+可以用下面的方法获知当前使用的是哪种shell：
+
+#+BEGIN_SRC bash
+echo $SHELL
+# or
+echo $0
+#+END_SRC
+
+*** UID
+
+UID是一个重要的环境变量，可以用于检查当前脚本是以超级用户还是以普通用户的身份运行的。例如
+
+#+BEGIN_SRC bash
+if [ $UID -ne 0 ]; then
+  echo Non root user. Please run as root.
+else
+  echo Root user
+fi
+#+END_SRC
+
+
+** 特殊Shell变量
+#+CAPTION: 特殊Shell变量
+#+NAME:   tab:basic-data
+
+| 别名          | 描述                             |
+|---------------+----------------------------------------------------------------------------------------------|
+| $0            | 当前脚本的文件名                                                                             |
+| $n            | 传递给脚本或函数的参数。n 是一个数字，表示第几个参数。例如，第一个参数是$1，第二个参数是$2。 |
+| $#            | 传递给脚本或函数的参数个数。                                                                 |
+| $*            | 传递给脚本或函数的所有参数。被双引号(" ")包含时，$* 会是一个字符串整体。其他都作为分开的     |
+| $@            | 传递给脚本或函数的所有参数。                                                                 |
+| $?            | 上个命令的退出状态，或函数的返回值。                                                         |
+| $$            | 当前Shell进程ID。对于 Shell 脚本，就是这些脚本所在的进程ID。                                 |
+| $!            | The process number of the last background command.                                           |
+| $-            | current options set for the shell.                                                           |
+| $_            | most recent parameter (or the abs path of the command to start the current shell immediately after startup). |
+| $IFS          | is the (input) field separator.                                                              |
+
+#+BEGIN_SRC shell
+#!/bin/sh
+# example
+# ./shell_env.sh --name shell_test --version 1.10
+# 显示当前运行程序的脚本
+echo $0
+
+# 对应的参数
+echo '$1 $2 $3' $1 $2 $3
+
+# 参数的数量
+echo $#
+
+#
+echo $*
+
+echo $@
+
+echo $?
+
+# 当前pid
+echo $$
+
+#
+echo $!
+#+END_SRC
+
+示例：
+
+#+BEGIN_SRC shell
+# asdf 中 node.js的调用
+exec /home/leo/.asdf/bin/asdf exec "node" "$@"
+
+#+END_SRC
+
+
+** 控制语句
+
+*** if
+
+**** if then
+
+#+BEGIN_SRC bash
+if [ condition ]
+then
+    commands
+fi
+#+END_SRC
+
+**** if then else
+
+#+BEGIN_SRC bash
+if [ condition ]
+then
+    commands
+else
+    commands
+fi
+#+END_SRC
+
+**** if then elif then else
+
+#+BEGIN_SRC bash
+if [ condition1 ]; then
+    command1
+elif [ condition2 ]; then
+    command2
+elif [ condition3 ]; then
+    command3
+else
+    command3
+fi
+#+END_SRC
+
+**** case
+
+case 的选项后的命令行是 ~;;~ 结尾的。
+
+#+BEGIN_SRC bash
+case VAR in
+pattern1 | patter2)
+   comand1;;
+pattern3)
+   comand2;;
+*)
+   comandDefault;;
+esac
+#+END_SRC
+
+或者在 ~()~ 内填入case选项
+
+#+BEGIN_SRC bash
+case VAR in
+(pattern1 | patter2)
+   comand1;;
+(pattern3)
+   comand2;;
+(*)
+   comandDefault;;
+esac
+#+END_SRC
+
+**** for
+
+#+BEGIN_SRC bash
+for VARIABLE in LIST
+do
+    commands
+done
+#+END_SRC
+
+而加入 ~;~ 则有多种方式
+
+#+BEGIN_SRC bash
+for VARIABLE in LIST; do
+    commands
+done
+#+END_SRC
+
+#+BEGIN_SRC bash
+for VARIABLE in LIST; do commands; done
+#+END_SRC
+
+
+
+*** 数组的万恶之源
+
+**** 数组的变量到底是什么
+
+看下面的案例，array在直接echo时，bash的实现中会是第一个元素，zshell中是整个数组，一定要注意
+
+#+BEGIN_SRC bash
+mytest=(one two three four)
+echo $mytest
+# one
+#+END_SRC
+
+#+BEGIN_SRC bash
+mytest=(one two three four)
+echo ${mytest[@]}
+# one two three four
+#+END_SRC
+
+
+***** 多维数组
+
+#+BEGIN_SRC bash
+array=('d1=(v1 v2 v3)' 'd2=(v1 v2 v3)')
+for elt in "${array[@]}";do eval $elt;done
+echo "d1 ${#d1[@]} ${d1[@]}"
+echo "d2 ${#d2[@]} ${d2[@]}"
+#+END_SRC
+
+**** unset是置null
+
+#+BEGIN_SRC bash
+mytest=(one two three four)
+unset mytest[2]
+echo ${mytest[*]}
+# one two four
+echo ${mytest[2]}
+# 返回了一个空
+#+END_SRC
+
+
+
+
+
+*** cd 到特殊文件夹中
+
+文件名为  =foo bar= 或者 =foo-bar=  这样的，脚本中怎么处理呢？
+
+#+BEGIN_SRC bash
+#!/bin/bash
+
+#+END_SRC
+
+
+*** faq
+
+如何用shell 来拷贝一个array
+
+
+*** 用shell来计算给出的两个数
+
+#+BEGINE_SRC sh
+echo 1 2 | awk '{print("%d\n", $1+$2)}'
+#+END_SRC
+
+#+BEGINE_SRC sh
+echo 1+2 | bc
+#+END_SRC
+
+#+BEGINE_SRC sh
+expr 1 + 2
+#+END_SRC
+
+** tips
+
+
+
+** term
+DEC VT100
+
+DEC VT102
+
+
+** 系统管理
+
+#+BEGIN_SRC sh
+/*
+ * Location of the users' stored
+ * registers relative to R0.
+ * Usage is u.u_ar0[XX].
+ */
+
+/usr/share/terminfo
+/etc/terminfo
+/lib/terminfo
+
+#+END_SRC
+
+infocmp
+
+
+** expression
+
+#+BEGIN_SRC bash
+if condition
+then
+  statements
+[elif condition
+  then statements...]
+[else
+  statements]
+fi
+
+for x in {1..10}
+do
+  statements
+done
+
+for name [in list]
+do
+  statements that can use $name
+done
+
+for (( initialisation ; ending condition ; update ))
+do
+  statements...
+done
+
+case expression in
+  pattern1 )
+    statements ;;
+  pattern2 )
+    statements ;;
+esac
+
+select name [in list]
+do
+  statements that can use $name
+done
+
+while condition; do
+  statements
+done
+
+until condition; do
+  statements
+done
+#+END_SRC

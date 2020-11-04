@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===CCC
+===Code===000257
+===Operation===Clear all CC's (condition codes)
+===Coden===清
+===Codez===清
+===Codev===清
+===Codec===清
+===Description===清所有标志位 
+===Example===无

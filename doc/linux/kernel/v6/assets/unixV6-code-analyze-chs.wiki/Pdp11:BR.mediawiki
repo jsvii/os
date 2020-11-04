@@ -1,0 +1,47 @@
+{{pdp11:instruction
+===Instruction===BR
+===Code===000400 + 偏移[offset]
+===Operation===PC ← PC + ( 2 * offset )
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===进行无条件程序控制转移，偏移范围 -128 ~ 127<br/>程序控制转移后新PC地址 = 指令执行时的PC地址 + (2 * 偏移) [ New PC address = updated PC + ( 2 * offset ) ]<br/>指令执行时的PC地址 = BR指令地址 + 2 [ Updated PC = address of branch instruction + 2 ]
+===Example===设BR指令地址为500
+<table class="wikitable" border="1" cellspacing="0" align="center" style="width:80%">
+<tr>
+<th width="200px">程序控制转移后新PC地址
+</th><th>偏移代码
+</th><th>偏移量
+</th></tr>
+<tr>
+<td> 474
+</td><td> 375 [ 11 111 101 ]( -3的补码形式 )
+</td><td> -3
+</td></tr>
+<tr>
+<td> 476
+</td><td> 376
+</td><td> -2
+</td></tr>
+<tr>
+<td> 500
+</td><td> 377
+</td><td> -1
+</td></tr>
+<tr>
+<td> 502
+</td><td> 000
+</td><td> 0
+</td></tr>
+<tr>
+<td> 504
+</td><td> 001
+</td><td> +1
+</td></tr>
+<tr>
+<td> 506
+</td><td> 002
+</td><td> +2
+</td></tr></table>
+

@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# example
+# ./shell_env.sh --name shell_test --version 1.10
+
+# 显示当前运行程序的脚本
+echo $0
+
+# 对应的参数
+echo '$1 $2 $3' $1 $2 $3
+
+# 参数的数量
+echo $#
+
+#
+
+echo $*
+
+
+echo $@
+
+echo $?
+
+# 当前pid
+echo $$
+
+#
+echo $!

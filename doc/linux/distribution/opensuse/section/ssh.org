@@ -1,0 +1,35 @@
+* ssh
+
+** 免密ssh
+
+  - 生成ssh
+
+    1. =ssh-keygen -t rsa=
+
+  - 复制 =id_ras.pub= 到远程机器中，有几种方式
+
+    - 方法1：ssh-copy-id user@host
+
+    - 方法2：直接复制到远程机器的
+
+  - 再优化：不想记ip名，直接ssh somealias
+
+#+BEGIN_SRC txt
+Host somealias
+    HostName example.com
+    Port 2222
+    User someuser
+    IdentityFile  ~/.ssh/id_example
+    IdentitiesOnly yes
+
+Host anotheralias
+    HostName 192.168.33.10
+    User anotheruser
+    PubkeyAuthentication no
+
+Host aws
+    HostName some.address.ec2.aws.com
+    User awsuser
+    IdentityFile  ~/.ssh/aws_identity.pem
+    IdentitiesOnly yes
+#+END_SRC

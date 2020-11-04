@@ -1,0 +1,85 @@
+===Source===
+<div class="wikiheadnote">
+*根据给定的路径名找到一个inode
+**路径名 由 [[code:user|u.u_dirp]] 指向
+*判断当前用户是否为该inode对应的文件拥有者,参看[[权限管理]]
+*返回
+**返回为空:
+***该路径名无法找到对应inode
+***当前用户不是该inode对应的文件拥有者
+***当前用户不是超级用户
+**返回得到的inode:
+***当前用户为该inode对应的文件拥有者
+***当前用户是超级用户
+</div>
+
+6782
+
+6783  /*
+
+6784 &nbsp;* Look up a pathname and test if
+
+6785 &nbsp;* the resultant inode is owned by the
+
+6786 &nbsp;* current user.
+
+6787 &nbsp;* If not, try for super-user.
+
+6788 &nbsp;* If permission is granted,
+
+6789 &nbsp;* return inode pointer.
+
+6790 &nbsp;*/
+
+6791  owner()
+
+6792  {
+
+6793 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct inode|struct inode]] *ip;
+
+6794 &nbsp;&nbsp;&nbsp;&nbsp;extern [[code:uchar|uchar]]();
+
+6795
+
+6796 &nbsp;&nbsp;&nbsp;&nbsp;if ((ip = [[code:namei|namei]]([[code:uchar|uchar]], 0)) == NULL)
+
+6797 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return(NULL);
+
+<blockquote>
+*获取路径名对应的inode,并赋给ip
+*若获取失败,返回空
+</blockquote>
+6798 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_uid]] == [[code:struct inode|ip]]->i_uid)
+
+6799 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return([[code:struct inode|ip]]);
+
+<blockquote>
+*如果当前用户为文件拥有者,返回ip
+</blockquote>
+6800 &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:suser|suser]]())
+
+6801 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return([[code:struct inode|ip]]);
+
+<blockquote>
+*如果当前用户为超级用户,返回ip
+</blockquote>
+6802 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]](ip);
+
+<blockquote>
+*如果当前用户既非文件拥有者又非超级用户,释放[[code:struct inode|ip]]
+</blockquote>
+6803 &nbsp;&nbsp;&nbsp;&nbsp;return(NULL);
+
+6804  }
+
+6805  /* -------------------------*/
+
+
+
+===Ref===
+*[[文件系统]]
+
+===Caller===
+*[[code:chmod]]
+*[[code:chown]]
+*[[code:smdate]]

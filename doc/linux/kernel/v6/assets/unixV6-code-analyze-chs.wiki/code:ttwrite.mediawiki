@@ -1,0 +1,82 @@
+===Source===
+<div class="wikiheadnote">
+*将指定内存地址空间的内容放入指定设备的输出队列中
+*传入1个参数:
+**atp:指定设备的[[code:struct tty|tty结构]]
+*同时还传入一系列隐式参数:
+**参看[[code:cpass|cpass]]
+</div>
+
+8547 /* Called from the device's write routine after it has
+
+8548 &nbsp;* calculated the tty-structure given as argument.
+
+8549 &nbsp;*/
+
+8551 struct tty *atp;
+
+8553 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct tty|struct tty]] *tp;
+
+8554 &nbsp;&nbsp;&nbsp;&nbsp;register int c;
+
+8555 &nbsp;&nbsp;&nbsp;&nbsp;tp = atp;
+
+8556 &nbsp;&nbsp;&nbsp;&nbsp;if (([[code:struct tty|tp->t_state]]&CARR_ON)==0)
+
+8557 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return;
+
+<blockquote>
+*若当前设备在逻辑上不存在,则直接返回
+</blockquote>
+8558 &nbsp;&nbsp;&nbsp;&nbsp;while ((c=[[code:cpass|cpass]]())>=0) {
+
+8559 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:spl|spl5]]();
+
+<blockquote>
+*处理机优先级设为5,防止在该过程中有其他字符进入输出队列
+</blockquote>
+8560 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   while ([[code:struct tty|tp->t_outq.c_cc]] > TTHIWAT) {
+
+8561 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:ttstart|ttstart]](tp);
+
+8562 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:struct tty|tp->t_state]] =<nowiki>|</nowiki> ASLEEP;
+
+<blockquote>
+*置ASLEEP标记,此语句无作用(源自LIONS源代码分析),参见[[遗留问题]]
+</blockquote>
+8563 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:sleep|sleep]](&tp->t_outq, TTOPRI);
+
+8564 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   }
+
+8565 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:spl|spl0]]();
+
+<blockquote>
+*[[开中断]]
+</blockquote>
+8566 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:ttyoutput|ttyoutput]](c, tp);
+
+8567 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+<blockquote>
+*8558 - 8567
+*从指定的内存地址空间读入字符
+*对于每个读入的字符
+*若输出队列过长
+**清输出队列直至缩短至一定长度为止,在此期间进程睡眠
+*否则
+**将读入的字符放入输出队列
+*继续读入下一个字符,直到读完为止
+</blockquote>
+8568 &nbsp;&nbsp;&nbsp;&nbsp;[[code:ttstart|ttstart]](tp);
+
+<blockquote>
+*最后启动tty输出
+</blockquote>
+8569 }
+
+8570 /* ------------------------- */
+
+
+
+===Caller===
+*[[code:klwrite]]
