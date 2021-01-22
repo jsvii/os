@@ -10,7 +10,7 @@ all : ${EXE}
 
 allgen : ${GEN_EXE}
 
-clean : 
+clean :
 	${RM} ${EXE} *.o
 
 check_password : check_password.o

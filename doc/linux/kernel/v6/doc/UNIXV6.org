@@ -1,9 +1,11 @@
 #+TITLE: UNIX V6内核源码剖析
 #+LANGUAGE: enc
-#+OPTIONS: toc:nil h:4 html-postamble:nil html-preamble:t tex:t f:t
+#+OPTIONS: toc:nil  html-postamble:nil html-preamble:t tex:t f:t date:nil author:nil
 #+OPTIONS: prop:("VERSION")
 #+AUTHOR: Leo Zhang
 #+TOC: headlines 3
+#+LATEX_COMPILER: xelatex
+#+LATEX_CLASS: ctexartdocsA5
 
 #+BEGIN_COMMENT
 本文档为unix v6学习笔记，用于理解操作系统原理。

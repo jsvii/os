@@ -1,0 +1,74 @@
+* ps
+
+ps 的参数非常多, 在此仅列出几个常用的参数并大略介绍含义
+
+-A 列出所有的进程
+
+-w 显示加宽可以显示较多的资讯
+
+-au 显示较详细的资讯
+
+-aux 显示所有包含其他使用者的行程
+
+au(x) 输出格式 :
+
+USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND
+
+  1. USER: 行程拥有者
+
+  1. PID: pid
+
+  1. %CPU: 占用的 CPU 使用率
+
+  1. %MEM: 占用的记忆体使用率
+
+  1. VSZ: 占用的虚拟记忆体大小
+
+  1. RSS: 占用的记忆体大小
+
+  1. TTY: 终端的次要装置号码 (minor device number of tty)
+
+  1.  STAT: 该行程的状态:
+
+    - D: 无法中断的休眠状态 (通常 IO 的进程)
+
+    - R: 正在执行中
+
+    - S: 静止状态
+
+    - T: 暂停执行
+
+    - Z: 不存在但暂时无法消除
+
+    - W: 没有足够的记忆体分页可分配
+
+  <: 高优先序的行程
+
+    - N: 低优先序的行程
+L: 有记忆体分页分配并锁在记忆体内 (实时系统或捱A I/O)
+
+START: 行程开始时间
+TIME: 执行的时间
+COMMAND:所执行的指令
+
+
+a: 显示所有
+
+x：显示没有控制终端的进程
+
+j：显示与作业有关的信息（显示的列）：会话期ID（SID），进程组ID（PGID），控制终端（TT），终端进程组ID（TRGID）
+
+
+#+BEGIN_SRC bash
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root       21735  0.0  0.0   9276  1208 ?        Ss   12:34   0:00 nginx: master process /usr/bin/nginx -g pid /run/nginx.pid; error_log stderr;
+root       21736  0.0  0.0  10316  3812 ?        S    12:34   0:00 nginx: worker process
+root       21737  0.0  0.0  10316  3812 ?        S    12:34   0:00 nginx: worker process
+root       21738  0.0  0.0      0     0 ?        I    12:34   0:00 [kworker/1:0-events]
+root       22041  0.0  0.0      0     0 ?        I    12:39   0:00 [kworker/u8:3-events_unbound]
+root       22591  0.0  0.0      0     0 ?        I    12:41   0:00 [kworker/3:2-mm_percpu_wq]
+root       22592  0.0  0.0      0     0 ?        I    12:41   0:00 [kworker/3:3]
+root       22856  0.0  0.0   6180  3496 pts/0    Ss+  12:46   0:00 /bin/login -p
+root       22858  0.0  0.0   6180  3312 pts/1    Ss+  12:46   0:00 /bin/login
+leo        22898  0.0  0.0  12808  3672 pts/7    R+   12:46   0:00 ps auxg
+#+END_SRC
