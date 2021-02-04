@@ -36,3 +36,8 @@
 *** 总结
 
 - P系列及以下的都不要买
+
+
+**** intel uhd graphics 630 显卡性能显示
+
+https://www.intel.com/content/www/us/en/support/products/98909/graphics-drivers/graphics-for-7th-generation-intel-processors/intel-hd-graphics-630.html

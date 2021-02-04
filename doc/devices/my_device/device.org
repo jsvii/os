@@ -77,12 +77,13 @@ https://www.intel.com/content/www/us/en/support/products/98909/graphics-drivers/
 
 *** dell
 
-  XPS 13 9350
+XPS 13 9350
 
-  显卡： Intel HD 520
+服务编号: 6KJFKC2
 
-  网卡：
+快速服务代码: 14302656434
 
+显卡： Intel HD 520
 
 Intel-HD-Graphics-Driver_V997F_WIN_21.20.16.4821_A11.EXE
 
