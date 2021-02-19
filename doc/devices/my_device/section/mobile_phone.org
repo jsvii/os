@@ -15,9 +15,7 @@
 
 https://www.game-debate.com/gpu/index.php?gid=4096&gid2=1438&compare=intel-uhd-graphics-630-vs-intel-hd-graphics-4600-desktop
 
-**** intel uhd graphics 630 显卡性能显示
 
-https://www.intel.com/content/www/us/en/support/products/98909/graphics-drivers/graphics-for-7th-generation-intel-processors/intel-hd-graphics-630.html
 
 
 ** macbook pro
