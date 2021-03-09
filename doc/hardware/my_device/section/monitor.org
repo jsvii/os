@@ -1,0 +1,43 @@
+* Monitor
+
+** Dell
+
+前缀：
+
+  - UP=Ultra-sharp with Premier color 最高端、出厂带校正颜色
+
+  - U=Ultra-sharp 最高端
+
+  - P=Productivity 生产力，面向商用，接口一般提供DVI+VGA+DP+USB，有升降功能，完美屏保证；
+
+  - S=Stylish 时尚，面向家用，接口提供标准的DVI+VGA，不支持升降功能，没有完美屏保证
+
+  - E=Essential 基本款
+
+四位数字：
+
+  - 前两位=尺寸后
+
+  - 两位=首发年份（比实际年份晚一年左右）
+
+后缀：
+
+  - H：FullHD 1920*1080，16：9
+
+  - M：WUXGA 1920*1200，16：10
+
+  - Q：4K
+
+  - W：Wide 21：9 带鱼屏
+
+  - D：QHD 2560*1440
+
+
+*** 总结
+
+- P系列及以下的都不要买
+
+
+**** intel uhd graphics 630 显卡性能显示
+
+https://www.intel.com/content/www/us/en/support/products/98909/graphics-drivers/graphics-for-7th-generation-intel-processors/intel-hd-graphics-630.html
