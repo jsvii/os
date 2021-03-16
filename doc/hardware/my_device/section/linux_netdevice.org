@@ -25,9 +25,12 @@ dns-search=
 may-fail=false
 method=manual
 never-default=true     # 默认不用它来当default网关
+## cc
 route1=99.48.64.0/24,192.168.1.91,100
 route2=99.47.192.0/22,192.168.1.91,100
 route3=99.47.148.0/22,192.168.1.91,100
+## new
+route1=172.16.0.0/20,192.168.1.91,100  #
 
 [ipv6]
 addr-gen-mode=stable-privacy
@@ -35,3 +38,12 @@ dns-search=
 method=auto
 
 #+END_SRC
+
+
+* ip地址计算器
+
+https://www.sojson.com/convert/subnetmask.html
+
+- 观察有哪些ip
+
+- 填写掩码位，看之前的ip是否在其中

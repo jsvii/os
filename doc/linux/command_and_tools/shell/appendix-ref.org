@@ -1,3 +1,9 @@
+* ref
+
+** books and sites
+
+- Advanced Bash-Scripting Guide
+
 - https://www.linux.com/
 
 - https://www.linuxjournal.com/ linux 杂志
