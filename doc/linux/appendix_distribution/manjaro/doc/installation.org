@@ -1,0 +1,102 @@
+* installation
+
+** mirrors
+
+#+BEGIN_SRC bash
+sudo  pacman-mirrors -i -c China -m rank
+#+END_SRC
+
+** linux headers
+
+#+BEGIN_SRC bash
+uname -r
+
+sudo pacman -S linux-headers
+#+END_SRC
+
+*** linux-headers上踩过的坑
+
+1. linux-headers 默认没有usb网卡的驱动，导致怎么也安装不了绿联的网卡
+
+** liquid powsave
+
+#+BEGIN_SRC bash
+# /etc/systemd/logind.conf and make sure you have
+# which will make it ignore the lid being closed. (You may need to also undo the other changes you've made.)
+HandleLidSwitch=ignore
+
+systemctl restart systemd-logind
+#+END_SRC
+
+#+BEGIN_SRC bash
+sudo pacman -S autoconf gcc make gnutls  ncurses extra/gnutls28
+#+END_SRC
+
+
+** base-devel
+
+sudo pacman -Sy base-devel
+
+** google-chrome
+
+pacman -S chromium
+
+
+** fonts
+
+Linux的字体都在/usr/share/fonts这个目录里，一种字体就是这个目录下面的一个子目录。注意，如果把Windows某个字体的ttf文件复制到某个新建的子目录里面，还需要在子目录里用root用户身份依次执行如下三条命令，这个字体才能用，并不是复制到/usr/share/fonts目录就可以用了：
+
+
+
+https://github.com/romkatv/powerlevel10k
+
+
+
+#+BEGNIN_SRC
+https://github.com/ryanoasis/nerd-fonts
+
+https://github.com/adobe-fonts/source-code-pro
+#+END_SRC
+
+
+
+mkfontscale
+mkfontdir
+fc-cache -f
+
+
+** ibus
+
+
+** kmscon
+
+#+BEGIN_SRC bash
+sudo pacman -Syyu
+#+END_SRC
+
+#+BEGIN_SRC bash
+systemctl disable getty@tty1.service
+systemctl enable kmsconvt@tty1.service
+#+END_SRC
+
+
+~/etc/kmscon/kmscon.conf~ 文件配置
+
+#+BEGIN_SRC bash
+font-size=18
+xbx-options=ctrl:nocaps
+font-name=Hack Nerd Font Mono
+#+END_SRC
+
+*** ref
+
+https://wiki.archlinux.org/index.php/KMSCON
+
+
+** latex
+
+安装 ~latex~ 及其中文依赖
+
+#+BEGIN_SRC bash
+pacman -S latex-most latex-lang
+#+END_SRC
