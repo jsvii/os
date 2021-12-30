@@ -1,0 +1,13 @@
+* cocopad
+
+** 安装rvm
+
+  https://rvm.io/
+
+** 安装pod
+
+   https://cocoapods.org/
+
+#+BEGIN_SRC bash
+gem install cocoapods
+#+END_SRC

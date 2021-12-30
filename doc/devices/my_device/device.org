@@ -16,7 +16,9 @@
 
 1. 也不要在IOS和android上进行生产力开发，太过鸡肋，好的系统是经过了多年检验的，不是几个广告、吹嘘就能搞定的
 
-1. 电子设备使用一模一样的，用户习惯不是随便就换的，自己轻松最重要。要捡漏，不要买年月久远的
+1. 电子设备使用一模一样的，用户习惯不是随便就换的，自己轻松最重要。
+
+1. 可以有捡漏心理，不要买年月久远的（1年6个月以上）
 
 *** 手机购买
 
@@ -50,8 +52,7 @@
 
 *** iphone 6
 
-<<<<<<< HEAD:doc/devices/my_device/device.org
-=======
+
 ** 电脑类
 
 *** 公司2019年配置电脑
@@ -117,13 +118,20 @@ $ sudo /usr/sbin/hwinfo --gfxcard
 
 Primary display adapter: #17
 #+END_SRC
->>>>>>> 82854a1 (update):doc/hardware/my_device/device.org
+
 
 ** usb 网卡
 
   绿联 CR111 传输速度: 1000Mbps  AX88179芯片 接口类型:RJ45 网络标准: 10/100/1000Mbps
 
   绿联USB千兆网卡AX88179芯片驱动（Linux+Windows系统）20256|20255|20258|20260|20265|30203|20248|20249 https://www.lulian.cn/download/44-cn.html
+
+  linux版本：
+
+  https://www.asix.com.tw/cn/product/USBEthernet/Super-Speed_USB_Ethernet/AX88179
+
+
+  /lib/modules/5.15.7-1-MANJARO/kernel/drivers/net/usb
 
 **  申请类
 

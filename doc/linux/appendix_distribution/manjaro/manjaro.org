@@ -2,7 +2,7 @@
 
 
 #+BEGIN_SRC bash
-sudo pacman-mirrors -f 5 && sudo pacman -Syyu
+sudo pacman-mirrors -f 5
 
 sudo pacman -Syyu
 
