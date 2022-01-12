@@ -131,7 +131,13 @@ Primary display adapter: #17
   https://www.asix.com.tw/cn/product/USBEthernet/Super-Speed_USB_Ethernet/AX88179
 
 
-  /lib/modules/5.15.7-1-MANJARO/kernel/drivers/net/usb
+  #+BEGIN_SRC bash
+    /lib/modules/5.15.7-1-MANJARO/kernel/drivers/net/usb/
+
+    modprobe usbnet
+
+    insmod ax88179_178a.ko
+  #+END_SRC
 
 **  申请类
 
