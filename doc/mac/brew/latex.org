@@ -1,0 +1,6 @@
+* latext
+
+
+#+BEGIN_SRC bash
+  brew install --cask mactex
+#+END_SRC

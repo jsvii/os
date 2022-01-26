@@ -1,0 +1,45 @@
+* Systemd Poweroff
+
+
+CentOS 7 had systemd init system.
+
+systemd has a good feature which is named as timer. Timer is like service and is intended for starting services at specific time. systemd shutdown system by calling systemd-poweroff service. So it's need to write systemd-poweroff.timer:
+
+$ cat /etc/systemd/system/systemd-poweroff.timer
+
+#+BEGIN_SRC bash
+[Unit]
+Description=Poweroff every work day
+# Call necessary service
+Unit=systemd-poweroff.service
+
+[Timer]
+# Power off in working days at 23:00
+OnCalendar=Mon,Tue,Wed,Thu,Fri *-*-* 23:00:00
+
+[Install]
+WantedBy=timers.target
+#+END_SRC
+
+
+It's need to do ~systemctl enable systemd-poweroff.timer~ and ~systemctl start systemd-poweroff.timer~ for enable and run timer. After, timer will be started:
+
+#+BEGIN_SRC bash
+$ systemctl list-timers
+  NEXT                         LEFT          LAST PASSED UNIT                         ACTIVATES
+  Thu 2018-04-19 19:39:36 MSK  14min left    n/a  n/a    systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+  Thu 2018-04-19 23:00:00 MSK  3h 34min left n/a  n/a    systemd-poweroff.timer       systemd-poweroff.service
+#+END_SRC
+
+2 timers listed.
+
+Pass --all to see loaded but inactive timers, too.
+If you want to disable timer in particular day then it's possible just in case of ordinary systemd service:
+
+# systemctl stop systemd-poweroff.timer
+# systemctl list-timers
+NEXT                         LEFT       LAST PASSED UNIT                         ACTIVATES
+Thu 2018-04-19 19:39:36 MSK  12min left n/a  n/a    systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+
+1 timers listed.
+Pass --all to see loaded but inactive timers, too.
