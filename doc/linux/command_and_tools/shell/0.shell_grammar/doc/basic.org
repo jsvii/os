@@ -339,3 +339,15 @@ until condition; do
   statements
 done
 #+END_SRC
+
+
+** $ 与 单引号
+
+#+BEGIN_SRC bash
+$ echo $'Name\tAge\nBob\t24\nMary\t36'
+Name    Age
+Bob     24
+Mary    36
+#+END_SRC
+
+https://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.html#ANSI_002dC-Quoting
