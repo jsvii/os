@@ -1,0 +1,17 @@
+* mac 分享network IP地址修改
+
+Step 1
+If internet sharing is on, switch it off
+
+Step 2
+Create a backup of the config file just in case something goes wrong: open the terminal app and copy file to desktop:
+sudo cp /Library/Preferences/SystemConfiguration/com.apple.nat.plist ~/Desktop.
+
+Step 3
+Now let’s make the changes: to make it easier, continue using Terminal but this time, use defaults command. We need to add 3 lines:
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.nat NAT -dict-add SharingNetworkNumberStart 10.0.111.1
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.nat NAT -dict-add SharingNetworkNumberEnd 10.0.111.20
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.nat NAT -dict-add SharingNetworkMask 255.255.255.0
+
+Step 4
+Turn internet sharing ON and test. You should get something that looks like this:

@@ -1,0 +1,13 @@
+* iterm2
+
+** 进行emacs适配
+
+profiles - keys - general - left Option key - 选择为Esc+，
+
+keys  - Remap Modifiers  - Remap Left command key to : Left Option
+
+** fonts
+
+https://www.jetbrains.com/zh-cn/lp/mono/
+
+profiles - text - font 选择 ~JetBrains Mono~
