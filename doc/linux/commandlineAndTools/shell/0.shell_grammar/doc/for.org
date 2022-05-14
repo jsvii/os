@@ -1,0 +1,58 @@
+arg
+#+BEGIN_SRC bash
+for VARIABLE in file1 file2 file3
+do
+        command1 on $VARIABLE
+        command2
+        commandN
+done
+#+END_SRC
+
+infinite loops
+
+#+BEGIN_SRC bash
+#!/bin/bash
+for (( ; ; ))
+do
+   echo "infinite loops [ hit CTRL+C to stop]"
+done
+#+END_SRC
+
+#+BEGIN_SRC bash
+for I in 1 2 3 4 5
+do
+  statements1      #Executed for all values of ''I'', up to a disaster-condition if any.
+  statements2
+  if (disaster-condition)
+  then
+        break              #Abandon the loop.
+  fi
+  statements3              #While good and, no disaster-condition.
+done
+#+END_SRC
+
+
+for I in 1 2 3 4 5
+do
+  statements1      #Executed for all values of ''I'', up to a disaster-condition if any.
+  statements2
+  if (disaster-condition)
+  then
+        break              #Abandon the loop.
+  fi
+  statements3              #While good and, no disaster-condition.
+done
+
+
+continue
+
+for I in 1 2 3 4 5
+do
+  statements1      #Executed for all values of ''I'', up to a disaster-condition if any.
+  statements2
+  if (condition)
+  then
+        continue   #Go to next iteration of I in the loop and skip statements3
+  fi
+  statements3
+done

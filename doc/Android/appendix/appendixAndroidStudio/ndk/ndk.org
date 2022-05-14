@@ -1,0 +1,9 @@
+* NDK
+
+** NDK简介
+
+定义:Native Development kit,是Android的一个工具开发包
+
+NDK是属于Android 的,与Java并无直接关系
+
+作用:快速开发C,C++的动态库,并自动将so和应用一起打包成APK,即可通过NDK在Android 中使用JNI与本地代码交互应用场景：在Android的场景下 使用JNI即 Android开发的功能需要本地代码（C/C++）实现

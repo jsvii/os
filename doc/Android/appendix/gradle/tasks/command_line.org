@@ -1,0 +1,47 @@
+* 构建
+
+1. gradlew assembleDebug 构建调试版 APK
+
+1. gradlew installDebug
+
+** gradlew assembleDebug
+
+这将在 project_name/module_name/build/outputs/apk/ 中创建一个名为 module_name-debug.apk 的 APK。该文件已使用调试密钥进行签名并使用 zipalign 对齐，因此您可以立即将其安装到设备上。
+
+或者，如需构建 APK 并立即在运行的模拟器或连接的设备上安装，请改为调用 installDebug：
+
+
+** gradlew installDebug
+
+上述任务名称中的“Debug”部分只是构建变体名称的驼峰式大小写版本，因此可以替换为您想组装或安装的任何构建类型或变体。例如，如果您有“demo”这个产品变种，则可以使用 assembleDemoDebug 任务来构建调试版本。
+
+如需查看每个变体可用的所有构建和安装任务（包括卸载任务），请运行 tasks 任务。
+
+另请参阅有关如何在模拟器上运行您的应用和在设备上运行您的应用的部分。
+
+** 构建发布版 APK
+
+当您准备好发布和分发您的应用时，必须构建一个使用您的私钥进行签名的发布版 APK。如需了解详情，请参阅有关如何从命令行为您的应用签名的部分。
+
+将您的应用部署到模拟器
+
+如需使用 Android 模拟器，您必须使用 Android Studio 创建 Android 虚拟设备 (AVD)。
+
+有了 AVD 后，您便可以启动 Android 模拟器并安装您的应用，具体步骤如下：
+
+在命令行中，转到 android_sdk/tools/，并通过指定 AVD 来启动模拟器：
+
+
+emulator -avd avd_name
+如果您不确定 AVD 的名称，请执行 emulator -list-avds。
+
+现在，您可以使用关于如何构建调试版 APK 的部分中提及的任意一项 Gradle 安装任务或使用 adb 工具来安装您的应用。
+如果 APK 是使用开发者预览版 SDK 构建的（即 targetSdkVersion 是字母，而非数字），您必须在 install 命令中添加 -t 选项才能安装测试版 APK。
+
+
+adb install path/to/your_app.apk
+
+
+您构建的所有 APK 都保存在 project_name/module_name/build/outputs/apk/ 中。
+
+如需了解详情，请参阅在 Android 模拟器上运行应用。

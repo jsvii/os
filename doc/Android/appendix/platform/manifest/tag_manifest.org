@@ -1,0 +1,49 @@
+* manifest标签
+
+#+BEGIN_SRC xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="string"
+          android:sharedUserId="string"
+          android:sharedUserLabel="string resource"
+          android:versionCode="integer"
+          android:versionName="string"
+          android:installLocation=["auto" | "internalOnly" | "preferExternal"] >
+    . . .
+</manifest>
+#+END_SRC
+
+** 描述
+
+manifest是AndroidManifest.xml的根节点。它必须包括一个<application>节点, 并且设定xmlns:android和包属性。
+
+属性:
+
+- xmlns:android
+
+定义android命名空间，一般为 http://schemas.android.com/apk/res/android ，这样使得Android中各种标准属性能在文件中使用，提供
+了大部分元素中的数据。
+
+- package
+
+指定本应用内java主程序包的包名，它也是一个应用进程的默认名称。它也是生成的应用程序资源文件的索引类（R）的包名。
+
+- sharedUserId
+
+表明数据权限，因为默认情况下，Android给每个APK分配一个唯一的UserID，所以是默认禁止不同APK访问共享数据的。若要共享数据，第一可以采用Share Preference方法，第二种就可以采用sharedUserId了，将不同APK的sharedUserId都设为一样，则这些APK之间就可以互相共享数据了。
+
+- sharedUserLabel
+一个共享的用户名，它只有在设置了sharedUserId属性的前提下才会有意义
+
+- versionCode
+是给设备程序识别版本(升级)用的必须是一个interger值代表app更新过多少次，比如第一版一般为1，之后若要更新版本就设置为2，3等
+等。
+
+- versionName
+这个名称是给用户看的，你可以将你的APP版本号设置为1.1版，后续更新版本设置为1.2、2.0版本等等。。。
+
+- installLocation
+程序的安装位置，有三个值可以选择：internalOnly、auto、preferExternal
+internalOnly--APK必须安装到内部存储空间。而且安装了之后，不能将程序移动到SD卡上。
+auto--系统将会根据存储空间去选择将APK安装在内部存储空间还是SD卡上。安装之后，可以在内部存储空间和SD卡之间移动。
+preferExternal--系统会优先考虑将APK安装到SD卡上(当然最终用户可以选择为内部ROM存储上，如果SD存储已满，也会安装到内部存储
+上)

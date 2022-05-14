@@ -1,0 +1,1368 @@
+* Manifest
+
+** 概要
+
+每一个Android应用都应该包含一个manifest文件，即AndroidManifest.xml。它包含了程序运行的一些必备信息，比如：
+--为Java应用程序指定一个独一无二的名字。
+--描述程序所包括的成分，如activities, services, broadcast receivers和content providers等内容。
+--定义哪一个成分是主要的。比如主线程等。
+--声明程序正常运行所需要的权限。比如，读写SD卡等。
+--声明该程序的API Level，低于该API Level的机器不能运行该程序。
+--声明程序需要使用的设备
+--声明程序支持的分辨率
+...
+
+manifest示例如下:
+
+#+BEGIN_SRC xml
+<?xml version="1.0" encoding="utf-8"?>
+
+<manifest>
+    <uses-permission />
+    <permission />
+    <permission-tree />
+    <permission-group />
+    <instrumentation />
+    <uses-sdk />
+    <uses-configuration />
+    <uses-feature />
+    <supports-screens />
+    <compatible-screens />
+    <supports-gl-texture />
+    <application>
+        <activity>
+            <intent-filter>
+                <action />
+                <category />
+                <data />
+            </intent-filter>
+            <meta-data />
+        </activity>
+        <activity-alias>
+            <intent-filter> . . . </intent-filter>
+            <meta-data />
+        </activity-alias>
+        <service>
+            <intent-filter> . . . </intent-filter>
+            <meta-data/>
+        </service>
+        <receiver>
+            <intent-filter> . . . </intent-filter>
+            <meta-data />
+        </receiver>
+        <provider>
+            <grant-uri-permission />
+            <meta-data />
+            <path-permission />
+        </provider>
+        <uses-library />
+    </application>
+</manifest>
+#+END_SRC
+
+
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+PART--02 安全机制和permission
+
+01, Android 安全机制概述 Permission
+
+PART--02.01 permission标签
+
+点击查看：Android manifest之系统自带的permission
+
+语法:
+
+
+<permission android:description="string resource"
+            android:icon="drawable resource"
+            android:label="string resource"
+            android:name="string"
+            android:permissionGroup="string"
+            android:protectionLevel=["normal" | "dangerous" |
+                                     "signature" | "signatureOrSystem"] />
+
+说明:
+
+定义一个安全访问许可。其它程序或组件若要访问该程序，必须先获取该permission。
+
+属性:
+
+android:description
+权限描述。是用户可读的，它稍稍有点不同于android:label属性。label属性可以直接赋值为字符串，而description必须指定定义在
+string资源文件中的字符串。
+android:icon
+
+图标
+android:label
+
+标签
+android:name
+权限的名称。这个非常重要！因为其它程序或组建若要获取该权限，必须通过权限的名称来指定。
+android:permissionGroup
+该权限所属的权限组。若不设定，则默认不属于任何权限组。
+android:protectionLevel
+设置权限的安全级别。用来指出权限的安全级别，是否对系统的安全构成威胁。有以下4个值:
+normal--表示权限是低风险的，不会对系统、用户或其他应用程序造成危害。用户使用该权限时，不会弹出对话框让用户确认是否允许使
+用该权限。
+dangerous--表示权限是高风险的，系统将可能要求用户输入相关信息，才会授予此权限。用户使用该权限时，会弹出确认对话框是否同
+意使用该权限。
+signature告诉Android，只有当应用程序所用数字签名与声明此权限的应用程序所有数字签名相同时，才能将权限授给它。
+signatureOrSystem告诉Android，将权限授给具有相同数字签名的应用程序或Android包类，这一级别适用于非常特殊的情况，比如多个
+供应商需要通过系统影像共享功能时。
+
+
+
+PART--02.02 permission-group标签
+
+
+
+<permission-group android:description="string resource"
+                  android:icon="drawable resource"
+                  android:label="string resource"
+                  android:name="string" />
+
+说明:
+描述permission是所属的组。permission-group本身并不定义权限，它只是权限所属的一个组。作用是来先区别不同的权限。
+
+属性:
+android:description
+权限组描述。它稍稍有点不同于android:label属性。label属性可以直接赋值为字符串，而description必须指定定义在string资源文件
+中的字符串。
+android:icon
+图标
+android:label
+标签
+android:name
+权限组的名称。当某权限要设置权限组时，就将该权限的permissionGroup设置权限组即可。
+
+参考:
+01, android中permission_group与permisson区别、作用
+
+
+
+PART--02.03 permission-tree标签
+
+语法:
+
+<permission-tree android:icon="drawable resource"
+                 android:label="string resource" ]
+                 android:name="string"/>
+
+说明:
+权限树是一个能够放置更多权限的命名空间，这个元素本身并不声明权限。
+它的主要作用是用来动态添加一些所谓 Dynamic 的 permission ，这些 permission 可以动态修改。这些 permission 名称要以
+permission-tree 的名称开头。它本身不是一种权限，没有 protectedLevel 和所属 group 。只是保存了所属的 packge 和权限名（带
+有 package 前缀的）
+
+属性（ATTRIBUTES）：
+android:icon
+图标
+android:label
+标签
+android:name
+这个属性定义了权限树根节点的名称。它被用于树中所有权限名称的前缀。应该使用Java样式命名规则，以确保名称的唯一性。在命名中
+必须要有两个以上的”.”来进行分离，例如：com.example.base是正确的，但com.example就是错误的。
+
+
+
+PART--02.04 uses-permission标签
+
+语法:
+
+<uses-permission android:name="string" />
+
+说明:
+程序需要指定<uses-permission>以获取权限来进行有关操作。这里的权限值可以是Android系统自带的，也可以是自定义的。
+比如，android.permission.READ_CONTACTS是读取通讯录的必备权限；android.permission.SET_WALLPAPER是设置墙纸的必备权限。
+属性:
+android:name
+
+参考:
+01, Android声明和使用权限
+02, permission和uses-permission的区别
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+PART--03 instrumentation标签
+
+语法:
+
+<instrumentation android:functionalTest=["true" | "false"]
+                 android:handleProfiling=["true" | "false"]
+                 android:icon="drawable resource"
+                 android:label="string resource"
+                 android:name="string"
+                 android:targetPackage="string"/>
+
+说明:
+这个元素声明了一个Instrumentation类，这个类能够监视应用程序跟系统的交互。Instrumentation对象会在应用的其他所有组件被实例
+化之前实例化。
+它的主要作用是用于进行单元测试。
+
+属性:
+android:functionalTest
+这个属性用于指定Instrumentation类是否应该作为一个功能性的测试来运行，如果设置为true，这要运行，否则不应该运行。默认值是
+false。
+android:handleProfiling
+这个属性用于指定Instrumentation对象是否会开启和关闭分析功能。如果设置为true，那么由Instrumentation对象来决定分析功能的启
+动和终止时机，如果设置为false，则分析功能会持续到Instrumentation对象整个运行周期。如果设置为true，会使Instrumentation对
+象针对一组特定的操作来进行分析。默认值是false。
+android:icon
+这个属性用于给Instrumentation类设置一个图标。它必须要应用一个可绘制的资源。
+android:label
+这个属性用于给Instrumentation类设置一个用户可读的标签。这个标签可用原生字符串，也可以引用一个字符串资源。
+android:name
+这个属性用于设定Instrumentation子类的名称。应该是完整的Java类名（如：com.example.project.StringInstrumentation）。但是，
+也可以用简写方式(如：.StringInstrumentation)，它的包名会使用<manifest>元素的package属性中指定的包名。 它没有默认值，必须
+被指定。
+android:targetPackage
+这个属性用于指定Instrumenttation对象所监视的应用程序。由包名所标识的应用程序会跟清单的<manifest>元素的package属性值相关
+联。
+
+参考:
+01, Android单元测试 Instrumentation
+02, 基于UI Automation的自动化测试框架
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+PART--04 uses-sdk标签
+
+语法:
+
+<uses-sdk android:minSdkVersion="integer"
+          android:targetSdkVersion="integer"
+          android:maxSdkVersion="integer" />
+
+说明:
+定义APK能够运行的版本。
+
+属性:
+android:minSdkVersion
+能够运行APK的最小sdk版本。如果没有设定的话，默认是1。
+android:targetSdkVersion
+指定了运行APK的目标的API级别。如果没有设定的话，默认等于minSdkVersion。
+android:maxSdkVersion
+能够运行APK的最大sdk版本。
+不推荐声明这个属性，首先，没有必要设置这个属性是因为，这样会阻止该应用程序在新发布的Android平台版本上运行。通过设计，新
+的平台版本时完全向后兼容的。该应用程序应该在升级后的平台上能够正常运行。其二，要注意的是，在某些情况中，声明这个属性在用
+户设备的系统升级较高的API Level之后，能够导致该应用程序被删除。大多数应用所在的设备都会定期的接到在线升级的请求，因此在
+设置这个属性之前，要仔细考虑该属性给应用程序所带来的影响。
+
+点击查看:Android SDK之API_LEVEL
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+PART--05 uses-configuration标签
+
+语法（SYNTAX）：
+
+<uses-configuration android:reqFiveWayNav=["true" | "false"]
+                    android:reqHardKeyboard=["true" | "false"]
+                    android:reqKeyboardType=["undefined" | "nokeys" | "qwerty" | "twelvekey"]
+                    android:reqNavigation=["undefined" | "nonav" | "dpad" | "trackball" | "wheel"]
+                    android:reqTouchScreen=["undefined" | "notouch" | "stylus" | "finger"] />
+
+说明:
+这个属性用于指定该应用程序所需要的硬件和软件功能。例如，应用程序可以用这个元素指定它所需要的物理键盘或特殊的导航设备，如
+轨迹球。使用这个规范可以避免把应用程序安装在那些不支持其不能工作的设备上。
+
+如果应用程序能够用不同的设备配置来工作，那么它就应该给每个配置包含一个独立的<uses-configuration>声明。每个声明必须被完
+成。例如，应用程序需要一个五向导航控制，就要需要一个支持手指操作的触屏，以及一个标准的QWERTY键盘或12键的数字键盘，因此要
+用两个<uses-configuration>元素来指定这些需求：
+
+<uses-configurationandroid:reqFiveWayNav="true"android:reqTouchScreen="finger"
+android:reqKeyboardType="qwerty"/>
+<uses-configurationandroid:reqFiveWayNav="true"android:reqTouchScreen="finger"
+android:reqKeyboardType="twelvekey"/>
+
+
+
+属性:
+android:reqFiveWayNav
+这个属性用于指定应用程序是否需要五向导航控制，如果设置为true，则需要，否则不需要。五向控制是指能够上、下、左、右移动所选
+择的对象，并提供调用当前选择对象的方法。它可以是一个D-pad(方向板)、轨迹球等。
+如果应用程序需要一个方向控制，但不是一种特殊类型的控制，就可以把这个属性设置为true，并且忽略reqNavigation属性。但是，如
+果应用程序需要一种特殊的方向控制类型，那么就可以忽略这个属性，并用reqNavigation属性的设置来代替。
+
+android:reqHardKeyboard
+这个属性用于指定应用程序是否需要硬键盘，如果设置为true，则需要，否则不需要。
+
+android:reqKeyboardType
+这个属性用于指定该应用程序需要的任何键盘的类型。这个属性不区分软/硬键盘。如果需要某种类型的硬键盘，就用这个属性来指定类
+型，并把reqHardKeyboard属性设置为true。 它的属性值必须是下表中值之一：
+undefined -- 应用程序不需要键盘。（键盘的需求没有被定义。）这是默认值。
+nokeys -- 应用程序不需要键盘，明确定义该应用不需要键盘
+qwerty -- 应用程序需要一个标准的QWERTY键盘。
+twelvekey -- 应用程序需要一个像大多电话那样的12键的数字键盘，键盘中包括0~9的数字和“*”号键、“#”号键。
+
+android:reqNavigation
+这个属性定义了应用程序所需要的任何导航设备，属性值必须是下表中的值之一：
+undefined -- 应用程序不需要任何类型的导航控制。（应用程序的导航需求没有被定义。）这是默认值。
+nonav -- 应用程序不需要到导航控制。
+dpad -- 应用程序要求使用D-pad(方向板)来进行导航控制
+trackball -- 应用程序要求使用轨迹球来进行导航控制
+wheel -- 应用程序要求使用一个导航滚轮来进行导航控制。
+如果应用程序要求一个导航控制，但并不关心具体的控制类型，那么就要把reqFiveWayNav属性设置为true，而不是只设置这一个属性。
+
+android:reqTouchScreen
+这个属性用于设置应用程序所需要的任何触屏类型。属性值必须是下表中的字符串之一：
+undefined -- 应用程序不需要触屏。（触屏的需求不被定义。）这是默认值。
+notouch -- 应用程序不需要触屏
+stylus -- 应用程序需要带有触控笔操作的触屏。
+finger -- 应用程序需要能够用一个手指进行操作的触屏。
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+PART--06 uses-feature标签
+
+语法:
+
+<uses-feature android:name="string"
+              android:required=["true" | "false"]
+              android:glEsVersion="integer"/>
+
+说明:
+声明APK的硬件或软件功能。
+<uses-feature>声明的目的是通知其他外部实体，该应用程序所依赖的硬件和软件功能。这个元素提供的required属性会让你指定应用程
+序在所需的功能不存在时，应用程序是否能够正常运行。因为功能能够所支持的Android设备不同，所以<uses-feature>元素被用于描述
+应用程序所依赖的、重要的、可用的设备功能。
+
+如果应用程序需要多个功能，就要分别使用<uses-feature>元素来指定所需的每一个功能，例如：需要设备中带有蓝牙和camera功能的应
+用程序，要声明两个<uses-feature>元素：
+
+<uses-feature android:name="android.hardware.bluetooth" />
+<uses-feature android:name="android.hardware.camera" />
+
+注意：在声明一个功能时，要记住必须申请相应的权限。例如，在应用程序能够访问Camera的API之前，必须申请CAMERA权限。申请权限
+是让应用程序能够访问相应的软/硬件，而声明应用程序所使用的功能是为了确保正确的设备兼容性。
+
+属性:
+android:name
+软/硬件功能名称。
+
+android:required
+这个属性用一个布尔值来指定应用程序是否需要在android:name属性中所指定的功能。
+true--默认值。在设备上不存在指定的功能时，则该应用不能够正常运行。
+false--如果设备上存在指定的功能，则应用程序会倾向使用这个功能，但是如果需要，也可设计成没被指定的功能也能够正常运行。
+
+android:qlEsVersion
+APK需要的OpenGL ES的版本。它的高16位代表主版本号，低16位代表次要版本号，如：要是指定OpenGL ES的版本号是2.0，那么就要设置
+为0x00020000。要指定的OpenGL ES的版本号是2.1，就要设置为0x00020001。
+
+其他:
+硬件设备的特性
+------------------------------------------------------
+
+
+Audio             android.hardware.audio.low_latency
+Bluetooth         android.hardware.bluetooth
+Camera            android.hardware.camera
+                  android.hardware.camera.autofocus
+                  android.hardware.camera.flash
+                  android.hardware.camera.front
+                  android.hardware.camera.any
+Location          android.hardware.location
+                  android.hardware.location.network
+                  android.hardware.location.gps
+Microphone        android.hardware.microphone
+NFC               android.hardware.nfc
+Sensors           android.hardware.sensor.accelerometer
+                  android.hardware.sensor.barometer
+                  android.hardware.sensor.compass
+                  android.hardware.sensor.gyroscope
+                  android.hardware.sensor.light
+                  android.hardware.sensor.proximity
+Screen            android.hardware.screen.landscape
+                  android.hardware.screen.portrait
+Telephony         android.hardware.telephony
+                  android.hardware.telephony.cdma
+                  android.hardware.telephony.gsm
+Television        android.hardware.type.television
+Touchscreen       android.hardware.faketouch
+                  android.hardware.faketouch.multitouch.distinct
+                  android.hardware.faketouch.multitouch.jazzhand
+                  android.hardware.touchscreen
+                  android.hardware.touchscreen.multitouch
+                  android.hardware.touchscreen.multitouch.distinct
+                  android.hardware.touchscreen.multitouch.jazzhand
+USB               android.hardware.usb.host
+                  android.hardware.usb.accessory
+Wifi              android.hardware.wifi
+
+软件设备的特性
+------------------------------------------------------
+软件 软件对应的特性
+
+Live Wallpaper    android.software.live_wallpaper
+SIP/VOIP          android.software.sip
+                  android.software.sip.voip
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+PART--07 supports-screens标签
+
+标签:
+
+
+<supports-screens android:resizeable=["true"|"false"]
+                  android:smallScreens=["true" | "false"]
+                  android:normalScreens=["true" | "false"]
+                  android:largeScreens=["true" | "false"]
+                  android:xlargeScreens=["true" | "false"]
+                  android:anyDensity=["true" | "false"]
+                  android:requiresSmallestWidthDp="integer"
+                  android:compatibleWidthLimitDp="integer"
+                  android:largestWidthLimitDp="integer"/>
+
+说明：
+指定应用程序所支持的屏幕尺寸，并针对比应用程序所支持的屏幕还要大屏幕，启用屏幕兼容模式。
+
+如果应用程序调整尺寸属性来填充整个屏幕，那么应用程序就要支持这个给定的尺寸。通常对于大多数应用程序，系统可以很好的完成这
+种调整工作，并且为了让应用程序在比一个手持设备大的屏幕上工作，你不需要做任何额外的工作。但是，针对不同的屏幕尺寸，通过提
+供可选的布局资源来优化应用程序的UI经常是很重要的。例如，一个运行在手持设备上的Activity布局，如果想要运行在平板电脑上，就
+需要修改这个Activity的布局。
+
+但是，如果为了适应不同的屏幕尺寸而调整了尺寸，但应用程序也不能很好的工作，就可以使用<supports-screens>元素的属性来控制应
+用程序是否应该发布给屏幕较小的设备，或者使用系统的屏幕兼容模式，让UI放大以适应较大屏幕的要求。在没有针对较大屏幕尺寸的设
+计，并且普通的尺寸不能达到合适结果时，屏幕的兼容模式会通过模拟普通尺寸的屏幕和中等密度来缩放UI，以便它能够填充整个屏幕，
+这样会导致UI模糊，因此针对大屏幕的优化是比较好的。
+
+属性（ATTRIBUTES）：
+android:resizeable
+是否可以调整尺寸。默认值是true。如果这个属性设置了false，在大的屏幕上，系统会在屏幕兼容模式中运行该应用程序。
+android:smallScreens
+是否支持较小外形的屏幕。默认值是true。
+android:normalScreens
+是否支持普通外形的屏幕。默认值是true。
+android:largeScreens
+是否支持较大外形的屏幕。
+这个属性的默认值实际上在某些版本之间是不同的，因此最好在任何时候都明确的声明这个属性。如果设置为false，系统会启用屏幕兼
+容模式，这时要格外的小心。
+android:xlargeScreens
+否支持超大外形的屏幕。
+android:anyDensity
+是否包含了能够适用于任何屏幕密度的资源。
+默认值是true。除非绝对的确认这是应用程序正常工作所必须的，否则不应该把它设置为false。只是在应用程序直接操作位图时才需要
+禁止这个属性。
+android:requiresSmallestWidthDp
+这个属性用于指定smallestWidth的最小需求。smallestWidth是屏幕空间的最短尺寸（以dp为单位），它必须是对应用程序的UI是有效
+的。也就是说它是有效的屏幕的两个维度的尺寸中最短的那个。因此为了考虑设备跟应用程序的兼容性，设备的smallestWidth的值必须
+要大于等于这个属性所设置的值。通常这个属性值是针对布局所支持的最小宽度，而不是屏幕当前的方向。
+例如，典型的手持设备屏幕smallestWidth是320dp；7英寸的平板电脑的smallestWidth是600dp；10英寸的平板电脑的smallestWidth是
+720dp。这些值一般都是最小的宽度，因为它们是屏幕可用空间中最短的那个尺寸。
+android:compatibleWidthLimitDp
+这个属性允许在设计应用程序时，通过指定最大的“smallest screen width”来启用屏幕兼容模式，作为一个用户可选的功能。如果设备
+的有效屏幕的最小边比这个属性值大，那么用户依然能够安装该应用程序，但是在运行时要使用屏幕兼容模式。默认情况下，屏幕兼容模
+式似乎被禁止的，并且通过会调整布局的尺寸来填充屏幕，但是在系统栏中会有一个按钮，让用户选择屏幕兼容模式的打开和关闭。
+android:largestWidthLimitDp
+这个属性允许再设计应用程序时，通过指定最大的“smallest screen width”来强制启用屏幕兼容模式。如果设备有效屏幕的最小边比这
+个属性值大，应用程序就会运行在屏幕兼容模式中，而用户没有办法禁止这种模式。
+
+参考:
+01, Supporting Multiple Screens
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+PART--08 compatible-screens标签
+
+语法：
+
+<compatible-screens>
+    <screen android:screenSize=["small" | "normal" | "large" | "xlarge"]
+            android:screenDensity=["ldpi" | "mdpi" | "hdpi" | "xhdpi"] />
+    ...
+</compatible-screens>
+
+说明：
+指定那些屏幕配置跟应用程序是兼容的。目的是提供给外部服务使用(如Google Play)，以便其判断兼容性。通常不建议使用该标签。
+在应用的清单中只允许有一个<compatible-screent>元素的实例，但是它能够包含多个<screen>元素。每个<screen>元素指定一个特定的
+跟应用程序兼容的尺寸---密度组合。
+
+子元素：
+<screen>
+指定一个跟应用程序兼容的屏幕配置。
+在<compatible-screens>元素内部，至少要有一个这个元素的实例。这个元素必须同时包含android:screenSize和
+android:screenDensity属性，如果没有同时声明，那么这个元素就会被忽略。
+
+属性：
+android:screenSize
+指定跟应用程序兼容的屏幕配置的屏幕尺寸。可以是以下的值：
+· small
+· normal
+· large
+· xlarge
+android:screenDensity
+指定跟应用程序兼容的屏幕配置的屏幕密度，可以是以下值：
+· ldpi
+· mdpi
+· hdpi
+· xhdpi
+
+例子：
+如果应用程序仅跟小屏和普通屏幕的设备兼容，而不管屏幕的密度，那么必须要指定八个不同的<screen>元素，因为每个屏幕尺寸都有四
+种不同密度的配置。必须对这些配置逐一声明；任何没有指定的尺寸和密度的组合，都会被认为这个屏幕配置跟应用程序不兼容。如果应
+用程序只跟小屏幕和普通屏幕兼容，那么清单配置如下：
+<manifest ... >
+...
+<compatible-screens>
+<!-- all small size screens -->
+<screenandroid:screenSize="small"android:screenDensity="ldpi"/>
+<screenandroid:screenSize="small"android:screenDensity="mdpi"/>
+<screenandroid:screenSize="small"android:screenDensity="hdpi"/>
+<screenandroid:screenSize="small"android:screenDensity="xhdpi"/>
+<!-- all normal size screens -->
+<screenandroid:screenSize="normal"android:screenDensity="ldpi"/>
+<screenandroid:screenSize="normal"android:screenDensity="mdpi"/>
+<screenandroid:screenSize="normal"android:screenDensity="hdpi"/>
+<screenandroid:screenSize="normal"android:screenDensity="xhdpi"/>
+</compatible-screens>
+<application ... >
+...
+<application>
+</manifest>
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+PART--09 supports-gl-texture标签
+
+语法：
+
+<supports-gl-textureandroid:name="string"/>
+
+说明：
+声明一个应用程序所支持的GL纹理压缩格式。
+
+一个应用程序支持一种纹理压缩格式，如果应用程序提供了用该格式压缩纹理资源的能力，那么一旦应用程序被安装在设备上，应用程序
+就能够从.apk文件的内部提供本地的压缩资源，或者在运行时从服务器上下载它们。
+
+属性：
+android:name
+描述字符串给指定一个由应用程序支持的一个GL纹理压缩格式。支持以下格式：
+GL_OES_compressed_ETC1_RGB8_texture
+GL_OES_compressed_paletted_texture
+GL_AMD_compressed_3DC_texture
+GL_AMD_compressed_ATC_texture
+GL_EXT_texture_compression_latc
+GL_EXT_texture_compression_dxt1
+GL_EXT_texture_compression_s3tc
+GL_IMG_texture_compression_pvrtc
+
+
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+PART--10 application标签
+
+语法:
+
+
+<application android:allowTaskReparenting=["true" | "false"]
+             android:backupAgent="string"
+             android:debuggable=["true" | "false"]
+             android:description="string resource"
+             android:enabled=["true" | "false"]
+             android:hasCode=["true" | "false"]
+             android:hardwareAccelerated=["true" | "false"]
+             android:icon="drawable resource"
+             android:killAfterRestore=["true" | "false"]
+             android:label="string resource"
+             android:logo="drawable resource"
+             android:manageSpaceActivity="string"
+             android:name="string"
+             android:permission="string"
+             android:persistent=["true" | "false"]
+             android:process="string"
+             android:restoreAnyVersion=["true" | "false"]
+             android:taskAffinity="string"
+             android:theme="resource or theme"
+             android:uiOptions=["none" | "splitActionBarWhenNarrow"] >
+    . . .
+</application>
+
+说明：
+应用程序的声明。它包含了每个应用程序组件所声明的子元素，并且还有能够影响所有组件的属性。
+
+属性：
+
+Android:allowTaskReparenting
+当一个与当前任务有亲缘关系的任务被带到前台时，用这个属性来指定应用程序中定义的Activity能否从他们当前的任务中转移到这个有
+亲缘关系的任务中。如果设置为true，则能够转移，如果设置为false，则应用程序中的Activity必须保留在它们所在的任务中。默认值
+是false。
+用来标记Activity能否从启动的Task移动到有着affinity的Task（当这个Task进入到前台时）——“true”，表示能移动，“false”，表示它
+必须呆在启动时呆在的那个Task里。
+如果这个特性没有被设定，设定到<application>元素上的allowTaskReparenting特性的值会应用到Activity上。默认值为“false”。
+一般来说，当Activity启动后，它就与启动它的Task关联，并且在那里耗尽它的整个生命周期。当当前的Task不再显示时，你可以使用这
+个特性来强制Activity移动到有着affinity的Task中。典型用法是：把一个应用程序的Activity移到另一个应用程序的主Task中。
+例如，如果e－mail中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义
+的，但是，现在它作为e－mail Task的一部分。如果它重新宿主到Browser Task里，当Browser下一次进入到前台时，它就能被看见，并
+且，当e－mail Task再次进入前台时，就看不到它了。
+Actvity的affinity是由taskAffinity特性定义的。Task的affinity是通过读取根Activity的affinity决定。因此，根据定义，根
+Activity总是位于相同affinity的Task里。由于启动模式为“singleTask”和“singleInstance”的Activity只能位于Task的底部，因此，重
+新宿主只能限于“standard”和“singleTop”模式。
+
+android:backupAgent
+用于定义应用程序备份代理的实现类的名称，这个类是BackupAgent类的一个子类。
+
+android:debuggable
+指定应用程序是否能够被调试，即使是以用户模式运行在设备上的时候。如果设置为true，则能够被调试，否则不能调试，默认值是
+false。
+
+android:description
+定义应用程序相关的用户可读文本。它的的值必须被设置成一个字符串资源的引用。跟label属性不一样，label属性可以使用原生的字符
+串。这个属性没有默认值。
+
+android:enabled
+指定Android系统能否实例化应用程序组件。如果设置为true，这个可以实例化其组件，否则不能够实例化。 默认值是true。
+
+android:hasCode
+设置应用程序是否包含了代码，如果设置为true，则包含代码，否则不包含任何代码。在这个属性被设置为false的时候，系统在加载组
+件的时候不会试图加载任何应用程序的代码。默认值是true。
+
+android:hardwareAccelerated
+设置能够给应用程序中的所有Activity和View对象启用硬件加速渲染。如果设置为true，则应该启用，如果设置为false，则不会启用。
+默认值是false。
+
+android:icon
+设置应用程序的整个图标，以及每个应用组件的默认图标。对于<activity>、<activity-alias>、<service>、<service>、<receiver>和
+<provider>元素，请看它们各自的icon属性。
+
+android:killAfterRestore
+在整型系统重置操作中，当他的设置被重置后，应用是否应该被终止。单个包的重置操作不会引起应用被关闭。整个系统的恢复操作仅代
+表
+性的发生一次，当电话第一次被设置时。第三方应用将不会经常使用此属性。
+默认值为true，意思是，当整个系统被恢复时，应用运行玩他的数据后，将会终止。
+
+android:label
+标签。
+
+android:logo
+这个属性用于给整个应用程序设置一个Logo，而且它也是所有Activity的默认Logo。设置这个属性时，必须要引用一个包含图片的可绘制
+资源（如：“@drawable/logo”）。没有默认的Logo。
+
+android:manageSpaceActivity
+定义了一个完整的Activity子类的名字，系统能够把这个名字加载到由用户管理被应用程序所占用的设备上的内存。这个Activity也应该
+用<activity>元素来声明。
+
+android:name
+这整个属性用完整的Java类名，给应用程序定义了一个Application子类的实现。当应用程序进程被启动时，这个类在其他任何应用程序
+组件被实例化之前实例化。
+这个子类实现是可选的，大多数应用程序不需要一个子类的实现。如果没有实现自己的子类，Android系统会使用基本的Application类的
+一个实例。
+
+android:permission
+这个属性定义了一个权限，为了跟应用程序进行交互，客户端必须要有这个权限。这个属性是为给所有的应用程序组件设置权限提供了便
+利的方法。它能够被独立组件所设置的permission属性所覆盖。
+
+android:persistent
+这个属性用户设置应用程序是否应该时刻保持运行状态，如果设置为true，那么就保持，否则不保持。默认值是false。普通的应用程序
+不应该设置这个属性，持久运行模式仅用于某些系统级的应用程序。
+
+android:process
+这个属性用于定义一个进程名称，应用程序的所有组件都应该运行在这个进程中。每个组件都能够用它自己process属性的设置来覆盖这
+个<application>元素中的设置。
+默认情况下，当应用程序的第一个组件需要运行时，Android系统就会给这个应用程序创建一个进程。然后，应用中的所有组件都运行在
+这个进程中。默认的进程名是跟<manifest>元素中设置的包名进行匹配的。
+通过设置这个属性，能够跟另外一个应用程序共享一个进程名，能够把这两个应用程序中的组件都安排到同一个进程中运行---但是仅限
+于这两个应用程序共享一个用户ID，并且带有相同的数字证书。
+如果这个进程名称用“：”开头，那么在需要的时候，就会给应用程序创建一个新的、私有的进程。如果进程名用小写字符开头，就会用这
+个名字创建一个全局的进程，这个全局的进程能够被其他应用程序共享，从而减少资源的使用。
+
+android:restoreAnyVersion
+设置这个属性表示应用程序准备尝试恢复任何备份的数据集，即使备份比设备上当前安装的应用程序的版本要新。这个属性设置为true，
+即使是在版本不匹配而产生数据兼容性提示的时候，也会允许备份管理来恢复备份的数据，所以要谨慎使用。
+这个属性的默认值是false。
+
+android:taskAffinity
+这个属性给应用的所有的Activity设置了一个亲缘关系名，除了那些用它们自己的taskAffinity属性设置不同亲缘关系的组件。
+默认情况下，应用程序中的所有Activity都会共享相同的亲缘关系，亲缘关系的名称跟由<manifest>元素设置的包名相同。
+
+android:theme
+这个属性给应用程序中所有的Activity设置默认的主题，属性值要引用一个样式资源。每个独立的Activity的主题会被它们自己的theme
+属性所覆盖。
+
+android:uiOptions
+这个属性设置了Activity的UI的额外选项。
+
+参考:
+01, Android的Task和Activity相关
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+PART--11 activity标签
+
+语法:
+
+
+<activity android:allowTaskReparenting=["true" | "false"]
+          android:alwaysRetainTaskState=["true" | "false"]
+          android:clearTaskOnLaunch=["true" | "false"]
+          android:configChanges=["mcc", "mnc", "locale",
+                                 "touchscreen", "keyboard", "keyboardHidden",
+                                 "navigation", "screenLayout", "fontScale", "uiMode",
+                                 "orientation", "screenSize", "smallestScreenSize"]
+          android:enabled=["true" | "false"]
+          android:excludeFromRecents=["true" | "false"]
+          android:exported=["true" | "false"]
+          android:finishOnTaskLaunch=["true" | "false"]
+          android:hardwareAccelerated=["true" | "false"]
+          android:icon="drawable resource"
+          android:label="string resource"
+          android:launchMode=["multiple" | "singleTop" |
+                              "singleTask" | "singleInstance"]
+          android:multiprocess=["true" | "false"]
+          android:name="string"
+          android:noHistory=["true" | "false"]
+          android:permission="string"
+          android:process="string"
+          android:screenOrientation=["unspecified" | "user" | "behind" |
+                                     "landscape" | "portrait" |
+                                     "reverseLandscape" | "reversePortrait" |
+                                     "sensorLandscape" | "sensorPortrait" |
+                                     "sensor" | "fullSensor" | "nosensor"]
+          android:stateNotNeeded=["true" | "false"]
+          android:taskAffinity="string"
+          android:theme="resource or theme"
+          android:uiOptions=["none" | "splitActionBarWhenNarrow"]
+          android:windowSoftInputMode=["stateUnspecified",
+                                       "stateUnchanged", "stateHidden",
+                                       "stateAlwaysHidden", "stateVisible",
+                                       "stateAlwaysVisible", "adjustUnspecified",
+                                       "adjustResize", "adjustPan"] >
+    . . .
+</activity>
+
+属性（ATTRIBUTES）：
+
+android:allowTaskReparenting
+这个属性用于设定Activity能够从启动它的任务中转移到另一个与启动它的任务有亲缘关系的任务中，转移时机是在这个有亲缘关系的任
+务被带到前台的时候。如果设置了true，则能够转移，如果设置了false，则这个Activity必须要保留在启动它的那个任务中。
+
+如果这个属性没有设置，那么其对应的<application>元素的allowTaskReparenting属性值就会应用到这个Activity上。它的默认值是
+false。
+
+通常，当Activity被启动时，它会跟启动它的任务关联，并它的整个生命周期都会保持在那个任务中。但是当Activity的当前任务不在显
+示时，可以使用这个属性来强制Activity转移到与当前任务有亲缘关系的任务中。这种情况的典型应用是把应用程序的Activity转移到与
+这个应用程序相关联的主任务中。
+
+例如，如果一个电子邮件消息中包含了一个网页的链接，点击这个链接会启动一个显示这个网页的Activity。但是，由e-mail任务部分启
+动的这个Activity是由浏览器应用程序定义的。如果把它放到浏览器的任务中，那么在浏览器下次启动到前台时，这个网页会被显示，并
+且在e-mail任务再次显示时，这个Activity有会消失。
+
+Activity的亲缘关系是由taskAffinity属性定义的。通过读取任务的根Activity的亲缘关系来判断任务的亲缘关系。因此，通过定义，任
+务中的根Activity与任务有着相同的亲缘关系。因此带有singleTask或singleInstance启动模式的Activity只能是任务的根节点，
+Activity的任务归属受限于standard和singleTop模式。
+
+android:alwaysRetainTaskState
+这个属性用于设置Activity所属的任务状态是否始终由系统来维护。如果设置为true，则由系统来维护状态，设置为false，那么在某些
+情况下，系统会允许重设任务的初始状态。默认值是false。这个属性只对任务根节点的Activity有意义，其他所有的Activity都会被忽
+略。
+
+通常，在某些情况中，当用户从主屏中重新启动一个任务时，系统会先清除任务（从堆栈中删除根节点Activity之上的所有Activity）。
+
+但是，当这个属性被设置为true时，用户会始终返回到这个任务的最后状态，而不管中间经历了哪些操作。这样做是有好处的，例如，
+Web浏览器的应用就会保留很多用户不想丢失的状态，如多个被打开的标签页。
+
+android:clearTaskOnLaunch
+这个属性用于设定在从主屏中重启任务时，处理根节点的Activity以外，任务中的其他所有的Activity是否要被删除。如果设置为true，
+那么任务根节点的Activity之上的所有Activity都要被清除，如果设置了false，就不会被清除。默认设置时false。这个属性只对启动新
+任务（或根Activity）的那些Activity有意义，任务中其他所有的Activity都会被忽略。
+
+当这个属性值被设置为true，用户再次启动任务时，任务根节点的Activity就会被显示，而不管在任务的最后做了什么，也不管任务使用
+Back按钮，还是使用Home离开的。当这个属性被设置为false时，在某些情况中这个任务的Activity可以被清除，但不总是这样的。
+
+例如，假设某人从主屏中启动了Activity P，并且又从P中启动了Activity Q。接下来用户按下了Home按钮，然后由返回到Activity P。
+通常用户会看到Activity Q，因为这是在P的任务中所做的最后的事情。但是，如果P把这个属性设置为true，那么在用户按下Home按钮，
+任务被挂起时，Activity P之上的所有Activity（本例中是Activity Q）都会被删除。因此当用户再次返回到本任务时，用户只能看到
+Activity P。
+
+如果这个属性和allowTaskReparenting属性都被设置为true，那些被设置了亲缘关系的Activity会被转移到它们共享的亲缘任务中，然后
+把剩下的Activity都给删除。
+
+android:configChanges
+这个属性列出了那些需要Activity进行自我处理的配置变化。当在运行时配置变化发生的时候，默认情况下，这个Activity会被关掉并重
+启，但是用这个属性声明一个配置，就会阻止Activity被重启。相反，这个Activity会保持运行，并且它的onConfigurationChanged()方
+法会被调用。
+下面中列出了这个属性的有效值，要设置多个值的时候，用“|”符号连接，例如：“locale|navigation|orientation”
+mcc -- IMSI移动国家编码改变时要进行自我处理---系统发现了一个新的SIM卡，并且更新了MCC。
+mnc -- IMSI移动网络编码改变时要进行自我处理---系统发现了一个新的SIM卡，并且更新了MNC
+locale -- 语言环境发生变化时要进行自我处理---用户选择了一种用于显示文本的新语言。
+touchscreen -- 触屏发生变化时要进行自我处理。（这种情况通常不会发生）
+keyboard -- 键盘类型发生变化时，要进行自我处理。例如用户插入了一个外部键盘
+keyboardHidden -- 键盘的可用性发生变化时，要进行自我处理。例如用户启用了硬件键盘。
+navigation -- 导航类型（轨迹球/方向板）发生变化时，要进行自我处理。这种情况通常不会发生。
+screenLayout -- 屏幕布局发生变化时，要进行自我处理。这可能是由被激活的不同的显示方式所导致的变化。
+fontScale -- 字体的缩放因子发生变化时，要进行自我处理。如用户选择了一个新的全局字体尺寸。
+uiMode -- 用户界面发生变化时，要进行自我处理。在把设备放入桌面/轿车内或夜间模式变化时，会导致这种情况发生。它在API级别8
+中被引入。
+orientation -- 屏幕的方向发生变化时，要进行自我处理。用户旋转设备时会发生这种变化。
+注意：如果应用程序的目标API级别是13或更高的版本，那么还应该声明screenSize配置，因为设备在横向和纵向之间切换时，对应的尺
+寸也会发生变化。
+screenSize -- 当前有效的屏幕尺寸发生变化时，要进行自我处理。这种变化意味着当前可用的相对长、宽比的尺寸发生了变化，因此当
+用户在横向和纵向之间切换时，就会产生屏幕可用尺寸的变化。但是，如果应用程序是在API级别12或更低的版本上编译的，那么
+Activity就要始终自己来处理这种变化（这个配置的变化不会重启Activity，即使是运行在Android3.2或更高版本的设备上）。
+smallestScreenSize -- 物理尺寸发生变化时，要进行自我处理。这种变化不关注屏幕方向的变化，只在实际的物理屏幕尺寸发生变化时
+才会发生，如切换到另一个显示器上的时候。这个变化对应smallestWidth属性的配置来进行改变。如果应用程序是在API级别12或更低的
+版本上编译的，那么Activity就要始终自己来处理这种变化（这个配置的变化不会重启Activity，即使是运行在Android3.2或更高版本的
+设备上）。
+
+android:enabled
+这个属性用于设置Activity是否能够被系统实例化。如果设置为true，则可以被实例化，如果设置为false，则不能被实例化。默认值是
+true。
+
+android:excledeFromRecents
+这属性用于设置由该Activity所启动的任务是否应该被排除在最近使用的应用程序列表之外。也就是说，当这个Activity是一个新任务的
+根节点时，这个属性决定了这个任务适应要显示在用户最近使用的应用程序列表中。如果设置为true，则这个任务会被排除在列表之外，
+如何设置为false，则应该包含在最近使用的应用列表中。默认值是false。
+
+android:exported
+这个属性用于设置该Activity能否由另一个应用程序的组件来启动，如果设置为true，则可以启动，否则不能启动。如果设置为false，
+那么该Activity只能被同一个应用程序中的组件或带有相同用户ID的应用程序来启动。默认值是true。
+
+android:finishOnTaskLaunch
+这个属性用于设置既存的Activity实例，在用户再次启动（在主屏上选择这个任务）它所属的任务时，是否应该被关闭。设置为true，则
+要关闭，否则不关闭，默认值是false。
+
+android:hardwareAccelerated
+这个属性用于设置该Activity是否应该启用硬件加速渲染。如果设置为true，则启用硬件加速，否则不启用。默认设置是false。
+
+android:icon
+图标
+
+android:label
+标签
+
+android:launchMode
+这个属性定义了应该如何启动Activity的一个指令。有四种工作模式会跟Intent对象中的Activity标记（FLAG_ACTIVITY_*常量）结合在
+一起用来决定被调用Activity在处理Intent对象时应该发生的事情，这四种模式是：
+standard
+singleTop
+singleTask
+singleInstance
+默认的模式是standard。
+
+这四种模式被分成两组，standard和singleTop为一组，singleTask和singleInstance为一组。带有standard和singleTop启动模式的
+Activity能够被实例化多次。其实例能够属于任何任务，并且能够在Activity的堆栈中被定为。通常是调用startActivity()方法把它们
+加载到任务中（除非Intent对象包含了一个FLAG_ACTIVITY_NEW_TASK指令，这种情况下会选择启动一个新的任务。）
+
+相比之下，singleTask和singleInstance启动模式的Activity只能启动一个任务。它们始终是Activity堆栈的根节点。并且设备每次只能
+拥有一个这样的Activity---只有一个这样的任务。
+
+standard和singleTop模式彼此在一个方面有所不同：对于standard启动模式的Activity，每次要有一个新的Intent对象才能启动，系统
+会创建一个新的Activity类的实例来响应Intent对象的请求。每个实例处理一个Intent对象。同样，singleTop启动模式的Activity也会
+创建一个新的实例来处理一个新的Intent对象。但是，如果目标任务中在堆栈的顶部已经有了这个Activity的实例，那么这个实例会接受
+这个新的Intent对象（在onNewIntent()回调方法中调用）；而不是创一个新的Activity实例。另一种情况，如：如果singleTop启动模式
+的Activity的一个实例，在目标任务中已经存在，但是它没有在任务堆栈的顶部，或者是在堆栈的顶部，却不是目标任务，那么就会创建
+一个新的Activity实例，并把它压入目标任务堆栈。
+
+singleTask和singleInstance模式彼此也在一个方面有所不同：singleTask模式的Activity，允许其他Activity作为它所在任务的一部
+分。它始终在所在任务的根节点，但是其他的Activity（需要是standard和singleTop模式的Activity）能够被加载到它的任务中。而
+singleInstance模式的Activity，不允许其他的Activity做它所在任务的一部分。它是其任务中唯一的Activity。如果要启动另外的
+Activity，那么被启动的Activity要关联到不同的任务中---就像是在Intent对象中设置了FLAG_ACTIVITY_NEW_TASK标记一样。
+
+android:multiprocess
+这个属性用于设置Activity的实例能否被加载到与启动它的那个组件所在的进程中，如果设置为true，则可以，否则不可以。默认值是
+false。
+通常，一个新的Activity实例会被加载到定义它的应用程序的进程中，以便应用程序的所有Activity都运行在同一个进程中。但是，如果
+这个属性被设置为true，那么这个Activity的实例就可以运行在多个进程中，允许系统在使用它们的进程中来创建实例（权限许可的情况
+下），这几乎是从来都不需要的事情。
+
+android:name
+名字。 这个属性没有默认值，名称必须被指定。
+
+android:noHistory
+这个属性用于设置在用户离开该Activity，并且它在屏幕上不再可见的时候，它是否应该从Activity的堆栈被删除。如果设置了true，则
+要删除，否则不删除。默认值是false。
+
+android:permission
+这个属性用于设定启动Activity的客户端或者是响应一个Intent对象的请求所必须要有的权限。如果startActivity()方法或
+startActivityForResult()方法的调用者没有被授予指定的权限，那么它的Intent对象就不会发送给对应的Activity。
+
+android:process
+这个属性用于设置Activity应该运行的那个进程的名字。通常，应用程序的所有组件都运行在为这个程序所创建的一个默认的进程中。它
+跟应用程序的包有相同的名字。<application>元素的process属性能够给所有的组件设置一个不同的默认值。但是每个组件都能够覆盖这
+个默认设置，允许把应用程序分离到多个进程中。
+
+android:screenOrientation
+设置Activity在设备上显示的方向。
+属性值可以以下值:
+unspecified -- 默认值，由系统来选择方向。它的使用策略，以及由于选择时特定的上下文环境，可能会因为设备的差异而不同。
+user -- 使用用户当前首选的方向。
+behind -- 使用Activity堆栈中与该Activity之下的那个Activity的相同的方向。
+landscape -- 横向显示（宽度比高度要大）
+portrait -- 纵向显示（高度比宽度要大）
+reverseLandscape -- 与正常的横向方向相反显示，在API Level 9中被引入。
+reversePortrait -- 与正常的纵向方向相反显示，在API Level 9中被引入。
+sensorLandscape -- 横向显示，但是基于设备传感器，既可以是按正常方向显示，也可以反向显示，在API Level 9中被引入。
+sensorPortrait -- 纵向显示，但是基于设备传感器，既可以是按正常方向显示，也可以反向显示，在API Level 9中被引入。
+sensor -- 显示的方向是由设备的方向传感器来决定的。显示方向依赖与用户怎样持有设备；当用户旋转设备时，显示的方向会改变。但
+是，默认情况下，有些设备不会在所有的四个方向上都旋转，因此要允许在所有的四个方向上都能旋转，就要使用fullSensor属性值。
+fullSensor -- 显示的方向（4个方向）是由设备的方向传感器来决定的，除了它允许屏幕有4个显示方向之外，其他与设置为“sensor”时
+情况类似，不管什么样的设备，通常都会这么做。例如，某些设备通常不使用纵向倒转或横向反转，但是使用这个设置，还是会发生这样
+的反转。这个值在API Level 9中引入。
+nosensor -- 屏幕的显示方向不会参照物理方向传感器。传感器会被忽略，所以显示不会因用户移动设备而旋转。除了这个差别之外，系
+统会使用与“unspecified”设置相同的策略来旋转屏幕的方向。
+
+android:stateNotNeeded
+这个属性用于设置在没有保存Activity状态的情况下，它能否被销毁且成功的重
+
+android:taskAffinity
+用于跟Activity有亲缘关系。默认情况下，在一个应用程序中的所有Activity都有相同的亲缘关系。能够通过设置这个属性把Activity分
+到不同的组中。甚至能够把定义在不同应用程序中的Activity放到同一个任务中。要指定一个跟任何任务没有亲缘关系的Activity，就要
+把这个属性设置为空字符串。
+
+android:theme
+设定Activity整体主题，它会应用一个样式资源。
+
+android:uiOptions
+设置Activity的UI的额外选项
+
+android:windowSoftInputMode
+设定Activity的主窗口与软件键盘的窗口如何交互。
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+PART--12 intent-filter标签
+
+语法：
+
+<intent-filter android:icon="drawable resource"
+               android:label="string resource"
+               android:priority="integer">
+    . . .
+</intent-filter>
+
+说明：
+这个元素用于指定Activity、Service或Broadcast Receiver能够响应的Intent对象的类型。
+过滤器的大多数内容是通过<action>、<category>和<data>子元素来描述的。
+
+属性：
+android:icon
+图片
+android:label
+标签
+android:priority="integer"
+优先级
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+PART--13 action标签
+
+语法：
+
+<action android:name="string"/>
+
+说明：
+给Intent过滤器添加一个操作。一个<intent-filter>元素必须包含一个或多个<action>元素，如果一个也没有包含，那么就不会有
+Intent对象通过过滤器。
+
+属性：
+android:name
+操作的名称。 在Intent类中用ACTION_string常量定义一些标准的操作。要把这些操作跟这个属性关联，就要把前置的ACTION_字符串换
+成“android.intent.action.”。例如，对于ACTION_MAIN操作，要使用android.intent.action.MAIN来作为属性值，对于
+ACTION_WEB_SEARCH操作，要使用android.intent.action.WEB_SEATCH来作为属性值。
+对于自定义的操作，最好使用包名来作为前缀，以确保唯一性。例如，TRANSMOGRIFY操作可以像下例这样定义：
+<action android:name="com.example.project.TRANSMOGRIFY"/>
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+PART--14 category标签
+
+语法：
+
+<category android:name="string"/>
+
+说明：
+给一个过滤器添加一个分类的名称。
+
+属性：
+android:name
+定义分类的名称。标准的分类是在Intent类中用CATEGORY_name常量来定义的。在定义这个属性值的时候，要用
+“andoid.intent.category.”来代替GATEGORY_，从而实现定义与常量的关联。例如：Intent类中的常量CATEGORY_LAUNCHER，在过滤器分
+类中的定义是：android.intent.category.LAUNCHER。
+自定义的分类应该使用包名作为前缀，以确保他们是唯一的。
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+PART--15 data标签
+
+语法：
+
+
+<data android:host="string"
+      android:mimeType="string"
+      android:path="string"
+      android:pathPattern="string"
+      android:pathPrefix="string"
+      android:port="string"
+      android:scheme="string"/>
+
+说明：
+这个元素用于把数据规范添加到一个Intent过滤器中，数据规范能够只是数据类型（mimeType属性）、或数据位置标识（URI），也可以
+是数据类型和数据位置标识（URI）。一个URI（如下格式）被分成几个独立的属性来分别指定：
+
+scheme://host:port/path or pathPrefix or pathPattern
+
+这些属性是可选的，但也是相互依赖的。如果没有给Intent过滤器指定scheme属性，那么所有其他的URI属性都会被忽略。如果没有给过
+滤器指定host属性，那么port属性和所有的路径属性都会被忽略。
+
+包含在同一个<intent-filter>元素中所有的<data>元素只会对这个过滤器起作用，例如：
+
+<intent-filter . . . >
+<data android:scheme="something" android:host="project.example.com" />
+. . .
+</intent-filter>
+
+等同于
+
+<intent-filter . . . >
+<data android:scheme="something" />
+<data android:host="project.example.com" />
+. . .
+</intent-filter>
+
+可以在<intent-filter>元素内放置多个<data>元素，来给过滤器设置多个数据选项。<data>元素的属性没有默认值。
+
+属性：
+android:host
+URI授权的主机部分，除非给过滤器也指定了<data>元素的scheme属性，否则这个属性没有意义。
+android:mimeType
+设定数据的MIME类型，如：image/jpeg或audio/mpeg4-generic。其子类型可用星号通配符（*）来代替，指示能够跟任何子类型匹配。
+android:path
+android:pathPrefix
+android:pathPattern
+这个三个属性用于指定URI的路径部分。Path属性指定一个完整的路径，这个路径会跟Intent对象中的路径进行匹配。PathPrefix属性只
+指定了部分路径，它会跟Intent对象中的路径初始部分匹配。pathPattern属性指定一个要跟Intent对象中的路径进行匹配的完整路径，
+但是这个路径中可以包含下列通配符：
+1. 星号（*）通配符，路径中的*星号代表任意多个星号之前的那个字符，如a*，可跟a、aa、aaa、aaaa、...字符串匹配。
+2. 点跟星号的组合(.*)通配符，它可以跟任意字符串进行匹配，如.*html，可以跟abchhtml、chtml、html、dssf.html、…等字符串匹
+配。
+因为系统读取XML中的字符串时，会把’\’符号作为强制转义字符，因此就需要两次转义。例如，符号”*”要被写成”\\*”，符号’\’要被写
+成”\\\\”。这与Java代码中的写法基本相同。
+android:port
+定义URI授权的端口部分。只有给过滤器指定了scheme和host属性时，这个属性才有意义。
+android:scheme
+这个属性用于设定URI的scheme部分。它是给指定URI设置的最基本的属性，至少要给过滤器设置一个scheme属性，否则，其他的URI属性
+就没有意义了。scheme属性值没有”:”符号结尾（如，http，而不是http: )
+
+
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+PART--16 meta-data标签
+
+语法：
+
+<meta-data android:name="string"
+           android:resource="resource specification"
+           android:value="string"/>
+
+说明：
+这个元素用name-value对的格式给其父组件提供任意可选的数据。一个组件元素能够包含任意多个<meta-data>子元素，所有这些元素中
+定义的值会被收集到一个Bundle对象中，并且提供给组件的PackageItemInfo.metaData属性字段。
+
+通常值是通过其value属性来指定的。但是，也可以使用resource属性来代替，把一个资源ID跟值进行关联。
+例如，下面的代码就是把值"hello world"跟”zoo”名称进行关联：
+<meta-data android:name="zoo" android:value="hello world" />
+另一个方面，使用resource属性会给zoo分配一个数字资源ID，而不是保存在资源中的值。例如：
+<meta-data android:name="zoo" android:resource="@string/kangaroo" />
+
+属性：
+android:name
+针对项目的一个唯一名称。使用Java样式的命名规则，可以确保名称的唯一性，例如：
+com.example.project.activity.fred。
+android:resource
+这个属性定义了一个要引用的资源。资源的ID会跟这个项目进行关联。通过Bundle.getInt()方法能够从meta-data的Bundle对象中获取这
+个ID。
+android:value
+这个属性会给这个项目分配一个值。可以分配int、String等不同类型，不同类型的获取方法也不同。
+例如，若android:value设为字符串，则获取的方法为getString()。
+
+参考:
+01, Android 读取<meta-data>元素的数据
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+PART--17 activity-alias标签
+
+语法：
+
+
+<activity-alias android:enabled=["true" | "false"]
+                android:exported=["true" | "false"]
+                android:icon="drawable resource"
+                android:label="string resource"
+                android:name="string"
+                android:permission="string"
+                android:targetActivity="string">
+    . . .
+</activity-alias>
+
+说明：
+这个元素用于给targetActivity属性所指定Activity设定一个别名，目标Activity必须跟别名Activity在同一个应用程序中，并且这个
+Activity必须在别名之前被声明。
+别名会作为一个独立的实体来代表目标Activity。它能够有自己的Intent过滤器设置，而不是目标Activity自己的Intent过滤器，通过别
+名和系统处理别名的方式来判断哪个Intent对象能够激活目标。例如：别名中的Intent过滤器可以指定“android.intent.action.MAIN”和
+“android.intent.category.LAUNCHER”标记，这样即使在目标Activity的过滤器上没有指定这些标记，也会让它在应用的启动器窗口中表
+示。
+
+除了targetActivity属性以外，<activity-alias>的其他属性是<activity>属性的一个子集。对于子集中的属性，不会把目标Activity中
+所设置的任何值转交给别名Activity。但是，对于子集中所没有的属性，则给目标Activity所设置的值也会应用到别名Activity。
+
+属性:
+android:enabled
+设定系统能否通过这个别名来实例化目标Activity，如果设置为true，则可以实例化，否则不能实例化。默认值是true。
+
+android:exported
+设定其他的应用程序组件能否通过这个别名来启动目标Activity，如果设置为true，则能够启动，否则不能启动。默认值是false。
+
+android:icon
+图标。
+
+android:label
+标签。
+
+android:name
+给别名设置一个唯一的名字。这个名字应该像一个完全限定的类名，但是不想目标Activity的名字那样，别名的名称是任意的，它不对应
+一个实际的类名。
+
+android:permission
+设定权限的名称，客户端必须有这个权限才能启动目标Activity或通过别名来获取目标Activity以便做某些事情。如果startActivity()
+或startActivityForResult()方法的调用者没有被授予指定的权限，那么目标Activity就不会被激活。
+
+android:targetActivity
+这个属性用于设置通过别名所能够激活的那个Activity的名字。这个名字必须跟它前面的<activity>元素的name属性匹配。
+
+参考:
+01, activity-alias的使用
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+PART--18 service标签
+
+语法：
+
+
+<service android:enabled=["true" | "false"]
+         android:exported=["true" | "false"]
+         android:icon="drawable resource"
+         android:label="string resource"
+         android:name="string"
+         android:permission="string"
+         android:process="string">
+    . . .
+</service>
+
+说明：
+这个元素用于声明一个服务（Service类的子类）作为应用程序的组件之一。跟Activity不一样，服务没有可见的用户界面。它们被用于
+实现长时的后台操作，或提供能够被其他应用程序调用的通信API。
+所有的服务都必须用清单文件中的<service>元素来代表。任何没有在清单中声明的服务都不能被系统看到，也不会被运行。
+
+属性：
+android:enabled
+是否能够被实例化。默认值是true。
+android:exported
+否能够被其他应用程序组件调用或跟它交互。默认值是true。
+android:icon
+图标
+android:label
+标签
+android:name
+定实现该服务的Service子类的类名。它应该是完整的Java类名（如：com.example.project.RoomService）。但是，也可以使用简写
+（如：.RoomService），系统会把<manifest>元素中package属性所设定的值添加到简写名称的前面。这个属性没有默认值，名称必须要
+指定。
+android:permission
+这个属性定义了要启动或绑定服务的实体必须要有的权限。如果调用者的startService()、bindService()和stopService()方法没有被授
+予这个权限，那么这些方法就不会工作，并且Intent对象也不会发送给改服务。如果这个属性没被设置，那么通过<appliction>元素的
+permission属性所设定的权限就会适用于该服务。如果<application>元素也没有设置权限，则该服务不受权限保护。
+android:process
+设定服务所运行的进程名称。通常，应用程序的所有组件都运行在给应用程序创建的进程中，进程名与应用程序的包名相同。
+<application>元素的process属性能够给应用程序的所有组件设置一个不同的默认名称。但是每个组件自己的process属性都能够覆盖这
+个默认值，这样允许把应用程序分离到不同的多个进程中。
+如果这个属性值用“:”开头，则在需要的时候系统会创建一个新的，应用程序私有的进程，并且该服务也会运行在这个进程中。如果这个
+属性值用小写字母开头，那该服务就会运行在以这个属性值命名的全局进程中，它提供了使其工作的权限。这样就允许不同的应用程序组
+件来共享这个进程，从而降低资源的使用。
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+PART--19 receiver标签
+
+语法（SYNTAX）：
+
+
+<receiver android:enabled=["true" | "false"]
+          android:exported=["true" | "false"]
+          android:icon="drawable resource"
+          android:label="string resource"
+          android:name="string"
+          android:permission="string"
+          android:process="string">
+    . . .
+</receiver>
+
+说明：
+这个元素用于声明一个广播接收器（一个BroadcastReceiver 子类），作为应用程序的组件之一。广播接收器能够让应用程序接收那些由
+系统或其他应用程序发出的广播Intent对象，即使是在该应用程序的其他组件没有运行的时候，也能够接收来自系统或其他应用程序的广
+播消息。
+有两种方式让系统知道本应用程序用户一个广播接收器：
+1. 在应用程序的清单文件中，使用本元素来声明注册一个广播接收器；
+2. 在代码中动态的创建一个广播接收器，并使用Context.registerReceiver()方法来注册它。有关更多动态创建接收器的方法，请看
+BoradcastReceiver类说明。
+
+属性：
+android:enabled
+是否能够实例化这个广播接收器。默认值是true。
+android:exported
+是否能够接收来自应用程序外部的消息。默认值是true。
+android:icon
+图标
+android:label
+标签
+android:name
+这个属性值要用广播接收器的实现类的类名来设置，它是BroadcastReceiver类的一个子类。通常要使用类的全名来设置（如：
+com.example.project.ReportReceiver）。但是，也可以使用简写（如：.ReportReceiver）。系统会自动的把<manifest>元素中的
+package属性所设定的包名添加到这个简写的名称上。这个属性没有默认值，这个名字必须被指定。
+android:permission
+定义把消息发送给该广播接收器的广播器所必须要有的权限。如果没有设置这个属性，那么<application>元素的permission属性所设置
+的权限就适用于这个广播接收器。如果<application>元素也没有设置权限，那么该接收器就不受权限的保护。
+android:process
+设置该广播接收器应该运行在那个进程中的进程名。通常，应用程序的所有组件都在给应用程序创建的默认进程中运行，它有与应用程序
+包名相同的名称。<application>元素的process属性能够给它的所有组件设置一个不同的默认进程，但是它的每个组件自己的process属
+性能够覆盖这个默认设置，这样就允许把一个应用程序分离到多个进程中。
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+PART--22 uses-library标签
+
+语法：
+
+<uses-library android:name="string"
+              android:required=["true" | "false"] />
+
+说明：
+这个元素用于指定该应用程序必须链接的共享类库。这个元素告诉系统该应用程序包的类装载器中所包含的类库代码。
+Android的所有包（如andorid.app，android.content，android.view和android.widget等）都在应用程序自动链接的默认类库中。但
+是，有些包是在于独立的类库中，它们不能被自动的链接到应用程序包中，要查看这些包的文档，以确定要把哪些类库包含到包的代码
+中。
+
+属性：
+android:name
+指定类库的名称。这个名称是在对应的类库文档中提供的。例如：android.test.runner库就是包含Android测试类的一个程序包。
+
+android:required
+指定应用程序是否需要有android:name属性所指定的类库：
+true -- 没有这个库应用程序无法工作。如果用户设备设备上没有这个类库，系统不允许该应用程序安装在这个设备上。
+false -- 如果该类库存在，则应用程序能够使用这个类库，但是如果有必要，也可以设计成没有该类库，应用程序也能够工作。系统会
+允许应用程序安装，即使该类库不存在。如果使用false，就要在运行时对类库的有效性进行必要的检查。
+默认值是true。

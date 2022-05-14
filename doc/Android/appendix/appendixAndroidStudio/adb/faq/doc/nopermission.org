@@ -1,0 +1,58 @@
+* [linux] multi-user.target下无法看到devices & 设备未被授权
+
+   https://askubuntu.com/questions/863587/adb-device-list-doesnt-show-phone
+
+
+*** 解决方案1
+
+
+To set up device detection on Ubuntu Linux:
+
+Using sudo, create this file: /etc/udev/rules.d/51-android.rules.
+
+Use this format to add each vendor to the file:
+
+SUBSYSTEM=="usb", ATTR{idVendor}=="0bb4", MODE="0666", GROUP="plugdev"
+In this example, the vendor ID is for HTC. The MODE assignment specifies read/write permissions, and GROUP defines which Unix group owns the device node.
+
+If you do not know your vendor ID, you can get this from lsusb, it is the string after ID. If lsusb doesn't report your device, try checking grep USB /var/log/kern.log | less for vendor ID (for example, a line New USB device found, idVendor=1bbb, idProduct=0167).
+
+Once you have created/updated the 51-android.rules file, execute:
+
+sudo chmod a+r /etc/udev/rules.d/51-android.rules
+
+*** 解决方案2
+
+Finally got the device detected in adb under adb devices command by restarting adb server with root privilege as mentioned here in the Troubleshooting adb section.
+
+sudo adb kill-server
+sudo adb start-server
+After this adb devices returned
+
+7dd91912      unauthorized
+with a prompt on device for RSA authorize. After authorizing
+
+adb devices now returns
+
+72291912      device
+Share
+Improve this answer
+Follow
+edited Mar 31, 2019 at 3:57
+answered Dec 23, 2016 at 10:45
+
+1565986223
+80111 gold badge88 silver badges1313 bronze badges
+also carefully check that debugging via USB is on –
+im_infamous
+ Jan 8, 2018 at 13:07
+1
+When these steps are not enough, check out this more complete answer. –
+Skippy le Grand Gourou
+ Jul 23, 2018 at 16:14
+Also note that it might be necessary to unplug and plug the USB again. And if you don't get the initial authorization prompt on your phone, it won't work. –
+dvlcube
+ Nov 17, 2020 at 15:20
+-1 to this answer, just adds noise. Just check, perfect answer: android.stackexchange.com/a/144967/110742 There's no need to repeat everything, considering this is a very requested issue and there's dozens of questions about it. –
+João Pimentel Ferreira
+ Nov 20, 2021 at 22:09

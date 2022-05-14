@@ -1,0 +1,54 @@
+* Intent
+
+** 显式Intent & 隐式Intent
+
+- ~显式Intent~ 通过组件名指定启动的 ~目标组件~ (即目标组件的类名是确定的)，比如 startActivity(new Intent(A.this, B.class))
+
+- ~隐式Intent~ 不指定组件名，而指定Intent的Action，Data，或Category，当我们启动组件时, 会去匹配 ~AndroidManifest.xml~ 相关组件的Intent-filter，逐一匹配出满足属性的组件，当不止一个满足时, 会弹出一个让我们选择启动哪个的对话框
+
+在Android系统中，可利用隐式intent启动其他应用的activity。在显式intent中，我们指定要启动的activity类，操作系统会负责启动它。在隐式intent中，我们只要描述要完成的任务，操作系统就会找到合适的应用，并在其中启动相应的activity。
+
+显式Intent使用示例：
+
+#+BEGIN_SRC java
+Intent it = new Intent();
+it.setAction(Intent.ACTION_MAIN);
+it.addCategory(Intent.CATEGORY_HOME);
+startActivity(it);
+#+END_SRC
+
+** IntentFilter
+
+IntentFilter直译：意图过滤器，可以给四大组件配置自己关心的action等，以免想打开A结果打开了B 使用场景就太多了，比如Receiver需要指定intent-filter来表明自己关心什么广播等
+
+
+单从manifest层面讲intentFilter下有三个参数，action,data，category。
+
+action:可以用来指定操作。常见的是在receiver中过滤广播，和隐式意图打开界面
+category：目标操作的类别（个人这么叫），用来区别打开浏览器，打开页面等等
+data：就是数据了
+
+
+** Intent传输限制
+
+Intent传输数据的大小受Binder的限制，上限是1M。
+
+不过这个1M并不是安全的上限，Binder可能在处理别的工作，安全上限是多少这个在不同的机型上也不一样。
+
+传 512K 以下的数据的数据可以正常传递。
+传 512K~1024K 的数据有可能会出错，闪退。
+传 1M以上的数据会报错：TransactionTooLargeException
+考虑到 Intent 还包括要启动的 Activity 等信息，实际可以传的数据略小于 512K
+
+解决办法
+
+减少传输数据量
+Intent通过绑定一个Bundle来传输，这个可以超过1M，不过也不能过大
+通过内存共享，使用静态变量或者使用EventBus等类似的通信工具
+通过文件共享
+
+有，限制大约是1M左右，这个限制是binder底层的限制，因为binder本来就没有设计成传输大量数据的
+解决办法：别直接传，比如通过MemoryFile开辟一片共享内存，然后传递FileDescriptor，接收端用这个fd读
+
+
+Intent 是消息传递对象，用于各组件间通信。各组件以及个程序间通信都用到了进程间通信。因此Intent 的数据传递是基于 Binder 的，Intent 中的数据会存储在 Bundle 中，然后IPC过程中会将各个数据以Parcel 的形式存储在 Binder 的事物缓冲区（Binder transaction buffer）进程传递，而 Binder 的事物缓冲区有个固定的大小，大小在 1M 附近。因为这 1M大小是当前进程共享的，Intent 中也会带有其他相关的必要信息，所以实际使用中比这个数字要小很多。

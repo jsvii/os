@@ -1,0 +1,40 @@
+* surface理解
+
+不论是使用Skia绘制二维图像，还是用OpenGL绘制三维图像，最终Application都要和Surface交互。
+
+
+** activity
+
+
+应用程序的外表是通过Activity来展示的。
+
+Activity是如何完成界面绘制工作的呢？即Activity是如何与surface交互的？
+
+1. Activity 对象中的 ~mWindow~ 是PhoneWindow实例
+
+#+BEGIN_SRC java
+  @UnsupportedAppUsage
+  final void attach()  {
+    mWindow = new PhoneWindow(this, window, activityConfigCallback);
+
+    //...
+    mWindowManager = mWindow.getWindowManager();
+  }
+
+  public void setContentView(@LayoutRes int layoutResID) {
+    getWindow().setContentView(layoutResID);
+    initWindowDecorActionBar();
+  }
+#+END_SRC
+
+
+1. Window是一个抽象基类，用于控制顶层窗口的外观和行为，它的作用是绘制背景和标题栏、默认的按键处理等。它将作为一个顶级的View加入到WindowManager中。
+
+
+
+#+BEGIN_SRC java
+public final class ViewRootImpl implements ViewParent,
+        View.AttachInfo.Callbacks, ThreadedRenderer.DrawCallbacks {
+
+}
+#+END_SRC

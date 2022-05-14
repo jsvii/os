@@ -1,0 +1,92 @@
+* overview
+
+本文源自：  https://developer.android.com/topic/libraries/support-library/features?hl=zh-cn
+
+
+** 应用组件
+这些支持库类提供了重要的核心平台功能的向后兼容实现。这些实现通常会扩展类的早期版本，以处理在更高版本的平台中添加的新方法和功能。其中一些类是框架 API 的完整静态实现。
+
+- Activity
+
+  1. ActivityCompat - 包含针对最新的关键 Activity 功能（例如运行时权限和动画过渡）的向后兼容实现。
+
+  1. FragmentActivity - 提供 Activity 的向后兼容实现，以使用 Fragment 和 Loader API 的支持库版本。
+
+  1. AppCompatActivity - 为较低版本的设备提供 Material Design 颜色主题背景、微件色调调节和应用栏支持。您需要使用 Theme.AppCompat 主题背景实现一致的视觉呈现效果，才能使用此类。
+
+- Fragment - 提供框架 Fragment 类的独立实现。此类必须与 FragmentActivity 搭配使用。
+
+- ContextCompat - 为较新版本的 Context 类中引入的功能提供支持，包括权限支持、文件访问权限和颜色信息。
+
+- IntentCompat - 为较新版本的 Intent 类中引入的功能提供支持，包括选择和启动特定 Activity 的方法。
+
+- Loader - 提供框架 Loader 类的静态实现，并且是 AsyncTaskLoader 和 CursorLoader 支持类的基类。
+
+- Preference - 此类及其子类以向后兼容的方式提供应用设置界面的实现。
+
+- ContentResolverCompat - 为较新版本的 ContentResolver 类中引入的功能提供支持，特别是支持取消进行中的查询的 query() 方法。
+
+
+
+界面
+这些支持库类可提供关键界面微件和行为的实现，帮助您在低版本的设备上创建新版的应用界面。其中一些微件只能通过支持库获取。
+
+通用布局容器
+这些支持类提供了可针对不同设计用例进行调整的界面容器。
+
+RecyclerView - 创建用于显示长列表的布局，并通过使用策略避免过高的内存消耗。借助此类，您可以针对较大的数据集创建有限的窗口视图，从而避免在显示列表时消耗大量内存。如需详细了解如何使用 RecyclerView，请参阅 Recycler 视图指南。
+ViewPager - 提供一种布局，允许用户左右翻阅数据页面。
+GridLayout - 提供一种子项位于矩形网格中的布局，可支持任意跨度的连续单元格和灵活的空间分布。此类提供了在 Android 4.0（API 级别 14）中引入的 GridLayout 类的向后兼容版本。
+PercentFrameLayout 和 PercentRelativeLayout - 提供具有以下特点的布局：布局的子视图和内容支持基于百分比的尺寸和边距。
+注意：ViewPager、RecyclerView、PercentFrameLayout 和 PercentRelativeLayout 类只能从支持库中获取。
+
+专用布局容器
+这些支持类提供特定布局模式的兼容实现，例如可以从屏幕边缘拉出的抽屉式导航栏视图、滑动面板以及在列表中嵌套列表。
+
+DrawerLayout - 创建一种布局，允许从视图窗口的边缘拉出互动式的抽屉式导航栏视图。
+SlidingPaneLayout - 提供一种水平的多窗格布局，以在应用界面的顶层用于创建各种布局，这些布局能够顺畅地适应多种不同的屏幕尺寸、在较大屏幕中展开以及通过折叠适应更小的屏幕。
+NestedScrollView - 支持嵌套其他滚动视图的滚动布局，可让您创建列表项中包含其他子列表的列表。这些嵌套列表可以包含独立于父列表横向或纵向滚动的项。
+SwipeRefreshLayout - 提供一种布局，该布局支持通过手指滑动手势刷新列表或其他布局的数据。
+视图、对话框和微件
+这些支持库提供了许多用于在布局中显示内容和提供用户互动元素的类。
+
+CardView - 一种支持库自定义类，用于创建 Material Design 样式的显示卡片。此类基于具有圆角和阴影的 FrameLayout。
+AppCompatDialogFragment - 通过扩展 DialogFragment 和使用 AppCompatDialog 提供样式一致的对话框。
+NotificationCompat - 以向后兼容的方式为较新的通知样式提供支持。
+SearchView - 提供一个类，以供用户输入搜索查询并向搜索提供器提交请求，该类主要在应用栏中使用。
+Material Design
+这些支持库提供了许多用于实现 Material Design 界面建议的类。
+
+CoordinatorLayout - 为整合 Material Design 组件和行为的布局提供顶层容器。此类还可以用作与一个或多个子视图进行特定交互的容器。
+AppBarLayout - 提供 Material Design 应用栏概念的许多滚动功能的实现。
+FloatingActionButton - 创建浮动按钮，用于显示您希望用户执行的特殊类型操作。此 Material Design 界面元素显示为浮在应用界面上方的圆形图标。有关详情，请参阅添加浮动操作按钮。
+DrawerLayout - 创建抽屉式导航栏，即显示应用的主导航菜单的界面面板。当用户从屏幕左边缘滑动手指或点按应用栏中的抽屉式导航栏图标时，此导航栏就会显示。有关详情，请参阅创建抽屉式导航栏。
+TabLayout - 提供一种用于显示标签式页面的布局。此微件应与 ViewPager 类一起使用。
+Snackbar - 提供一个微件，用于使用信息提示控件弹出式窗口显示与操作有关的精简反馈。
+图形
+android.support.graphics.drawable 软件包提供了对矢量可绘制对象的支持。通过使用矢量可绘制对象，您可以使用一个矢量图形（在 XML 中定义）替换多个 PNG 资源。
+
+VectorDrawableCompat 为 API 级别 9 及更高版本中的矢量可绘制对象提供支持。AnimatedVectorDrawableCompat 为 API 级别 11 及更高版本中的动画矢量可绘制对象提供支持。
+
+无障碍
+android.support.v4.view.accessibility 软件包提供了用于实现在 API 级别 14 及更高版本中引入的无障碍功能的兼容性类，使无障碍服务能够观察和识别用户与屏幕中显示的项目进行的互动。
+
+ExploreByTouchHelper - 在代表类视图逻辑项集合的自定义视图中提供无障碍支持。
+媒体播放
+Android 支持库可支持将媒体路由器功能向后移植到搭载的低于 Android 4.1（API 级别 16）的平台版本的设备。借助这些类，您可以在连接的 Android 设备上控制媒体播放：
+
+MediaRouter - 让应用能够控制媒体渠道和流从当前设备到外部扬声器和目标设备的路由路径。
+MediaControllerCompat - 让应用能够与进行中的媒体会话进行交互。应用可以通过此机制提供媒体控制按钮，并将其他播放命令发送到会话。
+MediaSessionCompat - 提供针对媒体播放的远程控制界面，以支持与其他应用或独立设备中的媒体控制器、音量键、媒体按钮和传输控件进行交互。
+TV 应用
+Android SDK 提供了各种库以支持大屏幕设备等设备类型及相关的控制器。应用可以借助相应的支持库为各种平台版本提供功能，并且可以在外部屏幕、扬声器和其他目标设备上提供内容。
+
+android.support.v17.leanback.* 软件包
+Wear 应用
+Android SDK 提供了支持手表的库。这些库为应用提供了当用户佩戴手表时可用的功能。
+
+android.support.wear.* 软件包
+实用工具
+Android 支持库提供了许多未内置于框架的功能。这些库提供了一系列应用可以使用的实用工具。
+
+android.support.v4.util 软件包

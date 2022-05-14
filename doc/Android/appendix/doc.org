@@ -1,0 +1,42 @@
+* Android 学习笔记
+
+
+** Android Platform
+
+** jetpack
+
+** kernel
+
+   内核
+
+** appendix android_studio
+
+** appendix sdk
+
+   - adb
+
+
+[Androidx](java_api/androidx/README.md)
+
+## 其他主题
+
+[Jetpack](jetpack/README.md)
+
+## 附录
+
+### android gradle相关
+
+
+### 第三方库分析
+
+* [ARoute库原理](appendix/appendix-lib/aroute/README.md)
+
+### 安卓市场
+
+* [安卓市场浏览](appendix/appendix-market/README.md)
+
+### 面试题
+
+* [基础面试题](appendix/appendix-quiz/basic.md)
+
+* [安卓市场浏览](appendix/appendix-quiz/README.md)

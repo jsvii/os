@@ -1,0 +1,43 @@
+* surface的定义
+
+
+#+BEGIN_SRC java
+public class Surface implements Parcelable {
+    private static final String TAG = "Surface";
+
+    private static native long nativeCreateFromSurfaceTexture(SurfaceTexture surfaceTexture)
+            throws OutOfResourcesException;
+
+    private static native long nativeCreateFromSurfaceControl(long surfaceControlNativeObject);
+    private static native long nativeGetFromSurfaceControl(long surfaceObject,
+            long surfaceControlNativeObject);
+
+    private static native long nativeLockCanvas(long nativeObject, Canvas canvas, Rect dirty)
+            throws OutOfResourcesException;
+    private static native void nativeUnlockCanvasAndPost(long nativeObject, Canvas canvas);
+
+    @UnsupportedAppUsage
+    private static native void nativeRelease(long nativeObject);
+    private static native boolean nativeIsValid(long nativeObject);
+    private static native boolean nativeIsConsumerRunningBehind(long nativeObject);
+    private static native long nativeReadFromParcel(long nativeObject, Parcel source);
+    private static native void nativeWriteToParcel(long nativeObject, Parcel dest);
+
+    private static native void nativeAllocateBuffers(long nativeObject);
+
+    private static native int nativeGetWidth(long nativeObject);
+    private static native int nativeGetHeight(long nativeObject);
+
+    private static native long nativeGetNextFrameNumber(long nativeObject);
+    private static native int nativeSetScalingMode(long nativeObject, int scalingMode);
+    private static native int nativeForceScopedDisconnect(long nativeObject);
+    private static native int nativeAttachAndQueueBufferWithColorSpace(long nativeObject,
+            GraphicBuffer buffer, int colorSpaceId);
+
+    private static native int nativeSetSharedBufferModeEnabled(long nativeObject, boolean enabled);
+    private static native int nativeSetAutoRefreshEnabled(long nativeObject, boolean enabled);
+
+    private static native int nativeSetFrameRate(
+            long nativeObject, float frameRate, int compatibility);
+}
+#+END_SRC
