@@ -1,8 +1,9 @@
-#!/bin/sh
+* 不同的参数
 
+#+BEGIN_SRC bash
+#!/bin/sh
 # example
 # ./shell_env.sh --name shell_test --version 1.10
-
 # 显示当前运行程序的脚本
 echo $0
 
@@ -13,7 +14,6 @@ echo '$1 $2 $3' $1 $2 $3
 echo $#
 
 #
-
 echo $*
 
 
@@ -26,3 +26,4 @@ echo $$
 
 #
 echo $!
+#+END_SRC

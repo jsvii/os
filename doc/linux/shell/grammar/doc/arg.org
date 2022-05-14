@@ -70,6 +70,8 @@ sh users-shift-operator.sh john matt bill 'joe wicks' carol
 
 一些情况下使用 ${1:+"$@"} 代替 "$@".
 
+在一些早期的 Bourne Shell 变种中，如果没有参数， $@
+
 
 https://stackoverflow.com/questions/154625/1-in-bin-sh
 
