@@ -1,0 +1,9 @@
+* config
+
+** iterm2
+
+
+** sed
+
+# 安装gnu sed
+brew install  gnu-sed

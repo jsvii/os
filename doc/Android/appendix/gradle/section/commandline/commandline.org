@@ -1,0 +1,118 @@
+* command line
+
+  https://docs.gradle.org/current/userguide/command_line_interface.html
+
+** 执行任务
+
+#+BEIGN_SRC bash
+# 一个task
+gradle :myTask
+
+# sub project task
+gradle :my-subproject:taskName
+gradle my-subproject:taskName
+
+# multi tasks
+gradle test deploy
+
+# Excluding tasks from execution
+gradle dist --exclude-task test
+gradle dist -x test
+
+
+
+# You can force Gradle to execute all tasks ignoring up-to-date checks using the --rerun-tasks option:
+gradle test --rerun-tasks
+
+# Continuing the build when a failure occurs
+gradle test --continue
+#+END_SRC
+
+
+** 通用任务
+
+- ~build~   It is common in Gradle builds for the build task to designate assembling all outputs and running all checks.
+
+- ~run~  It is common for applications to be run with the run task, which assembles the application and executes some script or binary.
+
+- ~check~ It is common for all verification tasks, including tests and linting, to be executed using the check task.
+
+
+** Project reporting 项目情况概览
+
+#+BEIGN_SRC bash
+# Running gradle projects gives you a list of the sub-projects of the selected project, displayed in a hierarchy.
+gradle projects
+
+
+gradle tasks
+
+# By default, this report shows only those tasks which have been assigned to a task group. You can obtain more information in the task listing using the --all option.
+gradle tasks --all
+
+# 显示某一组下的tasks
+gradle tasks --group="build setup"
+
+
+# 展示某个task的信息
+gradle help --task someTask
+
+# 展示某一task的信息
+gradle myTask --scan
+
+# 展示所有依赖项
+gradle dependencies
+
+# Running gradle dependencyInsight gives you an insight into a particular dependency (or dependencies) that match specified input.
+gradle buildEnvironment
+#+END_SRC
+
+
+** debug
+
+-?, -h, --help
+Shows a help message with all available CLI options.
+
+-v, --version
+Prints Gradle, Groovy, Ant, JVM, and operating system version information.
+
+-S, --full-stacktrace
+Print out the full (very verbose) stacktrace for any exceptions. See also logging options.
+
+-s, --stacktrace
+Print out the stacktrace also for user exceptions (e.g. compile error). See also logging options.
+
+--scan
+Create a build scan with fine-grained information about all aspects of your Gradle build.
+
+-Dorg.gradle.debug=true
+Debug Gradle client (non-Daemon) process. Gradle will wait for you to attach a debugger at localhost:5005 by default.
+
+-Dorg.gradle.debug.port=(port number)
+Specifies the port number to listen on when debug is enabled. Default is 5005.
+
+-Dorg.gradle.debug.server=(true,false)
+If set to true and debugging is enabled, Gradle will run the build with the socket-attach mode of the debugger. Otherwise, the socket-listen mode is used. Default is true.
+
+-Dorg.gradle.debug.suspend=(true,false)
+When set to true and debugging is enabled, the JVM running Gradle will suspend until a debugger is attached. Default is true.
+
+-Dorg.gradle.daemon.debug=true
+Debug Gradle Daemon process.
+
+
+** log
+
+-Dorg.gradle.logging.level=(quiet,warn,lifecycle,info,debug)
+Set logging level via Gradle properties.
+
+-q, --quiet
+Log errors only.
+
+-w, --warn
+Set log level to warn.
+
+-i, --info
+Set log level to info.
+
+-d, --debug

@@ -1,5 +1,9 @@
 * xargs
 
+build and execute command lines from standard input
+
+通过标准化输出构建命令
+
 ** $1 被忽略
 
 ps ax | grep -E "bar" | grep -v "grep" | awk '{print $1}' | xargs kill -9 $1
@@ -12,4 +16,10 @@ As a side note, ps can also print processes according to their command name (wit
 
 #+BEGIN_SRC bash
 sed  -nr 's/.*"(\w+\.html).*+/\1/p' index.html | sort | uniq | awk '{print "https://nodejs.org/dist/v12.16.2/docs/api/"$1}'  | xargs wget
+#+END_SRC
+
+** 案例
+
+#+BEGIN_SRC bash
+find . -name "*.tar.gz" -print | xargs -I ARG tar -xvzf ARG
 #+END_SRC

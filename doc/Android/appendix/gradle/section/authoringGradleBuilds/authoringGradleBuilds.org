@@ -1,0 +1,12 @@
+* Authoring Gradle Builds
+
+
+** Initialization
+
+   gradle如何知道项目是mutli-project
+
+1. It looks for ~settings.gradle~ in parent directories.
+
+1. If not found, the build is executed as a single project build.
+
+1. If a ~settings.gradle~ file is found, Gradle checks if the current project is part of the multi-project hierarchy defined in the found settings.gradle file. If not, the build is executed as a single project build. Otherwise a multi-project build is executed.

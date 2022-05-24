@@ -19,3 +19,13 @@ echo "basename: `basename $0`"
 echo "dirname: `dirname $0`"
 echo "dirname/readlink: $(dirname $(readlink -f $0))"
 #+END_SRC
+
+
+
+if [[ " ${array[*]} " =~ " ${value} " ]]; then
+    # whatever you want to do when array contains value
+fi
+
+if [[ ! " ${array[*]} " =~ " ${value} " ]]; then
+    # whatever you want to do when array doesn't contain value
+fi

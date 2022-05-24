@@ -35,3 +35,21 @@ maven { url 'http://maven.aliyun.com/nexus/content/repositories/gradle-plugin' }
 #+END_SRC
 
 2. test
+
+
+
+* direct
+
+
+implementation
+
+
+
+configurations {
+    // declare a "configuration" named "someConfiguration"
+    someConfiguration
+}
+dependencies {
+    // add a project dependency to the "someConfiguration" configuration
+    someConfiguration project(":lib")
+}

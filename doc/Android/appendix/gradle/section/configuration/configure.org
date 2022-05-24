@@ -1,0 +1,41 @@
+* configuration
+
+
+** gralde.properties
+
+
+*** 设置代理
+
+#+BEGIN_SRC properties
+systemProp.http.proxyHost=172.31.1.90
+systemProp.http.proxyPort=3049
+systemProp.https.proxyHost=172.31.1.90
+systemProp.https.proxyPort=3049
+systemProp.http.keepAlive=true
+#+END_SRC
+
+#+BEGIN_SRC java
+if (trustAnchors.isEmpty()) {
+    throw new InvalidAlgorithmParameterException("the trustAnchors " +
+        "parameter must be non-empty");
+}
+#+END_SRC
+
+
+- TrustStore：顾名思义，它通常用于存储受信任实体的证书。进程可以维护其信任的所有受信任方的证书存储。
+
+- keyStore：用于存储服务器密钥（公共和私人）以及签名证书。
+
+**** 代理不生效
+#+BEGIN_SRC bash
+ > Could not resolve org.apache.commons:commons-text:1.9.
+     Required by:
+         project :app
+      > Could not resolve org.apache.commons:commons-text:1.9.
+         > Could not get resource 'https://repo.maven.apache.org/maven2/org/apache/commons/commons-text/1.9/commons-text-1.9.pom'.
+            > Could not GET 'https://repo.maven.apache.org/maven2/org/apache/commons/commons-text/1.9/commons-text-1.9.pom'.
+               > java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
+#+END_SRC
+
+
+java -Djavax.net.ssl.trustStore=/some/loc/on/server/ our_truststore.jks -Djavax.net.ssl.trustStorePassword=our_password -jar application.jar

@@ -20,3 +20,9 @@ set bell-style none
 #+BEGIN_SRC bash
 blacklist pcspkr
 #+END_SRC bash
+
+
+** toollist
+
+
+   sdkman

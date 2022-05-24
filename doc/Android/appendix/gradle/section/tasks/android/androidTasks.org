@@ -38,9 +38,7 @@ emulator -avd avd_name
 现在，您可以使用关于如何构建调试版 APK 的部分中提及的任意一项 Gradle 安装任务或使用 adb 工具来安装您的应用。
 如果 APK 是使用开发者预览版 SDK 构建的（即 targetSdkVersion 是字母，而非数字），您必须在 install 命令中添加 -t 选项才能安装测试版 APK。
 
-
 adb install path/to/your_app.apk
-
 
 您构建的所有 APK 都保存在 project_name/module_name/build/outputs/apk/ 中。
 
