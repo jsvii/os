@@ -1,0 +1,67 @@
+* read
+
+read是一个重要的Bash命令，它用于从键盘或标准输入中读取文本。
+
+
+-a 后跟一个变量，该变量会被认为是个数组，然后给其赋值，默认是以空格为分割符。
+-d 后面跟一个标志符，其实只有其后的第一个字符有用，作为结束的标志。
+-p 后面跟提示信息，即在输入前打印提示信息。
+-e 在输入的时候可以使用命令补全功能。
+-n 后跟一个数字，定义输入文本的长度，很实用。
+-r 屏蔽\，如果没有该选项，则\作为一个转义字符，有的话 \就是个正常的字符了。
+-s 安静模式，在输入字符时不再屏幕上显示，例如login时输入密码。
+-t 后面跟秒数，定义输入字符的等待时间。
+-u 后面跟fd，从文件描述符中读入，该文件描述符可以是exec新开启的。
+
+** 不使用回车键来读取n 个字符
+
+
+*** 下面的语句从输入中读取n个字符并存入变量variable_name：
+
+read -n number_of_chars variable_name
+
+例如：
+$ read -n 2 var
+$ echo $var
+
+
+用无回显的方式读取密码：
+
+read -s var
+
+*** 显示提示信息：
+read -p "Enter input:" var
+
+***  在特定时限内读取输入：
+
+read -t timeout var
+例如：
+$ read -t 2 var
+#在2秒内将键入的字符串读入变量var
+
+*** 用特定的定界符作为输入行的结束：
+read -d delim_char var
+
+例如：
+$ read -d ":" var
+hello:#var 被设置为 hello
+
+
+*** 结合stdin，巧妙运用while语句和子shell
+
+$ cat files.txt | ( while read arg; do cat $arg; done )
+# 等同于cat files.txt | xargs -I {} cat {}
+
+
+
+#+BEGIN_SRC bash
+# Printf '%s\n' "$var" is necessary because printf '%s' "$var" on a
+# variable that doesn't end with a newline then the while loop will
+# completely miss the last line of the variable.
+while IFS= read -r line
+do
+   echo "$line"
+done < <(printf '%s\n' "$var")
+#+END_SRC
+
+https://unix.stackexchange.com/questions/9784/how-can-i-read-line-by-line-from-a-variable-in-bash

@@ -1,6 +1,8 @@
 #+TITLE: Build-in-Commands
 
-* list
+https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html
+
+* 概览
 
 ~:~ colon.org
 
