@@ -1,0 +1,19 @@
+* 参考资料
+
+** linux kernel
+
+  https://makelinux.github.io/kernel/map/
+
+
+** 网络相关
+
+  - route policy的资料  http://www.policyrouting.org/PolicyRoutingBook/ONLINE/TOC.html
+
+** linux学习
+
+  - http://linux.vbird.org/
+
+  - https://jvns.ca/ Julia Evans博客
+
+
+  - Linux 开发者大会文档 https://github.com/meission/ckernel

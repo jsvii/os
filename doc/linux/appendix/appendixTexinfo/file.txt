@@ -1,2 +1,0 @@
-https://www.gnu.org/software/texinfo/manual/texinfo/texinfo.texi.tar.gz
-https://www.gnu.org/software/autoconf/manual/autoconf-2.68/autoconf.texi.tar.gz

@@ -1,5 +1,0 @@
-* pacman
-
-** Troubleshooting
-
-https://wiki.parabola.nu/Pacman_troubleshooting

@@ -1,0 +1,28 @@
+* login shell
+
+
+** login shell
+
+login shell是说在取得bash时需要完整的登陆流程。
+
+什么时候取得bash呢？当然就是用户登陆的时候。当你在tty1~tty6登陆，需要输入账号和密码，此时取得的bash就是login shell。
+
+那这个login shell具体会读那些配置文件呢？
+
+~etc/profile~ : 这是系统的整体设置， 如果你修改了这个文件，任何用户登陆时候都会按照你的修改改变，建议不要修改这个文件。每个用户登陆取得bash的时候都会读取这个文件，可以用vi来打开这个script读一下。根据你的UID读取PATH， MAIL， USER，LOGNAME, HOSTNAME, HISTSIZE等设置。然后设置你的umask的值，然后是读取 ~/etc/profile.d/*.sh~ 中的一系列文件。这个目录下主要规定了语系，颜色，vi的命令别名等，具体可以查看这个文件夹。
+
+有的说还会读取/etc/inputrc，/etc/sysconfig/i18n等，当然不同的系统配置当然不一样了，如果想深入学习的话可以读一下这个文件的shell，看一下具体都做了哪些问题。
+
+~~/.bash_profile~ 或 ~~/.bash_login~ 或 ~~/.profile~
+
+其实上边的这个三个文件只会读取一个的，如果存在~/.bash_profile就不会读取后两个; 如果不存在, 则读取~/.bash_login, 如果/.bash_login存在的话就不会读取/.profile； 如果/.bash_login不存在则读取/.profile。不同的系统，这三个文件的存在情况不一样。这三个文件属于用户个人偏好设置，如果你要配置个人的环境，就修改这里边就可以了。
+
+我们可以去读一下这三个文件看看帮我们干了些什么事情，我们用vi打开对应的shellscript， 发现其实只帮我们做了一下判断/.bashrc这个文件是不是存在，如果存在的话，读取这个文件。我们用vi打开/.bashrc, 在~/.bashrc中，也只帮我们做了一件事情就是判断/etc/bashrc是否存在，存在的话读取/etc/bashrc。然后我们去读一下/etc/bashrc中的shell源码，发现在/etc/bashrc中帮我们做了几件事情，设置umask，设置PS1（就是命令提示符前边的一部分字符的格式），读取/etc/profile.d/*.sh等。是不是和/etc/profile做的事情差不多。
+
+** non-login shell
+
+non-login shell就是取得bash不需要重复登录，就像你在桌面视图中用ctrl+alt+T启动的shell输入窗口就是non-login shell。还有就是你在shell窗口直接su切换的用户，都属于non-login shell。
+
+non-login shell只会读取~/.bashrc这个文件，具体步骤和上边一样。
+
+如果我们修改了我们的~/.bashrc如果想让配置立即生效，我们只需要用source命令。例如：$ source ~/.bashrc
