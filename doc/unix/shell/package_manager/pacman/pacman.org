@@ -1,5 +1,86 @@
 * pacman
 
+** 数据库
+
+~/var/lib/pacman/sync~
+
+
+** 常用操作示例
+
+- ~pacman -Syu~ 升级系统及所有已经安装的软件。
+
+- ~pacman -S 软件名~  安装软件。也可以同时安装多个包，只需以空格分隔包名即可。
+
+- ~pacman -Rs 软件名~ 删除软件，同时删除本机上只有该软件依赖的软件。
+
+- ~pacman -Ru 软件名~ 删除软件，同时删除不再被任何软件所需要的依赖。
+
+- ~pacman -Rcns 软件名~ 删除某软件，并删除其他任何依赖于此package的包(一些在低层库无法升级时使用)
+
+- ~pacman -Ssq 关键字~  在仓库中搜索含关键字的软件包，并用简洁方式显示。
+
+- ~pacman -Qs 关键字~ 搜索已安装的软件包。
+
+- ~pacman -Qi 软件名~ 查看某个软件包信息，显示软件简介,构架,依赖,大小等详细信息。
+
+- pacman -Sg: 列出软件仓库上所有的软件包组。
+
+- pacman -Sg 软件包组: 查看某软件包组所包含的所有软件包。
+
+- pacman -Sc：清理未安装的包文件，包文件位于 /var/cache/pacman/pkg/ 目录。
+
+- pacman -Scc：清理所有的缓存文件。
+
+** 操作及其选项
+
+1. ~-D, --database~ 在数据库上进行操作
+
+1. ~-Q, --query~ 在数据库上进行查询
+
+1. ~-R, --remove~ 在系统中删除包
+
+1. ~-S, --sync~ 同步packages 本地软件与远程同步
+
+1. ~-T, --deptest~
+
+1. ~-U, --upgrade~ 升级或添加packages
+
+1. ~-F, --files~
+
+1. ~-V, --version~
+
+1. ~-h, --help~
+
+
+*** -yy
+
+传两个yy 代码强制更新，即便已经是最新版的了。
+
+Passing two --refresh or -y flags will force a refresh of all
+           package databases, even if they appear to be
+           up-to-date.
+
+
+-y, --refresh
+           Download a fresh copy of the master package database from the
+           server(s) defined in pacman.conf(5). This should typically be used
+           each time you use --sysupgrade or -u. Passing two --refresh or -y
+           flags will force a refresh of all package databases, even if they
+           appear to be up-to-date.
+
+~-u, --upgrades~
+
+
+-U, --upgrade
+
+Upgrade or add package(s) to the system and install
+the required dependencies from sync repositories.
+Either a URL or file path can be specified. This is
+a “remove-then-add” process. See Upgrade Options
+below; also see Handling Config Files for an
+explanation on how pacman takes care of
+configuration files.
+
 
 Update package list
 sudo pacman -Syy
@@ -46,6 +127,11 @@ yaourt -Syua
 Get distro version
 lsb_release -a
 
+
+** 最佳实践
+
+- pacman -Syu
+           Update package list and upgrade all packages afterwards.
 
 
 
