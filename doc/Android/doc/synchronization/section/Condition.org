@@ -1,0 +1,44 @@
+* Condition
+
+#+BEGIN_SRC C
+class Condition {
+public:
+    enum {
+        PRIVATE = 0,
+        SHARED = 1
+    };
+
+    enum WakeUpType {
+        WAKE_UP_ONE = 0,
+        WAKE_UP_ALL = 1
+    };
+
+    Condition();
+    explicit Condition(int type);
+    ~Condition();
+    // Wait on the condition variable.  Lock the mutex before calling.
+    // Note that spurious wake-ups may happen.
+    status_t wait(Mutex& mutex);
+    // same with relative timeout
+    status_t waitRelative(Mutex& mutex, nsecs_t reltime);
+    // Signal the condition variable, allowing one thread to continue.
+    void signal();
+    // Signal the condition variable, allowing one or all threads to continue.
+    void signal(WakeUpType type) {
+        if (type == WAKE_UP_ONE) {
+            signal();
+        } else {
+            broadcast();
+        }
+    }
+    // Signal the condition variable, allowing all threads to continue.
+    void broadcast();
+
+private:
+#if !defined(_WIN32)
+    pthread_cond_t mCond;
+#else
+    void*   mState;
+#endif
+};
+#+END_SRC

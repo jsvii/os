@@ -1,0 +1,6 @@
+* mutex
+
+
+mutual exclusion object 互斥体。
+
+如果允许多个对象同时访问，那么称为 Counting Semaphores, 对于取值只能为0 或 1的semaphore，叫做binary Semaphores，这个与mutex具有相同的性质。

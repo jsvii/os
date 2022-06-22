@@ -28,3 +28,6 @@ electromagnetic shield  | Electromagnetic Susceptibility
 质量是随速度的增大而增大的，但是要质量有明显的增大，则要求速度接近于光速。
 
 正确的定律是：如果一个物体以小于每秒一百多千米的速率运动，其质量在百万分之一的精度内是不变的。在某种这样的近似形式下，这是一条正确的定律。因此
+
+
+https://github.com/balena-io/etcher

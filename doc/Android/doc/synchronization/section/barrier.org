@@ -1,0 +1,54 @@
+* barrier 栅栏
+
+  洗车开之前，先确认栅栏是开启的。
+
+  wait()
+
+
+
+
+#+BEGIN_SRC c
+#ifndef ANDROID_BARRIER_H
+#define ANDROID_BARRIER_H
+
+#include <stdint.h>
+#include <condition_variable>
+#include <mutex>
+
+namespace android {
+
+class Barrier
+{
+public:
+    // Release any threads waiting at the Barrier.
+    // Provides release semantics: preceding loads and stores will be visible
+    // to other threads before they wake up.
+    void open() {
+        std::lock_guard<std::mutex> lock(mMutex);
+        mIsOpen = true;
+        mCondition.notify_all();
+    }
+
+    // Reset the Barrier, so wait() will block until open() has been called.
+    void close() {
+        std::lock_guard<std::mutex> lock(mMutex);
+        mIsOpen = false;
+    }
+
+    // Wait until the Barrier is OPEN.
+    // Provides acquire semantics: no subsequent loads or stores will occur
+    // until wait() returns.
+    void wait() const {
+        std::unique_lock<std::mutex> lock(mMutex);
+        mCondition.wait(lock, [this]() NO_THREAD_SAFETY_ANALYSIS { return mIsOpen; });
+    }
+private:
+    mutable std::mutex mMutex;
+    mutable std::condition_variable mCondition;
+    int mIsOpen GUARDED_BY(mMutex){false};
+};
+
+}; // namespace android
+
+#endif // ANDROID_BARRIER_H
+#+END_SRC
