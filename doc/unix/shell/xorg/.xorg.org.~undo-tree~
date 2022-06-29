@@ -1,8 +1,0 @@
-(undo-tree-save-format-version . 1)
-"a70b29061eca319167289485a76e35e452f2c26b"
-[nil nil nil nil (25266 51178 613719 900000) 0 nil]
-([nil nil ((1 . 7) (t 25266 51178 451256 288000)) nil (25266 51190 184545 629000) 0 nil])
-([nil nil ((7 . 9)) nil (25266 51190 184543 255000) 0 nil])
-([nil nil ((nil rear-nonsticky nil 68 . 69) (nil fontified nil 9 . 69) (9 . 69)) nil (25266 51190 184540 880000) 0 nil])
-([nil current ((nil fontified t 69 . 70) (nil face org-link 69 . 70) (nil font-lock-multiline t 69 . 70) (69 . 70)) nil (25266 51190 184534 245000) 0 nil])
-nil

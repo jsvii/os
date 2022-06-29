@@ -1,4 +1,5 @@
 **/download/**
 ._*
-
+*.~undo-tree~
+**/**/*.~undo-tree~
 **/**/._*

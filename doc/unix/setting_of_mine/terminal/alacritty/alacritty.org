@@ -1,0 +1,6 @@
+* Alacritty
+
+
+** copy & paste
+
+The vi mode allows moving around Alacritty's viewport and scrollback using the keyboard. By default you can toggle it using Ctrl+Shift+Space. To copy, you can either use a mouse to select and press Ctrl+Shift+c, or enter Vi mode, start a selection using v, move around with hjkl like in vim, and copy the selection with y. To paste, press Ctrl+Shift+v. To copy/paste to/from X clipboard, you can use a mouse selection to copy and a middle mouse click to paste.

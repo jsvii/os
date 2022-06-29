@@ -1,0 +1,10 @@
+* alacritty.yml说明
+
+** 以login shell来执行command
+
+#+BEGIN_SRC conf
+shell:
+  program: /usr/bin/zsh
+  args:
+    - --login
+#+END_SRC
