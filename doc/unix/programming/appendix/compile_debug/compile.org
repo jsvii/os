@@ -2,24 +2,115 @@
 
 ** ref
 
-1. https://github.com/g0dA/linuxStack/blob/master/linux%E5%86%85%E6%A0%B8%E8%B0%83%E8%AF%95.md
+1. https://www.kernel.org/doc/
 
-1. https://blog.csdn.net/jasonLee_lijiaqi/article/details/80967912
+1. https://github.com/g0dA/linuxStack/blob/master/linux%E5%86%85%E6%A0%B8%E8%B0%83%E8%AF%95.md +  https://blog.csdn.net/jasonLee_lijiaqi/article/details/80967912
 
 1. https://ops.tips/notes/booting-linux-on-qemu/
 
 1. https://www.zachpfeffer.com/single-post/build-the-linux-kernel-and-busybox-and-run-on-qemu
 
-** 准备
-
-busybox
+** 编译busybox
 
 
-** 说明
+#+BEGIN_SRC bash
+  make defconfig
+
+  make menuconfig
+
+  make install
+#+END_SRC
+
+menuconfig时选择 ~Busybox Settings  --->  Press the down arrow until you hit Build BusyBox as a static binary (no shared libs).~
+
+make install 会生成 ~_install~ 文件夹
+
+
+
+*** 在 _install 文件夹下添加目录文件
+
+添加更多目录
+
+#+BEGIN_SRC bash
+  mkdir -p {bin,sbin,etc,proc,sys,usr/{bin,sbin}}
+#+END_SRC
+
+#+BEGIN_SRC txt
+  - ramdisk
+    + bin
+    + etc
+    + proc
+    + sbin
+    + sys
+    + usr
+     init
+     linuxrc
+#+END_SRC
+
+*** init
+
+#+BEGIN_SRC bash
+  ln -s bin/busybox init
+#+END_SRC
+
+~etc/inittab~ 文件
+
+#+BEGIN_SRC bash
+::sysinit:/etc/init.d/rcS
+::askfirst:-/bin/sh
+::restart:/sbin/init
+::ctrlaltdel:/sbin/reboot
+::shutdown:/bin/umount
+::shutdown:/sbin/swapoff
+#+END_SRC
+
+
+~etc/init.d/rcS~ 文件
+
+#+BEGIN_SRC bash
+#!/bin/sh
+
+mount proc
+mount -o remount,rw /
+mount -a
+clear
+echo "My Tiny Linux Start :D ......"
+#+END_SRC
+
+
+~/etc/fstab~
+
+#+BEGIN_SRC bash
+proc       /proc       proc       defaults          0    0
+sysfs      /sys        sysfs      defaults          0    0
+devtmpfs   /dev        devtmpfs   defaults          0    0
+#!/bin/sh
+
+#+BEGIN_SRC bash
+#!/bin/sh
+
+mount -t proc none /proc
+mount -t sysfs none /sys
+
+echo -e "\nBoot took $(cut -d' ' -f1 /proc/uptime) seconds\n"
+
+exec /bin/sh
+#+END_SRC
+
+*** initramfs.gz 文件生成
+
+#+BEGIN_SRC bash
+find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../initramfs.gz
+#+END_SRC
+
+** 编译linux
+
+
+*** 说明
 
 1. vmlinux  编译出来的最原始的内核文件，未压缩。
 
-1.zImage   是vmlinux经过gzip压缩后的文件。
+1. zImage   是vmlinux经过gzip压缩后的文件。
 
 1. bzImage bz表示“big zImage”，不是用bzip2压缩的。两者的不同之处在于，zImage解压缩内核到低端内存(第一个640K)，bzImage解压缩内核到高端内存(1M以上)。如果内核比较小，那么采用zImage或bzImage都行，如果比较大应该用bzImage。
 
@@ -29,43 +120,13 @@ busybox
 
 1. initrd   是“initial ramdisk”的简写。一般被用来临时的引导硬件到实际内核vmlinuz能够接管并继续引导的状态。
 
-** download
 
-
-cp -v /boot/config-$(uname -r) .config
-
-
-** make
+*** make
 
 make menuconfig
 
-下面是打开的配置界面。可以看出里面包含所有的内核组件，包括文件系统，网络，IO栈，虚拟化和设备驱动等等。如果你不熟悉，可以不做任何修改。
 
 make -j 10
-
-
-
-busybox的作用就是生成一个简单的根文件系统
-
-下载源码后执行：
-
-make defconfig
-make menuconfig
-设置下配置，采用静态编译的方式，否则程序运行期间会动态加载库文件。
-
--> Busybox Setting -> Build Options
-[*] Build BusyBox as a static binary (no shared libs)
-保存后可以再确认下，出现的是CONFIG_STATIC=y则没什么问题了
-
-cat .config| grep STATIC
-接着就开始编译安装
-
-make
-make install
-文件都会生成到_install文件夹下，后面的内容借鉴下QEMU+gdb调试Linux内核全过程，生成initramfs.img留备用
-
-内核
-内核的编译主要得开启CONFIG_DEBUG_INFO(有CONFIG_GDB_SCRIPTS就也开启，没有就算)
 
 Kernel hacking -->
   [*] Kernel debug
@@ -73,17 +134,25 @@ Kernel hacking -->
 
 
 Kernel hacking -->
-
   [*] compile the kernel with frame pointers
 
 
 Kernel hacking -->
   [*] KGDB: kernel debugging with remote gdb
+
 这样可以看一下.config中是否为CONFIG_DEBUG_INFO=y和CONFIG_FRAME_POINTER=y，之后编译安装内核，会用到生成的arch/x86_64/boot/bzImage
 
 要注意只设置上面两个，其余全都不选择，否则会出现断点没拦截的情况，也可以尝试取消Write protect kernel read-only data structures这个选项，不过没有实验过，还有b start_kernel的问题，这个参照下硬件断点
 
-调试
+*** 启动
+
+#+BEGIN_SRC bash
+qemu-system-x86_64 -kernel ./arch/x86/boot/bzImage -initrd initramfs.gz -nographic -append "init=/bin/sh earlyprintk=serial,ttyS0 console=ttyS0"
+#+END_SRC
+
+
+*** 调试
+
 GEF插件
 
 执行命令先把内核运行起来：

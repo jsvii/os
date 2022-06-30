@@ -11,6 +11,8 @@
 
 ** linux学习
 
+  - linux from scratch https://lfs.xry111.site/zh_CN/11.1/
+
   - http://linux.vbird.org/
 
   - https://jvns.ca/ Julia Evans博客

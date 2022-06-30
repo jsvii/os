@@ -22,7 +22,7 @@ The first sample program has some logical errors. The program is supposed to out
 + (X^2)/2! + (X^3)/3! + (X^4)/4! + ... + (X^n)/n!, given x and n as inputs. However the program outputs a value of
 infinity, regardless of the inputs. We will take you step by step through the debugging process and trace the errors:
 
-1. Download the sample program broken.cpp
+**** 1. Download the sample program broken.cpp
 
 #+BEGIN_SRC cpp
 #include <iostream>
@@ -76,22 +76,32 @@ int main() {
 #+END_SRC
 
 
-2. Compile the program and execute the program.
+**** 2. Compile the program and execute the program.
 
+#+BEGIN_SRC shell
 % g++ -g broken.cpp -o broken
 % ./broken
 Whatever the input, the output will be inf. The -g option is important because it enables meaningful GDB debugging.
-3 Start the debugger
+#+END_SRC
 
+**** 3 Start the debugger
+
+#+BEGIN_SRC shell
 % gdb broken
-This only starts the debugger; it does not start running the program in the debugger.
-4 Look at the source code and set a breakpoint at line 43
+# This only starts the debugger; it does not start running the program in the debugger.
+#+END_SRC
 
-(gdb) b 43
-which is
+**** 4. Look at the source code and set a breakpoint at line 43
 
-double seriesValue = ComputeSeriesValue(x, n);
-5 Now, we start to run the program in the debugger.
+#+BEGIN_SRC shell
+  (gdb) b 43
+  which is
+  double seriesValue = ComputeSeriesValue(x, n);
+#+END_SRC
+
+
+
+*** 5 Now, we start to run the program in the debugger.
 
 (gdb) run
 Note: If you need to supply the command-line arguments for the execution of the program, simply include them after the
