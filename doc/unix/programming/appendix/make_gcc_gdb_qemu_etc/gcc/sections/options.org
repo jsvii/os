@@ -1,0 +1,116 @@
+* 选项
+
+** gcc的不同阶段
+
+#+BEGIN_SRC sh
+gcc -E  --> Preprocessor, but don't compile 预处理
+gcc -S  --> Compile but don't assemble 生成intel或att汇编语言
+gcc -c  --> assemble but don't link  编译，但不链接
+gcc with no switch will link your object files and generate the executable gcc  直接gcc就可以链接了
+#+END_SRC
+
+** 选项说明
+
+*** 预编译相关
+
+-E 可以使用 -E 选项来只运行预处理器：
+
+*** 编译相关
+
+-O (大写的o)选项来控制 gcc 优化的程度。通常，它执行非常细微的优化，可以使调试更
+加容易。 -O1 选项会开启最为普通和安全的优化。更高的数值开启需要长时间编译的高级优
+化。
+
+-S =-c= 选项类似。 =-S= 告诉 =gcc= 编译程序并生成汇编代码，它通常为机器代码的可读形式。
+
+-c 选项告诉 gcc 编译程序并生成机器码，但是不链接它们或生成可执行文件
+
+*** link相关
+
+
+** 选项概览
+
+参见于 gcc manual 中 GCC command options这一节
+
+
+
+** 开发者选项
+
+*** =-print-file-name=library= 
+
+用于打印某个库（这个库link时会被使用）完整的路径地址
+
+#+BEGIN_SRC sh
+gcc -print-file-name=libc.so
+#+END_SRC
+
+
+*** =-print-prog-name=program=
+
+用于打印一个程序的绝对地址，这个程序是GCC内部所使用的。
+
+#+BEGIN_SRC sh
+gcc -print-file-name=cc1
+gcc -print-file-name=f771
+#+END_SRC
+
+** C Options
+
+*** -rdynamic
+
+原文：
+
+Pass the flag ‘-export-dynamic’ to the ELF linker, on targets that support it. This instructs the linker to add all symbols, not only used ones, to the dynamic symbol table. This option is needed for some uses of dlopen or to allow obtaining backtraces from within a program.
+
+要求linker 加入文件中所有的symbol，而非那些用到的。
+
+** Debugging 
+
+-g
+
+Produce debugging information in the operating system’s native format (stabs, COFF, XCOFF, or DWARF). GDB can work with this debugging information. On most systems that use stabs format, ‘-g’ enables use of extra debugging information that only GDB can use; this extra information makes debugging work better in GDB but probably makes other debuggers crash or refuse to read the program. If you want to control for certain whether to generate the extra information, use ‘-gstabs+’, ‘-gstabs’, ‘-gxcoff+’, ‘-gxcoff’, or ‘-gvms’ (see
+below).
+
+** Optimization 优化
+
+-O 优化
+
+With ‘-O’, the compiler tries to reduce code size and execution time, without performing any optimizations that take a great deal of compilation time.
+
+有以下优化
+
+  - O0
+  - O1
+  - O2
+  - O3
+  - Os
+  - Ofast
+  - Og
+
+** Directory
+
+-I dir 
+-iquote dir
+-isystem dir
+-idirafter dir
+
+非常重要的选项，指定了headers的路径
+
+Add the directory dir to the list of directories to be searched for header files during preprocessing. If dir begins with ‘=’ or $SYSROOT, then the ‘=’ or $SYSROOT is replaced by the sysroot prefix; see ‘--sysroot’ and ‘-isysroot’. Directories specified with ‘-iquote’ apply only to the quote form of the directive, #include "file". Directories specified with ‘-I’, ‘-isystem’, or ‘-idirafter’ apply to lookup for both the #include "file" and #include <file> directives.
+
+** preprocessor
+
+-M 用于指出header files的路径，经常会用到
+
+Instead of outputting the result of preprocessing, output a rule suitable for make describing the dependencies of the main source file. The preprocessor outputs one make rule containing the object file name for that source file, a colon, and the names of all the included files, including those coming from ‘-include’ or ‘-imacros’ command-line options.
+
+Unless specified explicitly (with ‘-MT’ or ‘-MQ’), the object file name consists of the name of the source file with any suffix replaced with object file suffix and with any leading directory parts removed. If there are many included files then the rule is split into several lines using ‘\’-newline. The rule has no commands. This option does not suppress the preprocessor’s debug output, such as ‘-dM’. To avoid mixing such debug output with the dependency rules you should explicitly specify the dependency output file with ‘-MF’, or use an environment variable like DEPENDENCIES_OUTPUT (see Section 3.20 [Environment Variables], page 422). Debug output is still sent to the regular output stream as normal. Passing ‘-M’ to the driver implies ‘-E’, and suppresses warnings with an implicit ‘-w’.
+
+
+
+** 案例
+
+*** node.js 中 gcc  编译 eio
+
+/usr/bin/gcc -rdynamic -D_GNU_SOURCE -DHAVE_CONFIG_H=1 -DEV_MULTIPLICITY=0 -pthread -DX_STACKSIZE=65536 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DPLATFORM=linux -DNDEBUG -g -O3 -Idefault/deps/libeio -I../deps/libeio -Idefault -I.. ../deps/libeio/eio.c -c -o default/deps/libeio/eio_1.o
+

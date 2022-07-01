@@ -1,0 +1,5 @@
+* make cheatsheet
+
+uglify = $(uglify)        # lazy assignment
+compressor := $(uglify)   # immediate assignment
+prefix ?= /usr/local      # safe assignment

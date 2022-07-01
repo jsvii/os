@@ -3,3 +3,36 @@
   - semaphore
 
   - mutex
+
+
+** 控制机制
+
+锁与进程问通信
+
+竞态条件：几个进程在访问资源时彼此干扰被称为竞态条件（race condition）
+
+进程执行在不应该中断的地方被中断，所以进程工作得不正确。
+
+因为设置了临界区（critical section）方案，即只允许一个进程进入此区域，进入后不允许其他进程进入。
+
+*** linux内核锁机制
+
+1.
+
+#+BEGIN_SRC C
+typedef struct {
+        int counter;
+} atomic_t;
+#+END_SRC
+
+
+1. 自旋锁
+
+#+BEGIN_SRC C
+typedef struct spinlock {
+        struct rt_mutex_base	lock;
+#ifdef CONFIG_DEBUG_LOCK_ALLOC
+        struct lockdep_map	dep_map;
+#endif
+} spinlock_t;
+#+END_SRC

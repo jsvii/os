@@ -123,26 +123,65 @@ find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../initramfs.gz
 
 *** make
 
+#+BEGIN_SRC bash
+make defconfig
+
 make menuconfig
 
+make -j10
+#+END_SRC
 
-make -j 10
-
-Kernel hacking -->
-  [*] Kernel debug
-  [*] Compile the kernel with debug info
-
-
-Kernel hacking -->
-  [*] compile the kernel with frame pointers
+#+BEGIN_SRC conf
+# menuconfig时，找不到选项时，直接按 / ，进行搜索，有详细信息
+  CONFIG_GDB_SCRIPTS=y
+  CONFIG_DEBUG_INFO=y
+  CONFIG_FRAME_POINTER=y
+  #CONFIG_DEBUG_INFO_REDUCED 不开
+#+END_SRC
 
 
-Kernel hacking -->
-  [*] KGDB: kernel debugging with remote gdb
 
-这样可以看一下.config中是否为CONFIG_DEBUG_INFO=y和CONFIG_FRAME_POINTER=y，之后编译安装内核，会用到生成的arch/x86_64/boot/bzImage
 
-要注意只设置上面两个，其余全都不选择，否则会出现断点没拦截的情况，也可以尝试取消Write protect kernel read-only data structures这个选项，不过没有实验过，还有b start_kernel的问题，这个参照下硬件断点
+1. CONFIG_DEBUG_INFO 只要修改
+#+BEGIN_SRC txt
+Main menu
+  -> Kernel hacking
+    -> Compile-time checks and compiler options
+      Debug Information
+         Generate DWARF Version 5 debuginfo
+#+END_SRC
+
+1. ~CONFIG_RANDOMIZE_BASE~ =n
+#+BEGIN_SRC txt
+Main menu
+  │       -> Processor type and features
+  │ (1)     -> Build a relocatable kernel (RELOCATABLE [=y]
+  │        [ ]   Randomize the address of the kernel image (KASLR) # 不选
+#+END_SRC
+
+1. CONFIG_FRAME_POINTER 比较麻烦
+
+   不是说明上介绍的那样，而是在
+
+#+BEGIN_SRC txt
+ Symbol: UNWINDER_FRAME_POINTER [=y]
+  │ Type  : bool
+  │ Defined at arch/x86/Kconfig.debug:252
+  │   Prompt: Frame pointer unwinder
+  │   Depends on: <choice>
+  │   Location:
+  │     Main menu
+  │       -> Kernel hacking
+  │         -> x86 Debugging
+  │ (3)       -> Choose kernel unwinder (<choice> [=y])
+  │ Selects: FRAME_POINTER [=y]
+#+END_SRC
+
+*** menuconfig 说明
+
+1. 按 ~/~ 进行配置项搜索
+
+1. 搜索出结果后，可以看到 ~(1)、（2）~ 这样的数字，按 u 加数字，可以跳到结果中对应的位置
 
 *** 启动
 
@@ -150,6 +189,19 @@ Kernel hacking -->
 qemu-system-x86_64 -kernel ./arch/x86/boot/bzImage -initrd initramfs.gz -nographic -append "init=/bin/sh earlyprintk=serial,ttyS0 console=ttyS0"
 #+END_SRC
 
+
+发生错误：
+#+BEGIN_SRC bash
+(gdb) lx-symbols
+loading vmlinux
+Python Exception <class 'gdb.MemoryError'>: Cannot access memory at address 0xffffffff8293b900
+Error occurred in Python: Cannot access memory at address 0xffffffff8293b900
+(gdb) exit
+#+END_SRC
+
+参考： https://blog.csdn.net/nust20/article/details/96493101
+
+CONFIG_RANDOMIZE_BASE= 关闭 似乎没有作用
 
 *** 调试
 

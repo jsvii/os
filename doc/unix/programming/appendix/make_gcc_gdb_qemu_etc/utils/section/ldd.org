@@ -1,0 +1,91 @@
+* ldd
+
+显示二进度文件启动时需要静态加载的动态库的完整列表。
+
+#+BEGIN_SRC sh
+$ ldd /bin/ls
+        linux-vdso.so.1 (0x00007ffcc3563000)
+        libselinux.so.1 => /lib64/libselinux.so.1 (0x00007f87e5459000)
+        libcap.so.2 => /lib64/libcap.so.2 (0x00007f87e5254000)
+        libc.so.6 => /lib64/libc.so.6 (0x00007f87e4e92000)
+        libpcre.so.1 => /lib64/libpcre.so.1 (0x00007f87e4c22000)
+        libdl.so.2 => /lib64/libdl.so.2 (0x00007f87e4a1e000)
+        /lib64/ld-linux-x86-64.so.2 (0x00005574bf12e000)
+        libattr.so.1 => /lib64/libattr.so.1 (0x00007f87e4817000)
+        libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f87e45fa000)
+#+END_SRC
+
+** 原理
+
+   链接器会直接将依赖项的列表（不能就是在构建过程中，链接器命令行所指定的那些动态库）写入二进制文件的ELF格式字段之中。
+
+
+*** 无法识别dlopen函数库
+
+*** 安全问题
+
+   一些环境中的某些版本的ldd是尝试执行程序来获取依赖信息，因此会有隐患。这时候你应该使用objectdump。
+
+** option
+
+   -u, --unused Print unused direct dependencies.  (Since glibc 2.3.4.)
+
+   -d, --data-relocs
+          Perform relocations and report any missing objects (ELF only).
+
+   -r, --function-relocs
+          Perform relocations for both data objects and functions, and report any missing objects or functions (ELF only).
+
+
+** stackoverflow 中关于 unused direct dependencies的解释
+
+They are dependencies because the binary lists them as dependencies, as “NEEDED” entries in its dynamic section:
+这些库在dynamic section中被指明必须要有，但实际过程中却，没有用到他们库中所要的依赖。
+
+#+BEGIN_SRC sh
+readelf -d /usr/bin/gcc
+will show you the libraries gcc requests.
+#+END_SRC
+
+They are unused because gcc doesn’t actually need any of the symbols exported by the libraries in question. In ld-linux-x86-64.so.2’s case, that’s normal, because that’s the interpreter. In libm’s case, that usually results from an unconditional -lm, without corresponding linker options to drop unused libraries.
+
+In many cases this results from the limited granularity of build tools; in particular, linking e.g. GNOME libraries tends to result in long lists of libraries, which aren’t always all needed as direct dependencies (but end up in the tree of library dependencies anyway). It’s usually better to try to avoid having unused dependencies, to simplify dependency processing (both by the runtime linker, and by package management tools). It’s safe to ignore libm though since that’s tied to libc anyway.
+
+** 注意点
+
+       In the usual case, ldd invokes the standard dynamic linker (see ld.so(8)) with the LD_TRACE_LOADED_OBJECTS environment  variable  set  to  1.   This  causes  the
+       dynamic  linker  to  inspect  the program's dynamic dependencies, and find (according to the rules described in ld.so(8)) and load the objects that satisfy those
+       dependencies.  For each dependency, ldd displays the location of the matching object and the (hexadecimal) address at which it is loaded.   (The  linux-vdso  and
+       ld-linux shared dependencies are special; see vdso(7) and ld.so(8).)
+
+       Thus, you should never employ ldd on an untrusted executable, since this may result in the execution of arbitrary code.  A safer alternative  when  dealing  with
+       untrusted executables is:
+
+           $ objdump -p /path/to/program | grep NEEDED
+
+       Note, however, that this alternative shows only the direct dependencies of the executable, while ldd shows the entire dependency tree of the executable.
+
+OPTIONS
+       --version
+              Print the version number of ldd.
+
+
+      -v, --verbose
+              Print all information, including, for example, symbol versioning information.
+
+       -u, --unused
+              Print unused direct dependencies.  (Since glibc 2.3.4.)
+
+       -d, --data-relocs
+              Perform relocations and report any missing objects (ELF only).
+
+       -r, --function-relocs
+              Perform relocations for both data objects and functions, and report any missing objects or functions (ELF only).
+
+       --help Usage information.
+
+BUGS
+       ldd does not work on a.out shared libraries.
+
+       ldd  does not work with some extremely old a.out programs which were built before ldd support was added to the compiler releases.  If you use ldd on one of these
+       programs, the program will attempt to run with argc = 0 and the results will be unpredictable.
