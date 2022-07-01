@@ -1,7 +1,0 @@
-* nm
-nm UNIX命令可以读取目标文件并生成关于它所定义和所使用的名称的信息
-
-```
-gcc hello.c -c
-nm hello.o
-```
