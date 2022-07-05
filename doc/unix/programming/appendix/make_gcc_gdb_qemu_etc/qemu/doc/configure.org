@@ -1,0 +1,45 @@
+* configure
+
+
+qemu支持不同的平台，比如qemu-system-arm命令、qemu-system-mips命令等，不同的qemu命令，可以仿真不同架构的CPU。
+qemu同时也支持很多参数，用来描述仿真的开发板参数，不同的qemu参数，可以指定开发板的不同配置。
+
+以仿真的ARM平台vexpress为例，qemu-system-arm各个参数的使用示例及说明如下：
+
+** 参数
+
+-M vexpress-a9	指定要仿真的开发板：vexpress-a9
+
+-m 512M	指定DRAM内存大小为512MB
+
+-cpu cortex-a9	指定CPU架构
+
+-smp n	CPU的个数，不设置的话，默认是1
+
+-kernel ./zImage	要运行的镜像
+
+-dtb ./vexpress-vap-ca9.dtb	要加载的设备树文件
+
+-append cmdline	设置Linux内核命令行、启动参数
+
+-initrd file	使用file文件作为初始化ram disk
+
+-nographic	非图形化启动，使用串口作为控制台
+
+-sd rootfs.ext3	使用rootfs.ext3作为SD卡镜像文件
+
+-net nic	创建一个网卡
+
+-net nic -net tap	将开发板网卡和主机网卡建立桥接(Bridge)
+
+-mtdblock file	使用file作为片上Flash镜像文件
+
+-cdrom file	使用file作为CDROM镜像文件
+
+-display vnc= display	设置显示后端类型
+
+-vnc display	-display vnc=的简写形式
+
+-display none	默认：-vnc localhost:0,to=99,id=default
+
+-boot a c d n	a从floppy启动，c从光盘，d从硬盘，n从网络启动

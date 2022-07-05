@@ -155,6 +155,22 @@ $ gdb        use file command to load object
 (gdb) info history     print value history (gdb 3.5)
 #+END_SRC
 
+
+x/NFU/ Addr Addr为希望显示的地址， N为重复的次数，F为前面讲过的格式（x d u o t a c f s i)
+
+U代表为单位
+
+b 字节
+
+h 半字
+w 字（4字节）也是默认值
+g 双字
+
+
+#+BEGIN_SRC bash
+(gdb) x/10i $pc  显示PC所指地址开始的10条指令（i)
+#+END_SRC
+
 ** Object File manipulation
 
 #+BEGIN_SRC bash

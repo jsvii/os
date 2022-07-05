@@ -186,7 +186,7 @@ Main menu
 *** 启动
 
 #+BEGIN_SRC bash
-qemu-system-x86_64 -kernel ./arch/x86/boot/bzImage -initrd initramfs.gz -nographic -append "init=/bin/sh earlyprintk=serial,ttyS0 console=ttyS0"
+qemu-system-x86_64 -kernel ./arch/x86/boot/bzImage -initrd initramfs.gz -nographic -append "init=/bin/sh earlyprintk=serial,ttyS0 console=ttyS0 nokaslr" -S -s
 #+END_SRC
 
 
@@ -201,7 +201,7 @@ Error occurred in Python: Cannot access memory at address 0xffffffff8293b900
 
 参考： https://blog.csdn.net/nust20/article/details/96493101
 
-CONFIG_RANDOMIZE_BASE= 关闭 似乎没有作用
+CONFIG_RANDOMIZE_BASE=  似乎没有作用
 
 *** 调试
 
@@ -214,7 +214,7 @@ qemu-system-i386 -kernel /usr/src/linux-2.6.32.1/arch/x86/boot/bzImage -initrd i
 
 gdb vmlinux
 (gdb)target remote:1234
-(gdb)b cmdline_proc_show   //下个测试断点
+(gdb)b start_kernel   //下个测试断点
 (gdb)c
 此时在qemu中执行cat /proc/cmdline即可看到断点信息
 

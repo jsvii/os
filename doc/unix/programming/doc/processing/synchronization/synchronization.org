@@ -36,3 +36,35 @@ typedef struct spinlock {
 #endif
 } spinlock_t;
 #+END_SRC
+
+1. 实时互斥量
+
+ 在编译内核时，启动CONFIG_RT_MUTEX来启动
+
+互斥量继承了进程的优先级
+
+
+
+
+1. percpu_counter
+
+#+BEGIN_SRC C
+struct percpu_counter {
+        raw_spinlock_t lock;
+        s64 count;
+#ifdef CONFIG_HOTPLUG_CPU
+        struct list_head list;	/* All percpu_counters are on a list */
+#endif
+        s32 __percpu *counters;
+};
+#+END_SRC
+
+问题：
+
+系统中有大量CPU，但只有一个CPU可以修改其值，那么就会影响性能了。
+
+而有些场景，没必要了解其准确的数值
+
+核心思想：
+
+1. 计数器的准备值存储在内存某处，准确值所在内存位置后是一个数组，每个数组项对应着一个CPU
