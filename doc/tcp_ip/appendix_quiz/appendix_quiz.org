@@ -1,7 +1,0 @@
-* quiz
-
-- mac_truth 为什么要有mac address
-
-- three_way_handshake 为什么要三次挥手
-
-- three_way_handshakes_and_four_way_handshakes 三次握手、四次挥手

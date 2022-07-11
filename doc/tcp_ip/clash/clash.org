@@ -1,3 +1,0 @@
-* clash 规则
-
-https://docs.cfw.lbyczf.com/contents/ui/profiles/rules.html

@@ -1,4 +1,0 @@
-* http headers
-
-
-** X-Forwarded-Host

@@ -1,6 +1,0 @@
-* CORS
-
-#+BEGIN_SRC bash
-Access-Control-Allow-Origin:
-
-#+END_SRC
