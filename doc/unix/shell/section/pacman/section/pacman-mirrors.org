@@ -1,5 +1,7 @@
 * pacman-mirrors
 
+pacman-mirrors -i -c China -m rank
+
 
 -i, --interactive     Generate custom mirrorlist
 
