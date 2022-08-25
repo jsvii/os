@@ -8,8 +8,10 @@ variables affecting bash script behavior
 
 the path to the Bash binary itself
 
-bash$ echo $BASH
+#+BEGIN_SRC bash
+#$ echo $BASH
 /bin/bash
+#+END_SRC
 
 
 *** $BASH_ENV
@@ -71,8 +73,10 @@ Caution
 The $EUID is not necessarily the same as the $UID.
 
 *** $FUNCNAME
+
 name of the current function
 
+#+BEGIN_SRC bash
 xyz23 ()
 {
   echo "$FUNCNAME now executing."  # xyz23 now executing.
@@ -82,10 +86,15 @@ xyz23
 
 echo "FUNCNAME = $FUNCNAME"        # FUNCNAME =
                                    # Null value outside a function.
-$GLOBIGNORE
+#+END_SRC
+
+
+** $GLOBIGNORE
+
 A list of filename patterns to be excluded from matching in globbing.
 
-$GROUPS
+** $GROUPS
+
 groups current user belongs to
 
 This is a listing (array) of the group id numbers for current user, as recorded in /etc/passwd.
@@ -93,21 +102,22 @@ This is a listing (array) of the group id numbers for current user, as recorded 
 root# echo $GROUPS
 0
 
-
 root# echo ${GROUPS[1]}
 1
-
 
 root# echo ${GROUPS[5]}
 6
 
-$HOME
+** $HOME
+
 home directory of the user, usually /home/username (see Example 9-14)
 
-$HOSTNAME
+** $HOSTNAME
+
 The hostname command assigns the system name at bootup in an init script. However, the gethostname() function sets the Bash internal variable $HOSTNAME. See also Example 9-14.
 
-$HOSTTYPE
+** $HOSTTYPE
+
 host type
 
 Like $MACHTYPE, identifies the system hardware.
@@ -121,14 +131,37 @@ internal field separator
 
 This variable determines how Bash recognizes fields, or word boundaries when it interprets character strings.
 
+Shell 的环境变量分为 set, env 两种。
+
+其中 set 变量可以通过 export 工具导入到 env 变量中。其中，set是显示设置shell变量，仅在本 shell 中有效；env 是显示设置用户环境变量 ，仅在当前会话中有效。换句话说，set 变量里包含了 env 变量，但 set 变量不一定都是 env 变量。这两种变量不同之处在于变量的作用域不同。显然，env 变量的作用域要大些，它可以在 subshell 中使用。
+
+而 IFS 是一种 set 变量，当 shell 处理"命令替换"和"参数替换"时，shell 根据 IFS 的值，默认是 space, tab, newline 来拆解读入的变量，然后对特殊字符进行处理，最后重新组合赋值给该变量。
+
+————————————————
+
+
+
+#+BEGIN_SRC bash
+bash$ echo $IFS
+
+# 没有输出
+
+bash$ echo $IFS  | od -b
+0000000 012
+0000001
+#+END_SRC
+
 $IFS defaults to whitespace (space, tab, and newline), but may be changed, for example, to parse a comma-separated data file. Note that $* uses the first character held in $IFS. See Example 5-1.
 
+
+
+#+BEGIN_SRC bash
 bash$ echo $IFS | cat -vte
 $
 
-
 bash$ bash -c 'set w x y z; IFS=":-;"; echo "$*"'
 w:x:y:z
+#+END_SRC
 
 Caution
 $IFS does not handle whitespace the same as it does other characters.
@@ -942,5 +975,6 @@ echo $_              # :
 $?
 Exit status of a command, function, or the script itself (see Example 23-7)
 
-$$
+** $$
+
 Process ID of the script itself. The $$ variable often finds use in scripts to construct "unique" temp file names (see Example A-13, Example 29-6, Example 12-28, and Example 11-25). This is usually simpler than invoking mktemp.

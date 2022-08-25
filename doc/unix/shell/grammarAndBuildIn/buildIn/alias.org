@@ -8,7 +8,7 @@ e() { emacs "$@" & }
 
 ** alias 实践
 
-不要不要做成不同的命令，用相同的命令来代替
+不要做成不同的命令，用相同的命令来代替
 
 #+BEGIN_SRC bash
 display() { /usr/bin/display "$@" & }
