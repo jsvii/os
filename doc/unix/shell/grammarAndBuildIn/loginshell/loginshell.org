@@ -1,6 +1,5 @@
 * login shell
 
-
 ** login shell
 
 login shell是说在取得bash时需要完整的登陆流程。

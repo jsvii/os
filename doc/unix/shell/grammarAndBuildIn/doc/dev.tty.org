@@ -1,0 +1,9 @@
+* /dev/tty.org
+
+#+BEGIN_SRC bash
+  read pass < /dev/tty
+
+  echo $pass
+#+END_SRC
+
+从终端读取数据

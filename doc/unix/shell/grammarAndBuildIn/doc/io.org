@@ -1,0 +1,15 @@
+* 输入重定向
+
+** < 改变标准输入
+
+#+BEGIN_SRC bash
+tr -d '\r' < dos-files.txt
+#+END_SRC
+
+** > 改变标准输出
+
+cat file > demo-file
+
+** >> 附加输出
+
+cat file >> demo-file
