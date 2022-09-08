@@ -187,6 +187,8 @@ bar {
 }
 
 # browser
-bindsym $mod+Shift+b exec chromium
+bindsym $mod+Shift+b exec /usr/bin/chromium
 # emacs
 bindsym $mod+Shift+m exec /usr/bin/emacs
+
+bindsym Control+Mod1+l exec "i3lock -c 000000" # contrl alt l
