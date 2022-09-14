@@ -4,6 +4,8 @@
 
 - Mod4 win key
 
+** 参见setting中的i3设置
+
 
 ** move
 
