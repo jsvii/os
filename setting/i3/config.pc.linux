@@ -4,12 +4,21 @@
 # Should you change your keyboard layout some time, delete
 # this file and re-run i3-config-wizard(1).
 #
+# gaps inner all set 20
 
 # i3 config file (v4)
 #
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
 set $mod Mod4
+
+gaps inner 8
+gaps outer 5
+
+# Only enable gaps on a workspace when there is at least one container
+smart_gaps on
+
+
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -52,7 +61,8 @@ bindsym $mod+Return exec alacritty
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec --no-startup-id dmenu_run
+# bindsym $mod+d exec --no-startup-id dmenu_run
+bindsym $mod+d exec "rofi -show run"
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
@@ -184,6 +194,7 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 bar {
         status_command i3status
+        # height  if not set, the height will be calculated automatically depending on the font size
 }
 
 # browser
@@ -193,7 +204,8 @@ bar {
 
 # bindsym Control+Mod1+l exec "i3lock -c 000000" # contrl al
 
-bindsym $mod+Shift+z exec i3lock
+# lock screen always
+bindsym Control+mod1+l exec i3lock
 
 
 bindsym Print exec --no-startup-id maim "/home/$USER/Pictures/$(date)"

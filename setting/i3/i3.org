@@ -1,5 +1,44 @@
-* i3
+* i3-gap
+
+#+BEGIN_SRC bash
+pacman -S i3-gaps
+#+END_SRC
+
+** 直接使用本文件中的配置
+
+#+BEGIN_SRC bash
+ln -s /home/leo/workspace/leo/os/setting/i3/config.pc.linux ~/.config/i3/config
+#+END_SRC
 
 - Mod1 Alt key
 
 - Mod4 win key
+
+** 相关配合的软件
+
+- 命令行启动程序 （推荐使用rofi）
+
+  1. rofi
+
+  1. dmenu
+
+- flameshot是一款截图软件
+
+- i3lock 要安装
+
+- a file manager 使用系统默认的桌面管理工具
+
+  1. thunar xfce 桌面
+
+  1. nautils   gnome桌面下
+
+** 参考
+
+https://andreirozanski.com/2020/03/25/i3-gaps-config-file/
+
+
+** 其他相关软件
+
+- https://leburger.gitlab.io/posts/chunkwm-skhd-macos/
+
+- mac下使用yabai进行配置 https://anuj-chandra.medium.com/using-i3-like-tiling-window-managers-in-macos-with-yabai-ebf0e002b992
