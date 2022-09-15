@@ -42,3 +42,5 @@ https://andreirozanski.com/2020/03/25/i3-gaps-config-file/
 - https://leburger.gitlab.io/posts/chunkwm-skhd-macos/
 
 - mac下使用yabai进行配置 https://anuj-chandra.medium.com/using-i3-like-tiling-window-managers-in-macos-with-yabai-ebf0e002b992
+
+- mac下使用yabai进行配置2  https://sspai.com/post/73620
