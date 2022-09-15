@@ -1,0 +1,62 @@
+* i3 Reference Card
+
+https://i3wm.org/docs/refcard.html
+
+http://i3wm.org/docs/userguide.html
+
+Throughout this guide, the i3 logo will be used to refer to the configured modifier. This is the Alt key (Mod1) by default, with ⌘ (Mod4) being a popular alternative.
+
+** Basics
+
+$mod + Enter	open new terminal
+$mod + j	focus left
+$mod + k	focus down
+$mod + l	focus up
+$mod + ;	focus right
+$mod + a	focus parent
+$mod + Space	toggle focus mode
+
+** Moving windows
+
+$mod + Shift + j	move window left
+$mod + Shift + k	move window down
+$mod + Shift + l	move window up
+$mod + Shift + ;	move window right
+
+** Modifying windows
+
+$mod + f	toggle fullscreen
+$mod + v	split a window vertically
+$mod + h	split a window horizontally
+$mod + r	resize mode
+
+Look at the “Resizing containers / windows” section of the user guide.
+
+** Changing the container layout
+
+$mod + e	default splith/splitv 切换布局为水平切分，还是垂直切分
+
+$mod + s	stacking  变成一层层堆积的栈状，有焦点的显示在最上方
+
+$mod + w	tabbed
+
+** Floating
+
+$mod + Shift + Space	toggle floating
+$mod + Left click	drag floating
+
+** Using workspaces
+$mod + 0-9	switch to another workspace
+
+$mod + Shift + 0-9	move a window to another workspace
+
+** Opening applications / Closing windows
+
+$mod + d	open application launcher (dmenu)
+
+$mod  + Shift + q	kill a window
+
+** Restart / Exit
+$mod + Shift + c	reload the configuration file
+$mod + Shift + r	restart i3 inplace
+$mod + Shift + e	exit i3
