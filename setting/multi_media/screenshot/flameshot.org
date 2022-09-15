@@ -1,0 +1,3 @@
+* flameshot
+
+flameshot是一款截图软件

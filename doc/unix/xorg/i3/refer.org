@@ -28,9 +28,13 @@ $mod + Shift + ;	move window right
 $mod + f	toggle fullscreen
 $mod + v	split a window vertically
 $mod + h	split a window horizontally
-$mod + r	resize mode
+$mod + r	resize mode 处于resize模式下，对边框调整可以改变大小
 
 Look at the “Resizing containers / windows” section of the user guide.
+
+$mod + v $mod + h这个模式，我不太常用，因为屏幕较小，用不到这个
+
+如果某个一个窗口不小心被split了，用 Moving windows的方法，把它移动到上一层级
 
 ** Changing the container layout
 
