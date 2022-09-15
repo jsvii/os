@@ -1,0 +1,10 @@
+sudo pacman -S fcitx5 fcitx5-configtool fcitx5-qt fcitx5-gtk fcitx5-chinese-addons fcitx5-rime
+
+新建一个.pam_environment文件（这里 .XXX 文件代表隐藏文件）
+用kit打开该文件，然后把下面三行粘上
+
+GTK_IM_MODULE DEFAULT=fcitx
+QT_IM_MODULE  DEFAULT=fcitx
+XMODIFIERS    DEFAULT=@im=fcitx
+
+https://www.csdn.net/tags/OtTaggwsNTY5NTItYmxvZwO0O0OO0O0O.html

@@ -45,7 +45,7 @@ root: ~/
 # attach: false
 
 windows:
-  - emacs:
+  - main:
      layout: main-vertical
      panes:
        - cd /home/leo/
@@ -53,3 +53,7 @@ windows:
      layout: main-vertical
      panes:
        - cd /home/leo/workspace/leo/
+  - os:
+     layout: main-vertical
+     panes:
+       - cd /home/leo/workspace/leo/os
