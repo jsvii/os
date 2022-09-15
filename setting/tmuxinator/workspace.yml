@@ -48,7 +48,7 @@ windows:
   - emacs:
      layout: main-vertical
      panes:
-       - emacs
+       - cd /home/leo/
   - leo:
      layout: main-vertical
      panes:
