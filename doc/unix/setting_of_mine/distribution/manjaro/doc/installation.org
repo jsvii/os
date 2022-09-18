@@ -98,9 +98,5 @@ https://wiki.archlinux.org/index.php/KMSCON
 安装 ~latex~ 及其中文依赖
 
 #+BEGIN_SRC bash
-pacman -S latex-most latex-lang
-#+END_SRC
-
-#+BEGIN_SRC bash
 pacman -S texlive-most texlive-lang
 #+END_SRC
