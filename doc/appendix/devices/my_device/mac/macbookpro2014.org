@@ -1,0 +1,9 @@
+* mac
+
+在manjar下安装软件
+
+linux driver
+
+https://forum.manjaro.org/t/how-to-install-the-wifi-driver-for-my-macbook-pro-retina-late-2013/30263/4
+
+sudo pacman -S dkms linux54-headers broadcom-wl-dkms
