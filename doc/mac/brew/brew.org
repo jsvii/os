@@ -1,18 +1,1 @@
-brew install --cask emacs
 
-
-```sh
-==> Tapping homebrew/cask
-Cloning into '/opt/homebrew/Homebrew/Library/Taps/homebrew/homebrew-cask'...
-remote: Enumerating objects: 672833, done.
-remote: Counting objects: 100% (77/77), done.
-remote: Compressing objects: 100% (56/56), done.
-remote: Total 672833 (delta 47), reused 45 (delta 21), pack-reused 672756
-Receiving objects: 100% (672833/672833), 319.47 MiB | 1.93 MiB/s, done.
-Resolving deltas: 100% (477372/477372), done.
-Tapped 4075 casks (4,147 files, 340.9MB).
-==> Downloading https://emacsformacosx.com/emacs-builds/Emacs-28.2-universal.dmg
-==> Downloading from https://emacsformacosx.com/download/emacs-builds/Emacs-28.2-universal.dmg
-######################################################################## 100.0%
-
-```
