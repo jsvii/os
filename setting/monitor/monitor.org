@@ -1,0 +1,67 @@
+$ xrandr --auto
+
+# if the position is not correct, then manually setup by first listing all the monitors
+$ xrandr
+Screen 0: minimum 320 x 200, current 2880 x 1800, maximum 16384 x 16384
+eDP connected primary 2880x1800+0+0 (normal left inverted right x axis y axis) 331mm x 207mm
+   2880x1800     59.99*+
+   1920x1200     59.95
+   1920x1080     60.00
+   1600x1200     59.95
+   1680x1050     60.00
+   1400x1050     60.00
+   1280x1024     59.95
+   1440x900      59.99
+   1280x960      59.99
+   1280x854      59.95
+   1280x800      59.96
+   1280x720      59.97
+   1152x768      59.95
+   1024x768      59.95
+   800x600       59.96
+   848x480       59.94
+   720x480       59.94
+   640x480       59.94
+DisplayPort-0 disconnected (normal left inverted right x axis y axis)
+DisplayPort-1 disconnected (normal left inverted right x axis y axis)
+HDMI-0 connected (normal left inverted right x axis y axis)
+   3840x2160     30.00 +  25.00    24.00    29.97    23.98
+   4096x2160     30.00    25.00    24.00    29.97    23.98
+   1920x1080     60.00    50.00    59.94    30.00    25.00    24.00    29.97    23.98
+   1920x1080i    60.00    50.00    59.94
+   1680x1050     59.88
+   1600x900      60.00
+   1280x1024     75.02    60.02
+   1440x900      59.90
+   1366x768      59.79
+   1280x800      59.91
+   1152x864      75.00
+   1280x720      60.00    50.00    59.94
+   1024x768      75.03    70.07    60.00
+   832x624       74.55
+   800x600       72.19    75.00    60.32
+   720x576       50.00
+   720x576i      50.00
+   720x480       60.00    59.94
+   720x480i      60.00    59.94
+   640x480       75.00    72.81    66.67    60.00    59.94
+   720x400       70.08
+
+# or list active monitors only
+$ xrandr --listactivemonitors
+Monitors: 2
+ 0: +*eDP 2880/331x1800/207+0+0  eDP
+ 1: +HDMI-0 3840/1872x2160/1053+0+0  HDMI-0
+
+
+# (SECOND DISPLAY) place second HDMI screen to the right of main screen
+$ xrandr --output HDMI-0 --auto --right-of eDP
+
+# (MIRROR DISPLAY) mirror main screen on second display
+$ xrandr --output HDMI-0 --auto --same-as eDP
+
+# (TURN OFF SECOND DISPLAY)
+$ xrandr --auto --output HDMI-0 --off
+
+# (TURN OFF MAIN DISPLAY)
+$ xrandr --auto --output eDP --off

@@ -15,3 +15,5 @@ Lite mode 中，◇键是superkey
 hhkb mode中，◇键是muhenkan键
 
 muhenkan键只对日语、韩语有效
+
+** mac linux
