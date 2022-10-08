@@ -1,0 +1,9 @@
+* chrome
+
+安装google-chrome
+
+#+BEGIN_SRC bash
+git clone https://aur.archlinux.org/google-chrome.git
+cd google-chrome
+makepkg -si
+#+END_SRC bash
