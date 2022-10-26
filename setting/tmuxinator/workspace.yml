@@ -45,14 +45,10 @@ root: ~/
 # attach: false
 
 windows:
-  - main:
+  - todo:
      layout: main-vertical
      panes:
-       - cd /home/leo/
-  - leo:
-     layout: main-vertical
-     panes:
-       - cd /home/leo/workspace/leo/
+       - cd /home/leo/workspace/leo/todo-now
   - os:
      layout: main-vertical
      panes:

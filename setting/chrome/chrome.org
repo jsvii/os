@@ -5,5 +5,8 @@
 #+BEGIN_SRC bash
 git clone https://aur.archlinux.org/google-chrome.git
 cd google-chrome
+./
 makepkg -si
+
+google-chrome-stable --proxy-server="localhost:7890"
 #+END_SRC bash
