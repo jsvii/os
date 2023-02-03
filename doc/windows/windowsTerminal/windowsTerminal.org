@@ -1,0 +1,14 @@
+* Windows Terminal
+
+#+BEGIN_SRC json
+{
+                  "hidden": false,
+                  "name": "SSH to Majaro",
+                  "commandline": "ssh leo@192.168.2.14",
+                  "font":
+                  {
+                      "face": "JetBrains Mono",
+                      "size": 16
+                  }
+              }
+#+END_SRC
