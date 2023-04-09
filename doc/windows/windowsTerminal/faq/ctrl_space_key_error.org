@@ -1,0 +1,15 @@
+* ctrl-space 失效
+
+https://github.com/microsoft/terminal/issues/2865
+
+原因，Ctrl -Space 键在openSSH 8.9以前的版本中，不支持此热键
+
+#BEGIN_SRC bash
+showkey -a
+# 按一下 ctrl + space
+#+END_SRC
+
+window 设置 -> 应用 -> 可选功能 -> OpenSSH
+
+
+ winget install "openssh beta"

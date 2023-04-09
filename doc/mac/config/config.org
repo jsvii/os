@@ -1,8 +1,5 @@
 * config
 
-** iterm2
-
-
 ** sed
 
 # 安装gnu sed
