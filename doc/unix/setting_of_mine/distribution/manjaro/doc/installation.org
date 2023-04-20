@@ -6,6 +6,14 @@
 sudo  pacman-mirrors -i -c China -m rank
 #+END_SRC
 
+
+** emacs
+
+pacman -S emacs git vim
+
+pacman -S docker
+
+
 ** linux headers
 
 #+BEGIN_SRC bash
@@ -28,7 +36,7 @@ HandleLidSwitch=ignore
 systemctl restart systemd-logind
 #+END_SRC
 
-#+BEGIN_SRC bash
+#+BEGIN_SRC bashg
 sudo pacman -S autoconf gcc make gnutls  ncurses extra/gnutls28
 #+END_SRC
 
@@ -37,10 +45,31 @@ sudo pacman -S autoconf gcc make gnutls  ncurses extra/gnutls28
 
 sudo pacman -Sy base-devel
 
-** google-chrome
+** Dev Tools
+
+
+pacman -S the_silve_rsearcher
+*** google-chrome
 
 pacman -S chromium
 
+
+https://aur.archlinux.org/packages/google-chrome
+
+git clone https://aur.archlinux.org/google-chrome.git
+
+makepkg -s
+
+sudo pacman -U google-chrome-98.0.4758.102-1-x86_64.pkg.tar.zst
+
+
+** lisp
+
+git clone https://aur.archlinux.org/chez-scheme.git
+
+makepkg -s
+
+sudo pacman -U chez-scheme
 
 ** fonts
 
