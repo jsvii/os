@@ -1,5 +1,0 @@
-* issue
-
-** wsl2内存耗尽问题
-
-https://github.com/microsoft/WSL/issues/4166
