@@ -1,0 +1,17 @@
+* editor
+
+** emacs
+
+#+BEGIN_SRC bash
+pacman -S emacs git vim
+
+pacman -S docker
+#+END_SRC
+** sublime
+
+#+BEGIN_SRC bash
+sudo pacman -S snapd
+sudo systemctl enable --now snapd.socket
+sudo ln -s /var/lib/snapd/snap /snap
+sudo snap install sublime-text --classic
+#+END_SRC

@@ -1,0 +1,111 @@
+* develop
+
+** base-devel
+
+#+BEGIN_SRC bash
+sudo pacman -Sy base-devel
+#+END_SRC
+
+** Dev Tools
+
+pacman -S the_silver_searcher
+pacman -S fzf
+
+git clone https://github.com/wting/autojump.git
+
+*** google-chrome
+
+pacman -S chromium
+
+
+https://aur.archlinux.org/packages/google-chrome
+
+git clone https://aur.archlinux.org/google-chrome.git
+
+makepkg -s
+
+sudo pacman -U google-chrome-98.0.4758.102-1-x86_64.pkg.tar.zst
+
+
+** lisp
+
+git clone https://aur.archlinux.org/chez-scheme.git
+
+makepkg -s
+
+sudo pacman -U chez-scheme
+
+** fonts
+
+Linux的字体都在/usr/share/fonts这个目录里，一种字体就是这个目录下面的一个子目录。注意，如果把Windows某个字体的ttf文件复制到某个新建的子目录里面，还需要在子目录里用root用户身份依次执行如下三条命令，这个字体才能用，并不是复制到/usr/share/fonts目录就可以用了：
+
+
+
+https://github.com/romkatv/powerlevel10k  zsh theme
+
+
+
+#+BEGNIN_SRC
+
+#+END_SRC
+
+
+
+mkfontscale
+mkfontdir
+fc-cache -f
+
+
+** ibus
+
+
+** kmscon
+
+#+BEGIN_SRC bash
+sudo pacman -Syyu
+#+END_SRC
+
+#+BEGIN_SRC bash
+systemctl disable getty@tty1.service
+systemctl enable kmsconvt@tty1.service
+#+END_SRC
+
+
+~/etc/kmscon/kmscon.conf~ 文件配置
+
+#+BEGIN_SRC bash
+font-size=18
+xbx-options=ctrl:nocaps
+font-name=Hack Nerd Font Mono
+#+END_SRC
+
+*** ref
+
+https://wiki.archlinux.org/index.php/KMSCON
+
+
+** latex
+
+安装 ~latex~ 及其中文依赖
+
+#+BEGIN_SRC bash
+pacman -S texlive-most texlive-lang
+#+END_SRC
+
+* others
+
+** 声音
+
+*** 关闭shell的声音
+
+~/etc/inputrc~ 中的设置
+
+#+BEGIN_SRC bash
+# 关闭shell的声音
+set bell-style none
+#+END_SRC bash
+
+
+** nvm
+
+https://github.com/nvm-sh/nvm.git

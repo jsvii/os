@@ -1,0 +1,9 @@
+* basic settings
+
+** mirrors
+
+manjaro
+
+#+BEGIN_SRC bash
+sudo  pacman-mirrors -i -c China -m rank
+#+END_SRC

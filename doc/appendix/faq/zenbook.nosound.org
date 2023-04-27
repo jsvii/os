@@ -1,0 +1,5 @@
+* ref
+
+https://wiki.archlinux.org/title/ASUS_Zenbook_UM3402YA
+
+https://superuser.com/questions/1719920/no-sound-from-internal-speakers-on-laptop-but-headphone-jack-and-hdmi-works/1754954#1754954

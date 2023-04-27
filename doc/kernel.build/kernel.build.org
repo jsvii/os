@@ -1,0 +1,73 @@
+https://forum.manjaro.org/t/howto-build-your-very-first-custom-kernel/47683
+
+To start, grab the Linux kernel source. Go ahead and head to kernel.org 329, and choose the kernel you want to compile. I’ll use the mainline kernel as an example, which is 5.11-rc2 at the time of writing this post. You can grab it with git clone or wget the download link to it if you want.
+
+Extract the archive:
+
+bsdtar -xvf [kernel-archive-file]
+
+Where, obviously you have to replace [kernel-archive-file] with the name of the compressed archive of the kernel.
+
+cd into the directory it was extracted in. And run the following if you want to use the config that came with your distro. (RECOMMENDED)
+
+ zcat /proc/config.gz >> .config
+
+If you want to configure some extra features with the stock config, run the following:
+
+make menuconfig
+
+At this point, you’ll be greeted with a menu showing a bunch of options. If you don’t know what you’re doing, exit out and leave it.
+Now, it’s time to compile it!
+
+make -j$(nproc)
+
+Where $(nproc) will use all the CPU pipelines available so your build should go faster.
+
+After the compilation finises, it’s time to install the modules:
+
+sudo make modules_install
+
+Now, you’re ready to install the kernel file and the System.map. Run the following command to install them:
+
+sudo make install
+
+The following commands need a root shell for what we’re about to do, so:
+
+sudo su
+
+As we’re in the root shell now, we want to copy vmlinuz to
+
+vmlinuz-[kernel-version]-[arch]
+
+cp /boot/vmlinuz /boot/vmlinuz-[kernel-version]-[arch]
+Replace [kernel-version]-[arch] with the kernel version (E.g: linux-5.11-rc2-x86_64)
+If you do not perform the above command you won’t be able to reboot!
+Now, we’re going to generate initramfs.
+Arch Based distros use mkinitcpio, which is a bash script to automate the generation of the initramfs.
+Therefore, we want to make custom presets for the kernel. These are usually located in /etc/mkinitcpio.d, so we’ll use a template from another version of the kernel for our newly compiled version:
+
+# mkinitcpio preset file for the 'linux' package
+
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-[kernel-version]-[arch]"
+
+PRESETS=('default' 'fallback')
+
+#default_config="/etc/mkinitcpio.conf"
+default_image="/boot/initramfs-[kernel-version]-[arch].img"
+#default_options=""
+
+#fallback_config="/etc/mkinitcpio.conf"
+fallback_image="/boot/initramfs-[kernel-version]-[arch]-fallback.img"
+fallback_options="-S autodetect"
+Edit the [kernel-version]-[arch] with the kernel version you compiled and the arch of your cpu. E.G: x86_64 and save this to a preset in /etc/mkinitcpio.d/[kernel-version].preset:
+
+sudo mkinitcpio -p linux[kernel-version].preset
+If you get “no modules were added, this is probably not what you wanted”, please use the config that came with the distro, and recompile your kernel. Then follow the steps above again.
+
+If everything goes well, you can reboot and try out your new kernel! If you boot successfully.
+
+To verify the kernel version, execute::
+
+uname -a
+If you see the kernel version you compiled, congrats! You just successfully compiled your first Linux kernel!

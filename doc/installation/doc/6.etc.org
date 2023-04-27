@@ -1,0 +1,29 @@
+* systemd
+
+** liquid powsave
+
+#+BEGIN_SRC bash
+# /etc/systemd/logind.conf and make sure you have
+# which will make it ignore the lid being closed. (You may need to also undo the other changes you've made.)
+HandleLidSwitch=ignore
+
+systemctl restart systemd-logind
+#+END_SRC
+
+#+BEGIN_SRC bashg
+sudo pacman -S autoconf gcc make gnutls  ncurses extra/gnutls28
+#+END_SRC
+
+
+
+*** baidu net disk
+#+BEGIN_SRC bash
+https://aur.archlinux.org/baidunetdisk-bin.git
+#+END_SRC
+
+
+
+pacman -S alsa-utils
+
+
+alsamixer

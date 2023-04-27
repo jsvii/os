@@ -1,0 +1,169 @@
+* shell
+
+** zsh
+
+#+BEGIN_SRC bash
+pacman -S tmux
+# ruby
+pacman -S ruby
+
+gem install tmuxinator
+
+git clone https://github.com/gpakosz/.tmux.git
+
+ln -s -f .tmux/.tmux.conf
+
+cp .tmux/.tmux.conf.local .
+
+export PATH=$HOME/.local/share/gem/ruby/3.0.0/bin:$PATH
+#+END_SRC
+
+** oh-my-zsh
+
+
+
+#+BEGIN_SRC bash
+git clone https://github.com/zsh-users/zsh-autosuggestions  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
+git clone https://github.com/gradle/gradle-completion.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/gradle-completion
+
+git clone https://github.com/unixorn/fzf-zsh-plugin.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fzf-zsh-plugin
+#+END_SRC
+
+oh-myzsh-plugins
+
+#+BEGIN_SRC bash
+plugins=(git
+         zsh-autosuggestions
+         zsh-syntax-highlighting
+         gradle-completion
+         fzf-zsh-plugin
+         web-search
+        )
+#+END_SRC
+
+** powerline10k
+
+#+BEGIN_SRC bash
+otfinfo --info Cousine\ Bold\ Nerd\ Font\ Complete.ttf
+font-family: Cousine Nerd Font
+#+END_SRC
+
+
+** tmux tmuxinator, alacritty, zsh, oh-my-zsh
+
+manjaro
+
+
+
+
+oh-my-zsh
+
+#+BEGIN_SRC bash
+wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+sh install.sh
+#+END_SRC
+
+#+BegiN_SRC bash
+https://github.com/ryanoasis/nerd-fonts
+
+https://github.com/adobe-fonts/source-code-pro
+
+https://github.com/romkatv/powerlevel10k
+#+END_SRC
+
+oh-my-tmux
+
+#+BEGIN_SRC shell
+$ cd
+$ git clone https://github.com/gpakosz/.tmux.git
+$ ln -s -f .tmux/.tmux.conf
+$ cp .tmux/.tmux.conf.local .
+#+END_SRC
+
+
+#+BEGIN_SRC conf
+set -gu prefix2
+unbind C-a
+unbind C-b
+set -g prefix 'C-\'
+bind 'C-\' send-prefix
+#+END_SRC
+
+
+
+** linux headers
+
+#+BEGIN_SRC bash
+uname -r
+
+sudo pacman -S linux-headers
+#+END_SRC
+
+** linux-headers上踩过的坑
+
+1. linux-headers 默认没有usb网卡的驱动，导致怎么也安装不了绿联的网卡
+
+* keyboard
+
+/usr/bin/setxkbmap -option "ctrl:nocaps"
+
+
+# KEYBOARD CONFIGURATION FILE
+
+# Consult the keyboard(5) manual page.
+
+XKBMODEL="pc105"
+XKBLAYOUT="us"
+XKBVARIANT=""
+XKBOPTIONS="ctrl:swapcaps"
+
+BACKSPACE="guess"
+
+
+** xmonad
+
+ref: https://eason0210.github.io/post/install-xmonad-on-arch-linux/
+
+
+默认，系统是不进行缩放的，这样在 2K 屏幕下，应用的字体会非常小，完全没法使用。经过一番查询，其实设置很简单，在 Arch Wiki 中就有介绍，只要在 $HOME/.Xresource 中加入以下配置即可：
+
+
+.Xresources 文件
+
+#+BEGIN_SRC conf
+Xft.dpi: 144
+! These might also be useful depending on your monitor and personal preference:
+Xft.autohint: 0
+Xft.lcdfilter:  lcddefault
+Xft.hintstyle:  hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
+#+END_SRC
+
+Xft.dpi 的值设置为 96 乘以需要缩放的比例即可，比如 2K 屏幕需要缩放 1.5 倍，就是 96 X 1.5 = 144 , 如果需要缩放 2 倍，就设置为 192 即可。
+1440p的dpi 120 （120%） 144（150%）
+
+Xft.dpi: 192
+
+! These might also be useful depending on your monitor and personal preference:
+Xft.autohint: 0
+Xft.lcdfilter:  lcddefault
+Xft.hintstyle:  hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
+#+END_SRC
+
+~.xinitrc~ 文件中加入一行新功能
+
+xrdb -merge ~/.Xresources
+
+https://linuxreviews.org/HOWTO_set_DPI_in_Xorg
+
+鼠标的DPI是每英寸点数,也就是鼠标每移动一英寸指针在屏幕上移动的点数。
+
+联想小新参数

@@ -247,3 +247,16 @@ https://wiki.archlinux.org/index.php/KMSCON
 #+BEGIN_SRC bash
 pacman -S texlive-most texlive-lang
 #+END_SRC
+
+* others
+
+** 声音
+
+*** 关闭shell的声音
+
+~/etc/inputrc~ 中的设置
+
+#+BEGIN_SRC bash
+# 关闭shell的声音
+set bell-style none
+#+END_SRC bash
