@@ -1,0 +1,40 @@
+* Locking and Interprocess Communication
+
+
+** Control Mechanisms
+
+***  Race Conditions
+
+***  Critical Sections
+
+
+
+***  Memory and Optimization Barriers
+
+***  Reader/Writer Locks
+
+***  The Big Kernel Lock
+
+***  Mutexes
+
+***  Approximate Per-CPU Counters
+
+***  Lock Contention and Fine-Grained Locking
+
+** System V Interprocess Communication
+
+***  System V Mechanisms
+
+***  Semaphores
+
+***  Message Queues
+
+***  Shared Memory
+
+***  Other IPC Mechanisms
+
+***  Signals
+
+***  Pipes and Sockets
+
+***  Summary

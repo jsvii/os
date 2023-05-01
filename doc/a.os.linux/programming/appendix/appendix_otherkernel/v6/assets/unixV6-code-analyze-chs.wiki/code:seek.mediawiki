@@ -1,0 +1,158 @@
+===Source===
+<div class="wikiheadnote">
+*seek 的系统调用函数
+*移动 指定文件 的偏移指针
+*使用3个隐式参数 : fildes, offset, ptrname
+**fildes : 文件描述号，保存在 [[skill:u.u_ar0|u.u_ar0]][R0]
+**offset : 移动的增量，保存在 [[code:user|u.u_arg[0]]]
+**ptrname : 模式位，保存在 [[code:user|u.u_arg[1]]]
+***(以下为方便叙述
+设px为 对应x模式位的 文件偏移指针
+设 当前文件偏移为now
+设当前文件大小为size)
+***0,1,2 为 字节模式
+***3,4,5 为 块模式
+***0 : p0(无符号数) = offset
+***1 : p1 = now + offset
+***2 : p2 = size + offset
+***3 : p3(无符号数) = p0 * 512 
+***4 : p4 = p1 * 512
+***5 : p5 = p2 * 512
+</div>
+
+5857 
+
+5858 /* 
+
+5859 &nbsp;* seek system call 
+
+5860 &nbsp;*/ 
+
+5861 seek() 
+
+5862 { 
+
+5863 &nbsp;&nbsp;&nbsp;&nbsp;int n[2]; 
+
+5864 &nbsp;&nbsp;&nbsp;&nbsp;register *[[code:struct file|fp]], t; 
+
+5865 
+
+5866 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct file|fp]] = [[code:getf|getf]]([[skill:u.u_ar0|u.u_ar0]][R0]); 
+
+5867 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct file|fp]] == NULL) 
+
+5868 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+<blockquote>
+*fp ← 根据 fildes 得到对应的 [[code:struct file|file结构]]
+</blockquote>
+5869 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct file|fp]]->f_flag&FPIPE) { 
+
+5870 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = ESPIPE; 
+
+5871 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+5872 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若是管道文件(不支持[[code:seek|seek]]操作)，抛出错误
+**[[错误代码]] : ESPIPE
+</blockquote>
+5873 &nbsp;&nbsp;&nbsp;&nbsp;t = [[code:user|u.u_arg]][1]; 
+
+<blockquote>
+*t ← ptrname
+</blockquote>
+5874 &nbsp;&nbsp;&nbsp;&nbsp;if(t > 2) { 
+
+5875 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n[1] = [[code:user|u.u_arg]][0]<<9; 
+
+5876 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n[0] = [[code:user|u.u_arg]][0]>>7; 
+
+5877 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(t == 3) 
+
+5878 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   n[0] =& 0777; 
+
+<blockquote>
+*t = 3,4,5 ，n = [[code:user|u.u_arg]][0] * 512
+*t = 3 时，清R[0]的最高位(即符号位),因为R[0]表示的是无符号数
+</blockquote>
+5879 &nbsp;&nbsp;&nbsp;&nbsp;} else { 
+
+5880 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n[1] = [[code:user|u.u_arg]][0]; 
+
+5881 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n[0] = 0; 
+
+5882 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(t!=0 && n[1]&lt;0) 
+
+5883 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   n[0] = -1; 
+
+<blockquote>
+*t=0,1,2 ，n = [[code:user|u.u_arg]][0]
+*t=1,2 ，若为负数，将负数扩展到双字
+</blockquote>
+5884 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+5885 &nbsp;&nbsp;&nbsp;&nbsp;switch(t) { 
+
+5886 
+
+5887 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case 1: 
+
+5888 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case 4: 
+
+5889 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   n[0] =+ [[code:struct file|fp]]->f_offset[0]; 
+
+5890 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:dpadd|dpadd]](n, [[code:struct file|fp]]->f_offset[1]); 
+
+5891 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   break; 
+
+<blockquote>
+*t=1,4
+n = n + now
+</blockquote>
+5892 
+
+5893 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;default: 
+
+5894 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   n[0] =+ [[code:struct file|fp]]->f_inode->i_size0&0377; 
+
+5895 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:dpadd|dpadd]](n, [[code:struct file|fp]]->f_inode->i_size1); 
+
+<blockquote>
+*t=2,5
+n = n + size
+</blockquote>
+5896 
+
+5897 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case 0: 
+
+5898 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;case 3: 
+
+5899 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   ; 
+
+<blockquote>
+*t=0,3
+无操作
+</blockquote>
+5900 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+5901 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct file|fp]]->f_offset[1] = n[1]; 
+
+5902 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct file|fp]]->f_offset[0] = n[0]; 
+
+5903 } 
+
+5904 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[内存打开文件结构]]
+*[[文件系统]]
+
+===Param===
+:(seek = 19.)
+:(file descriptor in r0)
+:<b>sys seek; offset; ptrname</b>

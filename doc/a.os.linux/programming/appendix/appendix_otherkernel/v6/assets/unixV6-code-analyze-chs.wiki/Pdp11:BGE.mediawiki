@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===BGE
+===Code===002000 + 偏移[offset]
+===Operation===PC ← PC + ( 2 * offset ) if N ∨ V = 0
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===若标志位N未被置位且标志位V未被置位，进行程序控制转移<br/>互补操作为[[pdp11:BLT|BLT]]
+===Example===无

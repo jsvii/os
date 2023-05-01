@@ -1,0 +1,15 @@
+如需查看可用命令的完整列表，请运行以下命令：
+
+
+hmm
+
+
+
+使用 lunch 选择要构建的目标。lunch product_name-build_variant 会选择 product_name 作为需要构建的产品，并选择 build_variant 作为需要构建的变体，然后将这些选择存储在环境中，以便供后续对 m 和其他类似命令的调用读取。
+
+#+BEGIN_SRC bash
+  lunch
+  # select a target
+
+  m
+#+END_SRC

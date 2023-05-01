@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===SCC
+===Code===000277
+===Operation===Set all CC's (condition codes)
+===Coden===置
+===Codez===置
+===Codev===置
+===Codec===置
+===Description===置所有标志位 
+===Example===无

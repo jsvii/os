@@ -1,0 +1,80 @@
+===Source===
+<div class="wikiheadnote">
+*由 [[code:trap|trap]] 调用
+</div>
+
+2826
+
+2827 /*
+
+2828 &nbsp;* Call the system-entry routine f (out of the
+
+2829 &nbsp;* sysent table). This is a subroutine for trap, and
+
+2830 &nbsp;* not in-line, because if a signal occurs
+
+2831 &nbsp;* during processing, an (abnormal) return is simulated from
+
+2832 &nbsp;* the last caller to savu(qsav); if this took place
+
+2833 &nbsp;* inside of trap, it wouldn’t have a chance to clean up. 
+
+2834 &nbsp;*
+
+2835 &nbsp;* If this occurs, the return takes place without
+
+2836 &nbsp;* clearing u_intflg; if it’s still set, trap
+
+2837 &nbsp;* marks an error which means that a system
+
+2838 &nbsp;* call (like read on a typewrite) got interrupted
+
+2839 &nbsp;* by a signal.
+
+2840 &nbsp;*/
+
+2841 trap1(f)
+
+2842 int (*f)();
+
+2843 {
+
+2844
+
+2845 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_intflg]] = 1;
+
+<blockquote>
+*置 [[code:user|u.u_intflg]]（系统调用 出错标志）
+*参看 后面的注释
+</blockquote>
+2846 &nbsp;&nbsp;&nbsp;&nbsp;[[code:savu|savu]]([[code:user|u.u_qsav]]);
+
+<blockquote>
+*保存R5 R6到 [[code:user|u.u_qsav]]
+</blockquote>
+2847 &nbsp;&nbsp;&nbsp;&nbsp;(*f)();
+
+2848 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_intflg]] = 0;
+
+<blockquote>
+*清 [[code:user|u.u_intflg]]（系统调用 出错标志）
+</blockquote>
+<blockquote>
+关于此处的说明
+*如果 系统调用处理函数 正常，则[[code:user|u.u_intflg]]=0
+*若 系统调用处理函数 运行中 收到信号
+**检测信号 时 直接从[[code:user|u.u_qsav]]恢复R5,R6([[code:sleep|sleep]] 2106)
+**函数返回到[[code:trap|trap]]（SP已经恢复）
+**此时，[[code:user|u.u_intflg]]=1
+**在 [[code:trap|trap]] 2773 抛出错误
+</blockquote>
+2849 }
+
+2850 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[中断]]
+===Caller===
+*[[code:trap]]

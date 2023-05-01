@@ -1,0 +1,314 @@
+===Source===
+<div class="wikiheadnote">
+*为当前进程创建子进程
+*父进程返回0
+*子进程返回1
+</div>
+
+1800 #
+
+1801 /*
+
+1802 &nbsp;*/
+
+1803
+
+1804 #include "../param.h"
+
+1805 #include "../user.h"
+
+1806 #include "../proc.h"
+
+1807 #include "../text.h"
+
+1808 #include "../systm.h"
+
+1809 #include "../file.h"
+
+1810 #include "../inode.h"
+
+1811 #include "../buf.h"
+
+1812 /* ------------------------- */
+
+1813 /*
+
+1814 &nbsp;* Create a new process-- the internal version of
+
+1815 &nbsp;* sys fork.
+
+1816 &nbsp;* It returns 1 in the new process.
+
+1817 &nbsp;* How this happens is rather hard to understand.
+
+1820 &nbsp;* in the same call to newproc as the parent;
+
+1821 &nbsp;* but in fact the code that runs is that of swtch.
+
+1822 &nbsp;* The subtle implication of the return value of swtch
+
+1823 &nbsp;* (see above) is that this is the value that newproc's
+
+1824 &nbsp;* caller in the new process sees.
+
+1825 &nbsp;*/
+
+1826 newproc()
+
+1827 {
+
+1828 &nbsp;&nbsp;&nbsp;&nbsp;int a1, a2;
+
+1829 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct proc|struct proc]] *p, *up;
+
+1830 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct proc|struct proc]] *rpp;
+
+1831 &nbsp;&nbsp;&nbsp;&nbsp;register *rip, n;
+
+1832
+
+1833 &nbsp;&nbsp;&nbsp;&nbsp;p = NULL;
+
+1834 &nbsp;&nbsp;&nbsp;&nbsp;/*
+
+1835 &nbsp;&nbsp;&nbsp;&nbsp;* First, just locate a slot for a process
+
+1837 &nbsp;&nbsp;&nbsp;&nbsp;* The panic "cannot happen" because fork already
+
+1838 &nbsp;&nbsp;&nbsp;&nbsp;* checked for the existence of a slot.
+
+1839 &nbsp;&nbsp;&nbsp;&nbsp;*/
+
+1840  retry:
+
+1841 &nbsp;&nbsp;&nbsp;&nbsp;mpid++;
+
+1842 &nbsp;&nbsp;&nbsp;&nbsp;if(mpid < 0) {
+
+1843 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  mpid = 0;
+
+1844 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  goto retry;
+
+1845 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+<blockquote>
+*为要新建的进程分配一个独一无二的进程标识mpid
+*若为负值,则循环+1,直到其不为负为止
+</blockquote>
+1846 &nbsp;&nbsp;&nbsp;&nbsp;for(rpp = &[[code:proc|proc]][0]; rpp < &[[code:proc|proc]][NPROC]; rpp++) {
+
+1847 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(rpp->p_stat == NULL && p==NULL)
+
+1848 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   p = rpp;
+
+1849 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (rpp->p_pid==mpid)
+
+1850 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto retry;
+
+1851 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+1852 &nbsp;&nbsp;&nbsp;&nbsp;if ((rpp = p)==NULL)
+
+1853 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:panic|panic]]("no procs");
+
+1854
+
+<blockquote>
+*遍历[[code:proc|proc数组]],将搜索到的第一个空位分配给新进程
+**若遍历时发现有进程的标识等于要分配的标识符,则回到1840行重新分配一个新标识符
+**若没能搜索到空位,则抛出错误
+</blockquote>
+1855 &nbsp;&nbsp;&nbsp;&nbsp;/*
+
+1856 &nbsp;&nbsp;&nbsp;&nbsp;* make proc entry for new proc
+
+1857 &nbsp;&nbsp;&nbsp;&nbsp;*/
+
+1858
+
+1859 &nbsp;&nbsp;&nbsp;&nbsp;rip = u.u_procp;
+
+1860 &nbsp;&nbsp;&nbsp;&nbsp;up = rip;
+
+1861 &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rpp]]->p_stat = SRUN;
+
+1862 &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rpp]]->p_flag = SLOAD;
+
+1863 &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rpp]]->p_uid = rip->p_uid;
+
+1864 &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rpp]]->p_ttyp = rip->p_ttyp;
+
+1865 &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rpp]]->p_nice = rip->p_nice;
+
+1866 &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rpp]]->p_textp = rip->p_textp;
+
+1867 &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rpp]]->p_pid = mpid;
+
+1868 &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rpp]]->p_ppid = rip->p_pid;
+
+1869 &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rpp]]->p_time = 0;
+
+<blockquote>
+*置子进程的[[code:proc|proc结构]]中的相关信息,部分从父进程直接拷贝
+*1868行有笔误,原代码为<code>rpp->p_ppid = rip->p_ppid</code>
+</blockquote>
+1870
+
+1871 &nbsp;&nbsp;&nbsp;&nbsp;/*
+
+1872 &nbsp;&nbsp;&nbsp;&nbsp;* make duplicate entries
+
+1873 &nbsp;&nbsp;&nbsp;&nbsp;* where needed
+
+1874 &nbsp;&nbsp;&nbsp;&nbsp;*/
+
+1875
+
+1876 &nbsp;&nbsp;&nbsp;&nbsp;for(rip = &[[code:user|u]].u_ofile[0]; rip < &[[code:user|u]].u_ofile[NOFILE];)
+
+1877 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(([[code:struct file|rpp]] = *rip++) != NULL)
+
+1878 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct file|rpp]]->f_count++;
+
+1879 &nbsp;&nbsp;&nbsp;&nbsp;if((rpp=up->p_textp) != NULL) {
+
+1880 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rpp->x_count++;
+
+1881 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rpp->x_ccount++;
+
+<blockquote>
+*父进程的打开文件结构中的f_count加1(因为子进程继承了父进程打开的文件),参见[[内存打开文件结构]]
+*父进程的[[code:text|共享正文段]]中的共享进程数加1(因为子进程继承了父进程的共享正文段,且其[[code:proc|proc]]结构中的[[code:text|textp]]指针指向该正文段)
+</blockquote>
+1882 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+1883 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u]].u_cdir->i_count++;
+
+<blockquote>
+*此处子进程应当申请新的file引用，而不是新的inode引用，未能解释，列入[[遗留问题]]
+</blockquote>
+1884 &nbsp;&nbsp;&nbsp;&nbsp;/*
+
+1885 &nbsp;&nbsp;&nbsp;&nbsp;* Partially simulate the environment
+
+1887 &nbsp;&nbsp;&nbsp;&nbsp;* created (by copying) it will look right.
+
+1888 &nbsp;&nbsp;&nbsp;&nbsp;*/
+
+1889 &nbsp;&nbsp;&nbsp;&nbsp;[[code:savu|savu]]([[code:user|u.u_rsav]]);
+
+<blockquote>
+*将R5,R6保存到[[code:user|u.u_rsav[2]]]数组中
+</blockquote>
+1890 &nbsp;&nbsp;&nbsp;&nbsp;rpp = p;
+
+<blockquote>
+*rpp指向子进程[[code:proc|proc结构]]
+</blockquote>
+1891 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u]].u_procp = rpp;
+
+<blockquote>
+*当前进程[[code:user|u.u_procp]]指向子进程的[[code:proc|proc结构]]
+*即将KISA6指向子进程的[[code:proc|proc结构]],子进程上台
+</blockquote>
+1892 &nbsp;&nbsp;&nbsp;&nbsp;rip = up;
+
+<blockquote>
+*rip指向父进程[[code:proc|proc结构]]
+</blockquote>
+1893 &nbsp;&nbsp;&nbsp;&nbsp;n = rip->p_size;
+
+1894 &nbsp;&nbsp;&nbsp;&nbsp;a1 = rip->p_addr;
+
+1895 &nbsp;&nbsp;&nbsp;&nbsp;rpp->p_size = n;
+
+<blockquote>
+*n = 父进程图像大小
+*a1 = 父进程的ppda区首址
+*子进程图像大小置为n
+</blockquote>
+1896 &nbsp;&nbsp;&nbsp;&nbsp;a2 = [[code:malloc|malloc]](coremap, n);
+
+<blockquote>
+*在内存中为子进程分配一块大小为n的空间,并将该空间的首址赋给a2
+</blockquote>
+1897 &nbsp;&nbsp;&nbsp;&nbsp;/*
+
+1898 &nbsp;&nbsp;&nbsp;&nbsp;* If there is not enough core for the
+
+1899 &nbsp;&nbsp;&nbsp;&nbsp;* new process, swap put the current process to
+
+1900 &nbsp;&nbsp;&nbsp;&nbsp;* generate the copy.
+
+1901 &nbsp;&nbsp;&nbsp;&nbsp;*/
+
+1902 &nbsp;&nbsp;&nbsp;&nbsp;if(a2 == NULL) {
+
+1903 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rip->p_stat = SIDL;
+
+1904 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rpp->p_addr = a1;
+
+1905 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:savu|savu]]([[code:user|u.u_ssav]]);
+
+1906 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:xswap|xswap]](rpp, 0, 0);
+
+1907 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rpp->p_flag =<nowiki>|</nowiki> SSWAP;
+
+1908 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rip->p_stat = SRUN;
+
+<blockquote>
+*若分配空间失败
+**父进程置状态置为SIDL,接下来将会把父进程图像复制到盘交换区上,在此期间父进程不能被选中上台
+**子进程ppda区指向父进程ppda区首址
+**将R5,R6保存到[[code:user|u.u_ssav[2]]]数组中
+**在盘交换区上复制一份父进程图像的副本
+**子进程置SSWAP标识,恢复时直接从[[code:user|u.u_ssav[2]]]数组中恢复R5,R6
+**将父进程置为就绪态,可以被调度进程选中上台
+</blockquote>
+1909 &nbsp;&nbsp;&nbsp;&nbsp;} else {
+
+1910 &nbsp;&nbsp;&nbsp;&nbsp;/*
+
+1911 &nbsp;&nbsp;&nbsp;&nbsp;* There is core, so just copy.
+
+1912 &nbsp;&nbsp;&nbsp;&nbsp;*/
+
+1913 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rpp]]->p_addr = a2;
+
+1914 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;while(n--)
+
+1915 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; [[code:copyseg|copyseg]](a1++, a2++);
+
+<blockquote>
+*若分配空间成功
+**则直接将父进程的图像拷贝一份到新分配的内存空间
+</blockquote>
+1916 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+1917 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u]].u_procp = rip;
+
+<blockquote>
+*恢复父进程上台
+</blockquote>
+1918 &nbsp;&nbsp;&nbsp;&nbsp;return(0);
+
+<blockquote>
+*此处为父进程的返回处,返回值为0
+*子进程将会在[[code:swtch|swtch]]中被选中上台后直接从[[code:swtch|swtch]]中返回,返回值为1
+</blockquote>
+1919 }
+
+1920 /* ------------------------- */
+
+
+===Extend===
+=附图=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_newproc.png"/></p>
+
+===Ref===
+*[[进程调度#创建子进程]]
+*[[进程图像]]
+
+===Caller===
+*[[code:main]]
+*[[code:fork]]

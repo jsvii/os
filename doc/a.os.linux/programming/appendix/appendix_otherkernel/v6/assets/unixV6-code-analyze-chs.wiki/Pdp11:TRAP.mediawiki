@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===TRAP
+===Code===104400-104777
+===Operation===↓(SP) ← PS<br/>↓(SP) ← PC<br/>PC ← (34)<br/>PS ← (36)
+===Coden===从 [[中断|中断向量]] 读取
+===Codez===从 [[中断|中断向量]] 读取
+===Codev===从 [[中断|中断向量]] 读取
+===Codec===从 [[中断|中断向量]] 读取
+===Description===执行陷入操作
+===Example===<p>TRAP<br/><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_instruction_TRAP.png"/></p>

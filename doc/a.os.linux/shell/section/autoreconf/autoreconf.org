@@ -1,0 +1,22 @@
+* autoreconf
+
+
+~autoreconf~ 命令可以重复编译指定目录下的系统文件或configure-ac指定的目录树。默认情况下，它只编译比以前编译文件更新的文件。
+
+语法格式：autoreconf [参数] [目录]
+
+常用参数：
+
+-v 详细报告处理
+
+-d 不删除临时文件
+
+-f 认为所有的问价都是过期的文件，强制执行
+
+-i 复制辅助文件
+
+参考实例
+
+
+
+[root@linuxcool ~]# autoreconf

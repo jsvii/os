@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===COM <br/>COMB[字节版本]
+===Code===■051DD
+===Operation===(dst)← ~(dst)
+===Coden===若运算结果的最高位被置，则置位<br/>否则，清位
+===Codez===若运算结果为零，则置位<br/>否则，清位
+===Codev===清
+===Codec===置
+===Description===将目标位置的数据按位取反
+===Example===<p>COM R0<br/>013333[8进制] = 000 001 011 011 011 011[2进制]<br/>164444[8进制] = 001 110 100 100 100 100[2进制](对16位取反)<br/><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_instruction_Com_r0.png"/></p>

@@ -1,0 +1,976 @@
+
+sys/buf.h,360
+struct buf21,854
+} buf[buf35,1412
+struct devtab48,1948
+struct	buf bfreelist;62,2357
+#define	B_WRITE	67,2423
+#define	B_READ	68,2468
+#define	B_DONE	69,2513
+#define	B_ERROR	70,2558
+#define	B_BUSY	71,2603
+#define	B_PHYS	72,2653
+#define	B_MAP	73,2719
+#define	B_WANTED 74,2783
+#define	B_RELOC	75,2843
+#define	B_ASYNC	76,2885
+#define	B_DELWRI 77,2942
+
+sys/conf/mkconf.c,229
+#define CHAR	1,0
+#define BLOCK	2,16
+#define INTR	3,33
+#define EVEN	4,49
+#define KL	5,66
+#define ROOT	6,81
+struct tab39,314
+int	fout;370,6007
+main(373,6031
+puke(463,7720
+input(474,7811
+equal(523,8574
+getchar(533,8666
+
+sys/conf/sysfix.c,208
+int	tbuf[tbuf8,158
+int	rbuf[rbuf9,173
+int	obuf[obuf10,188
+int	txtsiz;11,203
+int	datsiz;12,215
+int	bsssiz;13,227
+int	symsiz;14,239
+int	txtrel	16,252
+int	datrel;17,269
+main(20,283
+getrel(128,2146
+
+sys/conf.h,130
+struct	bdevsw21,369
+} bdevsw[bdevsw27,457
+int	nblkdev;37,664
+struct	cdevsw42,713
+} cdevsw[cdevsw49,822
+int	nchrdev;55,903
+
+sys/dmr/bio.c,621
+char	buffers[buffers21,425
+struct	buf	swbuf;22,450
+int	tmtab;28,547
+int	httab;29,558
+bread(55,1300
+breada(73,1662
+bwrite(108,2360
+bdwrite(134,3053
+bawrite(153,3386
+brelse(166,3549
+incore(196,4192
+getblk(218,4812
+iowait(279,5950
+notavail(296,6203
+iodone(315,6557
+clrbuf(335,6840
+binit(352,7065
+#define	IENABLE	389,7803
+#define	WCOM	390,7824
+#define	RCOM	391,7840
+#define	GO	392,7856
+devstart(393,7870
+#define	RHWCOM	418,8362
+#define	RHRCOM	419,8381
+rhstart(421,8401
+int	maplock;452,9089
+mapalloc(453,9102
+mapfree(478,9479
+swap(491,9612
+bflush(524,10288
+physio(551,10880
+geterror(627,12660
+
+sys/dmr/cat.c,172
+#define	CATADDR	13,116
+#define	PCAT	14,140
+#define	CATHIWAT	15,155
+#define	CATLOWAT	16,175
+} cat;21,237
+ctopen(28,284
+ctclose(37,400
+ctwrite(42,433
+catintr(58,657
+
+sys/dmr/dc.c,425
+#define	DCADDR	18,217
+#define	NDC11	23,302
+#define	CDLEAD	28,363
+#define	CARRIER	29,381
+#define	SPEED1	30,400
+#define	STOP1	31,419
+#define	RQSEND	32,438
+#define	PARITY	33,456
+#define	ERROR	34,475
+#define	CTRANS	35,497
+#define	RINGIND	36,519
+struct	tty dc11[dc1139,544
+struct dcregs 41,569
+dcopen(103,1939
+dcclose(138,2694
+dcread(151,2875
+dcwrite(159,2944
+dcxint(167,3030
+dcrint(179,3224
+dcsgtty(216,4025
+
+sys/dmr/dh.c,621
+#define	DHADDR	19,345
+#define	NDH11	20,368
+#define	DHNCH	21,407
+struct	tty dh11[dh1123,454
+char	dh_clist[dh_clist27,525
+int	ndh11	NDH11;32,615
+#define	BITS6	37,665
+#define	BITS7	38,682
+#define	BITS8	39,699
+#define	TWOSB	40,716
+#define	PENABLE	41,733
+#define	OPAR	43,830
+#define	HDUPLX	44,847
+#define	IENABLE	46,870
+#define	PERROR	47,893
+#define	FRERROR	48,915
+#define	XINT	49,938
+#define	SSPEED	50,959
+int	dhsar;55,1046
+struct dhregs 57,1058
+dhopen(71,1206
+dhclose(102,1778
+dhread(115,1947
+dhwrite(123,2024
+dhrint(131,2107
+dhsgtty(156,2543
+dhparam(172,2764
+dhxint(208,3552
+dhstart(230,3901
+
+sys/dmr/dhdm.c,276
+#define	DMADDR	12,97
+struct	tty dh11[dh1114,121
+int	ndh11;15,140
+#define	DONE	17,190
+#define	SCENABL	18,208
+#define	CLSCAN	19,228
+#define	TURNON	20,249
+#define	TURNOFF	21,303
+#define	CARRIER	22,344
+struct dmregs 24,366
+dmopen(32,476
+dmclose(52,857
+dmint(68,1120
+
+sys/dmr/dhfdm.c,59
+struct	tty	dh11[dh1111,80
+dmopen(13,100
+dmclose(21,195
+
+sys/dmr/dn.c,334
+struct dn 13,106
+#define	DNADDR	20,174
+#define	PWI	22,198
+#define	ACR	23,216
+#define	DLO	24,234
+#define	DONE	25,251
+#define	IENABLE	26,269
+#define	DSS	27,290
+#define	PND	28,306
+#define	MENABLE	29,322
+#define	DPR	30,341
+#define	CRQ	31,356
+#define	DNPRI	33,372
+dnopen(35,389
+dnclose(50,640
+dnwrite(55,705
+dnint(86,1231
+
+sys/dmr/dp.c,602
+} dp11;28,582
+#define	ODDPAR	41,720
+#define	IENABLE	42,742
+#define	HDUPLX	43,763
+#define	CTRANS	45,782
+#define	RORUN	46,805
+#define	RING	47,826
+#define	DSRDY	48,846
+#define	CARRIER	49,867
+#define	DONE	50,889
+#define	IENABLE	51,907
+#define	SIENABL	52,928
+#define	WRITE	54,949
+#define	READ	55,965
+#define	DTRDY	57,981
+#define	RCVACT	58,998
+#define	DPADDR	60,1020
+#define	DPPRI	61,1043
+#define	SYN	62,1059
+dpopen(68,1226
+dpclose(89,1647
+dpread(108,1983
+dpwrite(135,2447
+dpwait(156,2892
+dpstart(177,3256
+dptimeout(197,3634
+dprint(212,3870
+dpxint(231,4253
+dpturnaround(246,4545
+
+sys/dmr/hp.c,620
+#define	HPADDR	43,1124
+#define	NHP	44,1147
+struct	devtab	hptab;63,1472
+struct	buf	hpbuf;64,1493
+char	hp_openf;66,1512
+#define	GO	69,1552
+#define	PRESET	70,1566
+#define	RECAL	71,1585
+#define RCLR	72,1602
+#define OFFSET	73,1619
+#define	READY	75,1639
+#define	PIP	76,1683
+#define	ERR	77,1749
+#define	DU	79,1799
+#define	DTE	80,1844
+#define	OPI	81,1897
+#define DCK	83,1989
+#define ECH	84,2040
+#define CLR	86,2090
+#define FMT22	88,2138
+#define	trksec	94,2262
+#define	cylin	95,2285
+hpopen(97,2308
+hpstrategy(109,2459
+hpstart(149,3210
+hpintr(161,3437
+hpread(192,4020
+hpwrite(199,4097
+hpphys(206,4176
+
+sys/dmr/hs.c,244
+struct	devtab	hstab;31,586
+struct	buf	rhsbuf;32,607
+#define	HSADDR	34,627
+#define ERR	36,651
+#define GO	38,701
+#define RCLR	39,715
+#define	DRY	40,732
+hsstrategy(42,775
+hsstart(68,1203
+hsintr(83,1490
+hsread(106,1876
+hswrite(112,1937
+
+sys/dmr/ht.c,741
+struct	devtab	httab;32,331
+struct	buf	rhtbuf;33,352
+#define	NUNIT	35,372
+char	h_openf[h_openf37,389
+char	*h_blkno[h_blkno38,410
+char	*h_nxrec[h_nxrec39,432
+#define	HTADDR	41,455
+#define	GO	43,479
+#define	NOP	44,493
+#define	WEOF	45,507
+#define	SFORW	46,524
+#define	SREV	47,542
+#define	ERASE	48,559
+#define	REW	49,577
+#define	CLR	50,592
+#define	P800	51,608
+#define	P1600	52,651
+#define	IENABLE	53,696
+#define	CRDY	54,717
+#define	EOF	55,735
+#define	DRY	56,750
+#define	MOL	57,767
+#define	PIP	58,786
+#define	ERR	59,805
+#define	SSEEK	61,825
+#define	SIO	62,841
+htopen(64,856
+htclose(79,1077
+hcommand(92,1250
+htstrategy(111,1662
+htstart(145,2207
+htintr(186,3098
+htread(226,3856
+htwrite(233,3960
+htphys(240,4052
+
+sys/dmr/kl.c,324
+#define	KLADDR	15,163
+#define	KLBASE	16,200
+#define	DLBASE	17,243
+#define	NKL11	18,277
+#define	NDL11	19,293
+#define DSRDY	20,309
+#define	RDRENB	21,326
+struct	tty kl11[kl1123,345
+struct klregs 25,376
+klopen(32,447
+klclose(67,1219
+klread(76,1324
+klwrite(81,1370
+klxint(86,1418
+klrint(96,1582
+klsgtty(110,1817
+
+sys/dmr/lp.c,417
+#define	LPADDR	13,112
+#define	IENABLE	15,136
+#define	DONE	16,157
+#define	LPPRI	18,176
+#define	LPLWAT	19,193
+#define	LPHWAT	20,211
+#define	EJLINE	21,230
+#define	MAXCOL	22,248
+} lp11;37,381
+#define	CAP	39,390
+#define	EJECT	40,453
+#define	OPEN	41,470
+#define IND	42,486
+#define	FORM	44,546
+lpopen(46,564
+lpclose(58,738
+lpwrite(64,794
+lpcanon(72,865
+lpstart(159,1943
+lpint(167,2050
+lpoutput(176,2150
+
+sys/dmr/mem.c,31
+mmread(17,231
+mmwrite(41,647
+
+sys/dmr/pc.c,554
+#define	PCADDR	13,123
+#define	CLOSED	15,147
+#define	WAITING	16,164
+#define	READING	17,182
+#define	EOF	18,200
+#define	RDRENB	20,215
+#define	IENABLE	21,233
+#define	DONE	22,254
+#define	BUSY	23,272
+#define	ERROR	24,291
+#define	PCIPRI	26,314
+#define	PCOPRI	27,332
+#define	PCOLWAT	28,350
+#define	PCOHWAT	29,369
+#define	PCIHWAT	30,389
+struct clist 39,475
+struct pc11 45,521
+} pc11;49,590
+pcopen(51,599
+pcclose(71,902
+pcread(83,1064
+pcwrite(101,1346
+pcstart(109,1418
+pcrint(117,1531
+pcpint(136,1868
+pcoutput(144,1949
+pcleader(158,2141
+
+sys/dmr/rf.c,291
+struct	devtab	rftab;22,190
+struct	buf	rrfbuf;23,211
+#define	NRFBLK	25,231
+#define	RFADDR	26,251
+#define	GO	28,275
+#define	RCOM	29,289
+#define	WCOM	30,305
+#define	CTLCLR	31,321
+#define	IENABLE	32,341
+rfstrategy(34,363
+rfstart(59,756
+rfintr(70,944
+rfread(93,1339
+rfwrite(99,1400
+
+sys/dmr/rk.c,394
+#define	RKADDR	14,121
+#define	NRK	15,144
+#define	NRKBLK	16,158
+#define	RESET	18,179
+#define	GO	19,195
+#define	DRESET	20,209
+#define	IENABLE	21,228
+#define	DRY	22,249
+#define	ARDY	23,266
+#define	WLO	24,284
+#define	CTLRDY	25,303
+struct	devtab	rktab;36,403
+struct	buf	rrkbuf;37,424
+rkstrategy(39,444
+rkaddr(69,892
+rkstart(88,1149
+rkintr(98,1296
+rkread(122,1730
+rkwrite(128,1791
+
+sys/dmr/rp.c,440
+#define	RPADDR	24,211
+#define	NRP	25,234
+struct	devtab	rptab;41,574
+struct	buf	rrpbuf;42,595
+#define	GO	44,615
+#define	RESET	45,629
+#define	HSEEK	46,645
+#define	IENABLE	48,664
+#define	READY	49,685
+#define	SUFU	51,705
+#define	SUSU	52,724
+#define	SUSI	53,743
+#define	HNF	54,762
+#define	trksec	61,852
+#define	cylin	62,875
+rpstrategy(64,898
+rpstart(106,1689
+rpintr(117,1882
+rpread(149,2514
+rpwrite(156,2592
+rpphys(163,2672
+
+sys/dmr/sys.c,77
+syopen(14,163
+syread(22,276
+sywrite(30,377
+sysgtty(38,480
+syttyp(46,595
+
+sys/dmr/tc.c,552
+struct	devtab	tctab;22,196
+char	tcper[tcper23,217
+#define	TCADDR	25,233
+#define	NTCBLK	26,256
+#define	TAPERR	28,276
+#define	TREV	29,299
+#define	READY	30,318
+#define	IENABLE	31,337
+#define	UPS	32,358
+#define	ENDZ	33,375
+#define	BLKM	34,396
+#define	ILGOP	35,415
+#define	SELERR	36,436
+#define	SAT	38,458
+#define	RNUM	39,472
+#define	RDATA	40,488
+#define	SST	41,505
+#define	WDATA	42,521
+#define	GO	43,539
+#define	SFORW	45,554
+#define	SREV	46,570
+#define	SIO	47,585
+tcclose(49,600
+tcstrategy(55,652
+tcstart(80,1045
+tcintr(108,1602
+
+sys/dmr/tm.c,678
+struct	devtab	tmtab;23,200
+struct	buf	rtmbuf;24,221
+char	t_openf[t_openf26,241
+char	*t_blkno[t_blkno27,258
+char	*t_nxrec[t_nxrec28,276
+#define	TMADDR	30,295
+#define	GO	32,319
+#define	RCOM	33,333
+#define	WCOM	34,349
+#define	WEOF	35,365
+#define	SFORW	36,381
+#define	SREV	37,399
+#define	WIRG	38,416
+#define	REW	39,433
+#define	DENS	40,449
+#define	IENABLE	41,486
+#define	CRDY	42,507
+#define GAPSD	43,525
+#define	TUR	44,546
+#define	HARD	45,560
+#define	EOF	46,601
+#define	SSEEK	48,622
+#define	SIO	49,638
+tmopen(51,653
+tmclose(65,843
+tcommand(76,996
+tmstrategy(85,1150
+tmstart(119,1691
+tmintr(161,2604
+tmread(199,3390
+tmwrite(206,3494
+tmphys(213,3586
+
+sys/dmr/tty.c,346
+struct cblock 48,1107
+struct cblock cfree[cfree54,1224
+struct cblock *cfreelist;cfreelist56,1298
+gtty(75,1698
+stty(94,1968
+sgtty(113,2381
+wflushtty(132,2720
+cinit(151,3036
+flushtty(171,3349
+canon(195,3869
+ttyinput(255,4921
+ttyoutput(296,5807
+ttrstrt(422,7994
+ttstart(441,8568
+ttread(472,9221
+ttwrite(488,9540
+ttystty(517,10110
+
+sys/dmr/vs.c,286
+#define	VSADDR	11,74
+#define	CDLEAD	12,97
+#define	B1200	13,115
+#define	STOP1	14,133
+#define	CLSEND	15,152
+#define	RQSEND	16,170
+#define	MAGIC_MAP 18,189
+} vs;30,323
+vsopen(32,330
+vsclose(39,438
+vswrite(46,525
+vschar(61,691
+vsxintr(75,840
+vsread(103,1287
+vsrintr(114,1433
+
+sys/dmr/vt.c,213
+int	vtflag;12,96
+struct vtreg 14,109
+#define	VTADDR	19,148
+#define	RQINT	20,171
+#define	BIENABL	21,188
+#define	SEOF	22,208
+#define	VTPRI	23,229
+vtopen(25,246
+vtclose(33,333
+vtwrite(39,392
+vtintr(63,747
+
+sys/file.h,105
+struct	file8,160
+} file[file14,327
+#define	FREAD	17,355
+#define	FWRITE	18,372
+#define	FPIPE	19,390
+
+sys/filsys.h,21
+struct	filsys12,366
+
+sys/ino.h,287
+struct	inode6,119
+#define	IALLOC	20,285
+#define	IFMT	21,308
+#define		IFDIR	22,328
+#define		IFCHR	23,350
+#define		IFBLK	24,372
+#define	ILARG	25,394
+#define	ISUID	26,415
+#define	ISGID	27,435
+#define ISVTX	28,455
+#define	IREAD	29,475
+#define	IWRITE	30,494
+#define	IEXEC	31,514
+
+sys/inode.h,455
+struct	inode11,334
+} inode[inode25,813
+#define	ILOCK	28,843
+#define	IUPD	29,883
+#define	IACC	30,930
+#define	IMOUNT	31,985
+#define	IWANT	32,1031
+#define	ITEXT	33,1085
+#define	IALLOC	36,1152
+#define	IFMT	37,1195
+#define		IFDIR	38,1235
+#define		IFCHR	39,1273
+#define		IFBLK	40,1319
+#define	ILARG	41,1375
+#define	ISUID	42,1430
+#define	ISGID	43,1482
+#define ISVTX	44,1535
+#define	IREAD	45,1595
+#define	IWRITE	46,1654
+#define	IEXEC	47,1674
+
+sys/ken/alloc.c,128
+iinit(23,427
+alloc(55,1104
+free(97,1819
+badblock(135,2558
+ialloc(160,3026
+ifree(224,4206
+getfs(255,4834
+update(284,5436
+
+sys/ken/clock.c,74
+#define	UMODE	7,89
+#define	SCHMAG	8,111
+clock(26,457
+timeout(145,2404
+
+sys/ken/fio.c,144
+getf(20,306
+closef(43,654
+closei(71,1192
+openi(100,1658
+access(143,2440
+owner(187,3152
+suser(206,3415
+ufalloc(218,3535
+falloc(240,3887
+
+sys/ken/iget.c,94
+iget(27,648
+iput(93,1884
+iupdat(122,2350
+itrunc(161,3094
+maknode(199,3787
+wdir(220,4120
+
+sys/ken/main.c,108
+#define	CLOCK1	10,152
+#define	CLOCK2	11,175
+main(49,959
+sureg(140,2415
+estabur(177,3087
+nseg(262,4335
+
+sys/ken/malloc.c,47
+struct map16,309
+malloc(28,479
+mfree(55,988
+
+sys/ken/nami.c,46
+namei(19,417
+schar(182,3211
+uchar(192,3334
+
+sys/ken/pipe.c,100
+#define	PIPSIZ	20,370
+pipe(28,528
+readp(63,1045
+writep(121,1862
+plock(191,2817
+prele(211,3081
+
+sys/ken/prf.c,131
+char	*panicstr;panicstr28,312
+printf(40,627
+printn(68,1036
+putchar(84,1278
+panic(113,1660
+prdev(129,1898
+deverror(142,2163
+
+sys/ken/rdwri.c,75
+readi(22,421
+writei(76,1559
+max(126,2585
+min(139,2710
+iomove(163,3190
+
+sys/ken/sig.c,178
+#define	IPCPRI	15,170
+} ipc;39,495
+signal(48,649
+psignal(61,846
+issig(88,1335
+stop(112,1712
+psig(138,2129
+core(188,2998
+grow(229,3656
+ptrace(256,4109
+procxmt(295,4845
+
+sys/ken/slp.c,130
+sleep(25,579
+wakeup(71,1231
+setrun(91,1484
+setpri(112,1830
+sched(144,2568
+swtch(264,4562
+newproc(351,6364
+expand(462,8886
+
+sys/ken/subr.c,95
+bmap(20,443
+passc(132,2277
+cpass(156,2762
+nodev(179,3130
+nulldev(189,3257
+bcopy(196,3316
+
+sys/ken/sys1.c,113
+#define EXPRI	22,499
+exec(24,517
+rexit(214,3569
+exit(228,3781
+wait(279,4788
+fork(332,5787
+sbreak(364,6280
+
+sys/ken/sys2.c,162
+read(12,158
+write(20,212
+rdwr(30,389
+open(63,945
+creat(78,1108
+open1(100,1488
+close(141,2073
+seek(155,2225
+link(202,2848
+mknod(244,3455
+sslep(271,3807
+
+sys/ken/sys3.c,105
+fstat(18,236
+stat(31,381
+stat1(47,606
+dup(70,961
+smount(86,1147
+sumount(143,2096
+getmdev(179,2793
+
+sys/ken/sys4.c,273
+getswit(16,215
+gtime(22,257
+stime(29,319
+setuid(39,417
+getuid(51,579
+setgid(58,657
+getgid(69,793
+getpid(76,871
+sync(81,918
+nice(87,942
+unlink(103,1130
+chdir(130,1551
+chmod(151,1813
+chown(165,2007
+ssig(202,2669
+kill(217,2894
+times(242,3308
+profil(252,3429
+
+sys/ken/text.c,61
+xswap(23,465
+xfree(53,965
+xalloc(88,1902
+xccdec(148,3056
+
+sys/ken/trap.c,214
+#define	EBIT	9,129
+#define	UMODE	10,179
+#define	SETD	11,234
+#define	SYS	12,279
+#define	USER	13,329
+struct sysent	18,439
+} sysent[sysent21,527
+trap(42,1108
+trap1(189,4328
+nosys(202,4473
+nullsys(210,4534
+
+sys/param.h,1060
+#define	NBUF	5,29
+#define	NINODE	6,73
+#define	NFILE	7,124
+#define	NMOUNT	8,183
+#define	NEXEC	9,240
+#define	MAXMEM	10,293
+#define	SSIZE	11,360
+#define	SINCR	12,415
+#define	NOFILE	13,470
+#define	CANBSIZ	14,522
+#define	CMAPSIZ	15,577
+#define	SMAPSIZ	16,633
+#define	NCALL	17,689
+#define	NPROC	18,744
+#define	NTEXT	19,792
+#define	NCLIST	20,841
+#define	HZ	21,888
+#define	PSWP	29,1004
+#define	PINOD	30,1022
+#define	PRIBIO	31,1040
+#define	PPIPE	32,1059
+#define	PWAIT	33,1075
+#define	PSLEP	34,1092
+#define	PUSER	35,1109
+#define	NSIG	42,1162
+#define		SIGHUP	43,1178
+#define		SIGINT	44,1209
+#define		SIGQIT	45,1252
+#define		SIGINS	46,1286
+#define		SIGTRC	47,1330
+#define		SIGIOT	48,1374
+#define		SIGEMT	49,1402
+#define		SIGFPT	50,1430
+#define		SIGKIL	51,1473
+#define		SIGBUS	52,1502
+#define		SIGSEG	53,1537
+#define		SIGSYS	54,1585
+#define		SIGPIPE	55,1614
+#define	USIZE	62,1707
+#define	NULL	63,1756
+#define	NODEV	64,1771
+#define	ROOTINO	65,1790
+#define	DIRSIZ	66,1837
+#define PS	89,2090
+#define KL	90,2109
+#define SW	91,2128
+
+sys/proc.h,308
+struct	proc9,214
+} proc[proc26,860
+#define	SSLEEP	29,893
+#define	SWAIT	30,943
+#define	SRUN	31,991
+#define	SIDL	32,1021
+#define	SZOMB	33,1082
+#define	SSTOP	34,1147
+#define	SLOAD	37,1209
+#define	SSYS	38,1241
+#define	SLOCK	39,1283
+#define	SSWAP	40,1333
+#define	STRC	41,1387
+#define	SWTED	42,1435
+
+sys/reg.h,188
+#define	R0	6,94
+#define	R1	7,109
+#define	R2	8,125
+#define	R3	9,141
+#define	R4	10,157
+#define	R5	11,173
+#define	R6	12,189
+#define	R7	13,205
+#define	RPS	14,220
+#define	TBIT	16,237
+
+sys/seg.h,176
+#define	UISD	5,37
+#define	UISA	6,104
+#define	UDSA	7,168
+#define	RO	8,232
+#define	WO	9,270
+#define	RW	10,284
+#define	ED	11,298
+int	*ka6;ka621,423
+#define	UBMAP	26,511
+
+sys/systm.h,590
+char	canonb[canonb6,71
+int	coremap[coremap7,130
+int	swapmap[swapmap8,184
+int	*rootdir;rootdir9,238
+int	cputype;10,294
+int	execnt;11,341
+int	lbolt;12,389
+int	time[time13,440
+int	tout[tout14,482
+struct	callo24,761
+} callout[callout29,884
+struct	mount35,995
+} mount[mount40,1135
+int	mpid;41,1152
+char	runin;42,1202
+char	runout;43,1238
+char	runrun;44,1275
+char	curpri;45,1312
+int	maxmem;46,1349
+int	*lks;lks47,1399
+int	rootdev;48,1441
+int	swapdev;49,1484
+int	swplo;50,1527
+int	nswap;51,1573
+int	updlock;52,1611
+int	rablock;53,1645
+char	regloc[regloc54,1688
+
+sys/text.h,38
+struct text7,106
+} text[text15,365
+
+sys/tty.h,796
+struct clist9,245
+struct tty26,660
+char partab[partab43,1301
+#define	TTIPRI	45,1362
+#define	TTOPRI	46,1380
+#define	CERASE	48,1399
+#define	CEOT	49,1452
+#define	CKILL	50,1469
+#define	CQUIT	51,1487
+#define	CINTR	52,1529
+#define	TTHIWAT	55,1573
+#define	TTLOWAT	56,1592
+#define	TTYHOG	57,1611
+#define	HUPCL	60,1643
+#define	XTABS	61,1660
+#define	LCASE	62,1677
+#define	ECHO	63,1694
+#define	CRMOD	64,1711
+#define	RAW	65,1729
+#define	ODDP	66,1745
+#define	EVENP	67,1763
+#define	NLDELAY	68,1782
+#define	TBDELAY	69,1805
+#define	CRDELAY	70,1828
+#define	VTDELAY	71,1851
+#define	DONE	74,1895
+#define	IENABLE	75,1913
+#define	TIMEOUT	78,1961
+#define	WOPEN	79,2013
+#define	ISOPEN	80,2066
+#define	SSTART	81,2106
+#define	CARR_ON	82,2166
+#define	BUSY	83,2226
+#define	ASLEEP	84,2269
+
+sys/user.h,790
+struct user14,361
+} u;59,2258
+#define	EFAULT	62,2284
+#define	EPERM	63,2303
+#define	ENOENT	64,2319
+#define	ESRCH	65,2336
+#define	EINTR	66,2352
+#define	EIO	67,2368
+#define	ENXIO	68,2382
+#define	E2BIG	69,2398
+#define	ENOEXEC	70,2414
+#define	EBADF	71,2432
+#define	ECHILD	72,2448
+#define	EAGAIN	73,2466
+#define	ENOMEM	74,2484
+#define	EACCES	75,2502
+#define	ENOTBLK	76,2520
+#define	EBUSY	77,2539
+#define	EEXIST	78,2556
+#define	EXDEV	79,2574
+#define	ENODEV	80,2591
+#define	ENOTDIR	81,2609
+#define	EISDIR	82,2628
+#define	EINVAL	83,2646
+#define	ENFILE	84,2664
+#define	EMFILE	85,2682
+#define	ENOTTY	86,2700
+#define	ETXTBSY	87,2718
+#define	EFBIG	88,2737
+#define	ENOSPC	89,2754
+#define	ESPIPE	90,2772
+#define	EROFS	91,2790
+#define	EMLINK	92,2807
+#define	EPIPE	93,2825
+
+sys/ken/sysent.c,0
+
+sys/dmr/partab.c,0

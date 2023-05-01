@@ -1,0 +1,46 @@
+* samples
+
+** iptables for transparent TCP proxy
+
+Doing a redirect with iptables can be accomplished as so :
+
+#+BEGIN_SRC bash
+iptables -t nat -A PREROUTING -i eth1 -p tcp -m tcp --dport 80 -j DNAT --to-destination 192.168.0.1:3128
+#+END_SRC
+
+This is a standard web redirect to a proxy server. The rule is placed in the NAT table PREROUTING chain for packets coming in on the eth1 interface for the tcp protocol port 80 and DESTINATION NATTED to an ip and port.
+
+Once the traffic is redirected however, your going to have to get it back to its original destination without the endpoint knowing. I'd be interested in knowing how you accomplish that.
+
+
+** 开启机器 的 ip forward为 iptables 提供路由
+
+有一台A服务器不能上网，和B服务器通过内网来连接，B服务器可以上网，要实现A服务器也可以上网。
+
+- A IP:192.168.0.35
+
+- B IP:192.168.0.146
+
+SNAT:改变数据包的源地址。防火墙会使用外部地址，替换数据包的本地网络地址。这样使网络内部主机能够与网络外部通信。
+
+1.在可以上网的服务器B上，开启内核路由转发功能
+
+#+BEGIN_SRC bash
+echo 1 > /proc/sys/net/ipv4/ip_forward
+#+END_SRC
+
+2.在需要通过代理上网服务器A上，查看路由表。并添加默认网关。route add default gw 192.168.0.146
+[root@localhost ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.0.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U     0      0        0 eth0
+0.0.0.0         192.168.0.146   0.0.0.0         UG    0      0        0 eth0
+
+3.在可以上网那台服务器B上添加SNAT规则
+iptables -t nat -A POSTROUTING -o eth0 -s 192.168.0.0/24 -j SNAT –-to 123.196.112.146
+
+4.保存
+service iptables save
+
+5.验证是否可以正常上网。

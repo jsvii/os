@@ -1,0 +1,38 @@
+* autoload
+
+~zsh info~ 文件中的 Functions 一节
+
+** 原理
+
+*** IBM Knowledge center 中对autoload的描述
+
+https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa400/autold.htm
+
+#+BEGIN_QUOTE
+Autoloading improves the performance of shell initialization by delaying function definition processing until the first use. Functions that are not used by a particular user are never read by the shell, thus avoiding the processing of unused functions. The FPATH variable allows flexibility in accessing directories with systemwide, group, or personal function definitions.
+
+FPATH is defined with the same format as the PATH variable. FPATH is a list of directories separated by colons. These directories contain only function definitions and should not contain the current working directory.
+
+To use autoloading, place frequently used and shared functions in a directory pointed to by the FPATH variable and specify the function name on an autoload or typeset –f command in the user's ENV setup script.
+
+The autoload command identifies functions that are not yet defined. The first time that an autoload function is called within the shell, the shell searches FPATH directories for a file with the same name as the function definition. If a matching file with the same name as the function is found, it is processed and stored in the shell's memory for subsequent execution. The matching file contains the function definition for the autoload function. Other function definitions may be found in this matching file, and if so, they will be defined to the shell when the file is processed.
+#+END_QUOTE
+
+autoloading 通过延迟 function 定义来提升 shell的性能。某一用户从来不需要的functions不会被加载，这样便能避免处理那些不需要用的functions。
+
+#+BEGIN_SRC zsh
+echo $FPATH
+/home/leo/.zinit/completions /usr/local/share/zsh/site-functions /usr/share/zsh/site-functions /usr/share/zsh//functions/Calendar /usr/share/zsh//functions/Chpwd /usr/share/zsh//functions/Completion /usr/share/zsh//functions/Completion/Base /usr/share/zsh//functions/Completion/Linux /usr/share/zsh//functions/Completion/Unix /usr/share/zsh//functions/Completion/X /usr/share/zsh//functions/Completion/Zsh /usr/share/zsh//functions/Completion/openSUSE /usr/share/zsh//functions/Exceptions /usr/share/zsh//functions/MIME /usr/share/zsh//functions/Math /usr/share/zsh//functions/Misc /usr/share/zsh//functions/Newuser /usr/share/zsh//functions/Prompts /usr/share/zsh//functions/TCP /usr/share/zsh//functions/VCS_Info /usr/share/zsh//functions/VCS_Info/Backends /usr/share/zsh//functions/Zftp /usr/share/zsh//functions/Zle /etc/zsh_completion.d
+#+END_SRC
+
+
+autoload 等同于functions -u （有例外），它等同于typeset -f （有例外）
+
+
+
+A function can be marked as _undefined_ using the autoload builtin (or 'functions -u' or 'typeset -fu').  Such a function has no body.  When the function is first executed, the shell searches for its definition using the elements of the fpath variable.  Thus to define functions for autoloading, a typical sequence is:
+
+     fpath=(~/myfuncs $fpath)
+     autoload myfunc1 myfunc2 ...
+
+The usual alias expansion during reading will be suppressed if the autoload builtin or its equivalent is given the option -U.  This is recommended for the use of functions supplied with the zsh distribution. Note that for functions precompiled with the zcompile builtin command the flag -U must be provided when the .zwc file is created, as the corresponding information is compiled into the latter.

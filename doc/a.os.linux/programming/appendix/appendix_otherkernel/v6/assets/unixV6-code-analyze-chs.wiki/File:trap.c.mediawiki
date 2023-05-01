@@ -1,0 +1,30 @@
+
+===Source===
+
+2650 #
+
+2651 #include "../param.h"
+
+2652 #include "../systm.h"
+
+2653 #include "../user.h"
+
+2654 #include "../proc.h"
+
+2655 #include "../reg.h"
+
+2656 #include "../seg.h"
+
+2657
+
+2658 #define EBIT 1 /* user error bit in PS: C-bit */ 
+
+2659 #define UMODE 0170000 /* user-mode bits in PS word */
+
+2660 #define SETD 0170011 /* SETD instruction */
+
+2661 #define SYS 0104400 /* sys (trap) instruction */
+
+2662 #define USER 020 /* user-mode flag added to dev */
+
+

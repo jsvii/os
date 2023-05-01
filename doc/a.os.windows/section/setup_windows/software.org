@@ -1,0 +1,75 @@
+* 基本工具
+
+** health
+
+ -  workrave
+
+** setup
+
+*** driver
+
+  - 驱动精灵
+
+*** office
+
+** develop
+
+*** wsl opensuse
+
+*** shell
+
+  - xshell
+
+  - ConEmu
+
+**** conemu 添加git bash
+
+  1. Open Conemu
+
+  1. Open Settings -> Tasks or go to new tab button -> Setup tasks.
+
+  1. Click + to add a new task
+
+  1. Enter the name as Git Bash or whatever you like
+
+  1. Task parameters: /icon "C:\Program Files (x86)\Git\etc\git.ico" /dir "C:\_git"
+
+  1. Command: "C:\Program Files (x86)\Git\bin\sh.exe" --login -i
+
+
+  1. If you want to force your $HOME directory to be on local HD not network drive, you can do this as the command instead:
+
+  "set PATH=C:\Users\Ndecarteret;%PATH%" & "set HOME=C:\Users\Ndecarteret" & "C:\Program Files (x86)\Git\bin\sh.exe" --login -i
+
+*** java
+
+
+  - jdk
+
+  - maven
+
+  - gradle
+
+  - idea
+
+  - spring tool suite
+
+*** api
+
+  - zeal
+
+*** os
+
+  - Binary Viewer windows下查看任何文件的二进制方式
+
+** media
+
+*** books
+
+  - icecream ebook reader
+
+** networks
+
+*** proxy
+
+  - ccproxy

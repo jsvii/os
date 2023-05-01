@@ -1,0 +1,112 @@
+===Source===
+<div class="wikiheadnote">
+*打开 KL/DL-11 设备
+</div>
+
+<blockquote>
+*涉及到的 常量定义在 [[file:kl.c|kl.c]] [[file:tty.h|tty.h]]
+</blockquote>
+8022 /* ------------------------- */ 
+
+8023 klopen(dev, flag) 
+
+8024 {   register char * addr; 
+
+8025 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct tty|struct tty]] *tp; 
+
+8026 &nbsp;&nbsp;&nbsp;&nbsp;if(dev[[skill:.d_minor|.d_minor]] >= NKL11+NDL11) { 
+
+8027 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = ENXIO; 
+
+8028 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+8029 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*次设备号越界 ， 则抛出错误
+**[[错误代码]] : ENXIO
+</blockquote>
+8030 &nbsp;&nbsp;&nbsp;&nbsp;tp = &[[code:kl11|kl11]][dev[[skill:.d_minor|.d_minor]]]; 
+
+<blockquote>
+*找到 对应的 [[code:struct tty|struct tty]] 结构
+</blockquote>
+8031 &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:user|u.u_procp]]->p_ttyp == 0) { 
+
+8032 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_procp]]->p_ttyp = tp; 
+
+8033 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;tp->t_dev = dev; 
+
+8034 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 现行进程 未分配 tty，则分配
+</blockquote>
+8035 &nbsp;&nbsp;&nbsp;&nbsp;/* set up minor 0 to address KLADDR 
+
+8036 &nbsp;&nbsp;&nbsp;&nbsp; * set up minor 1 thru NKL11-1 to address from KLBASE 
+
+8037 &nbsp;&nbsp;&nbsp;&nbsp; * set up minor NKL11 on to address from DLBASE 
+
+8038 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+8039 &nbsp;&nbsp;&nbsp;&nbsp;addr = KLADDR + 8*dev.d_minor; 
+
+8040 &nbsp;&nbsp;&nbsp;&nbsp;if(dev[[skill:.d_minor|.d_minor]]) 
+
+8041 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;addr =+ KLBASE-KLADDR-8; 
+
+8042 &nbsp;&nbsp;&nbsp;&nbsp;if(dev[[skill:.d_minor|.d_minor]] >= NKL11) 
+
+8043 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;addr =+ DLBASE-KLBASE-8*NKL11+8; 
+
+8044 &nbsp;&nbsp;&nbsp;&nbsp;tp->t_addr = addr; 
+
+<blockquote>
+*计算 tty 的设备寄存器地址
+*8035 - 8038 注释已经说的很明白
+</blockquote>
+8045 &nbsp;&nbsp;&nbsp;&nbsp;if ((tp->t_state&ISOPEN) == 0) { 
+
+8046 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;tp->t_state = ISOPEN<nowiki>|</nowiki>CARR_ON; 
+
+8047 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;tp->t_flags = <nowiki>XTABS|LCASE|ECHO|CRMOD</nowiki>; 
+
+8048 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;tp->t_erase = CERASE; 
+
+8049 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;tp->t_kill = CKILL; 
+
+8050 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*对于 "未打开"的tty，执行初始化操作
+**打开tty
+**置 模式 
+***XTABS
+***LCASE
+***ECHO
+***CRMOD
+**置特殊字符
+</blockquote>
+8051 &nbsp;&nbsp;&nbsp;&nbsp;addr->klrcsr <nowiki>=| IENABLE|DSRDY|RDRENB</nowiki>; 
+
+<blockquote>
+*置 设备接收器 标志
+**使能位
+**就绪位
+**完成位
+</blockquote>
+8052 &nbsp;&nbsp;&nbsp;&nbsp;addr->kltcsr <nowiki>=| IENABLE</nowiki>; 
+
+<blockquote>
+*置 设备发送器 标志
+**就绪位
+</blockquote>
+8053 } 
+
+8054 /* ------------------------- */ 
+
+
+
+===Caller===
+*[[code:cdevsw]]

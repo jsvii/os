@@ -1,0 +1,7 @@
+* 硬件
+
+** 存储
+
+#+BEGIN_SRC bash
+zypper install fuse-exfat exfat-utils
+#+END_SRC

@@ -1,0 +1,80 @@
+* provider标签
+
+#+BEGIN_SRC xml
+<provider android:authorities="list"
+          android:enabled=["true" | "false"]
+          android:exported=["true" | "false"]
+          android:grantUriPermissions=["true" | "false"]
+          android:icon="drawable resource"
+          android:initOrder="integer"
+          android:label="string resource"
+          android:multiprocess=["true" | "false"]
+          android:name="string"
+          android:permission="string"
+          android:process="string"
+          android:readPermission="string"
+          android:syncable=["true" | "false"]
+          android:writePermission="string">
+    . . .
+</provider>
+#+END_SRC
+
+
+这个元素用于声明一个内容提供器，它对应一个ContentProvider类的子类。它提供了对由应用程序管理的数据的结构化的访问。应用程序使用的所有的内容提供器都必须在其清单文件中由<provider>元素来声明。对于那些没有在清单中声明的内容提供器，系统看不到，也不会运行。（只需要声明那些作为该应用程序一部分的来开发的那些内容提供器，而不是那些由应用程序使用的由其他人开发本应用之外的那些内容提供器）。
+
+Android系统通过 ~content:URI~ 的授权部分来识别内容提供器。例如，假设下列的URI要传递给ContentResolver.query()方法：
+content://com.example.project.healthcareprovider/nurses/rn
+content:表示数据是属于内容提供器的，授权（com.example.project.healthcareprovider）：标识着一个具体的提供器。因此授权必须
+唯一的。通常，就像这个例子一样，授权是一个完整的ContentProvider子类的名称。URI的路径部分被内容提供器用来标识具体的数据子
+集，但是那些路径没有被声明在清单文件中。
+
+属性：
+android:authorities
+标识内容提供器范围内的数据URI的授权列表，有多个授权时，要用分号来分离每个授权。为了避免冲突，授权名应该使用Java样式的命
+名规则（如：com.example.provider.cartoonprovider）。通常，用ContentProvider子类名称来设定这个属性。
+这个属性没有默认值，至少要指定一个授权。
+
+android:enabled
+指定这个内容提供器是否能够被系统安装。默认值是true。
+
+android:exported
+指定该内容提供器是否能够被其他的应用程序组件使用。默认值是true。
+
+android:grantUriPermission
+设定那些对内容提供的数据没有访问权限的访问者，是否能够被授予访问的权限，这个权限是临时性的，它会克服由readPermission、
+writePermission和permission属性的设置限制。如果这个属性设置为true，那么权限就可以授予访问者，否则不会授予没有访问权限的
+访问者。如果设置为true，则权限可以临时被授予内容提供器的任何数据。如果设置为false，则权限只能被授予
+<gran-uri-permission>子元素中所列出的数据子集。默认值是false。
+
+android:icon
+图标。
+
+android:initOrder
+定义内容提供器应该被实例化的顺序，这个顺序是相对与相同进程所拥有的其他内容提供器的。当内容提供器间有相互的依赖时，就需要
+设置这个属性，以确保它们能够按照其依赖的顺序被创建。这个属性值是一个简单的整数，大的数字要被优先初始化。
+
+Android:label
+标签。
+
+android:multiprocess
+设定是否能够在每个使用该内容提供器的客户端进程中都创建一个内容提供器的实例。默认值是false。
+
+android:name
+名称。
+
+android:permission
+设定客户端在读写内容提供器的数据时必须要有的权限的名称。
+
+android:process
+定义内容提供器应该运行在那个进程中的进程名称。通常，应用程序的所有组件都运行在给应用程序创建的默认进程中。它有与应用程序
+包相同的名称。<application>元素的process属性能够给其所有的组件设置一个不同的默认进程。但是每个组件都能够用它们自己的
+process属性来覆盖这个默认设置，从而允许把应用程序分离到不同的多个进程中。
+
+android:readPermission
+设置查询内容提供器的数据时，客户端所必须要有的权限。
+
+android:syncable
+设定内容提供器控制下的数据是否要与服务器上的数据进行同步。
+
+android:writePermission
+设置修改内容提供器的数据时，客户端所必须要有的权限。

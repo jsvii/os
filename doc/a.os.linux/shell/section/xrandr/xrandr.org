@@ -1,0 +1,14 @@
+* xrandr
+
+The full name for RANDR is X Resize, Rotate, and Reflect Extension.
+
+这个字母代表着r and r
+
+Xrandr - X Resize, Rotate and Reflection extension.
+
+xrandr, xrandr --prop and xrandr --verbose will give you some information with different level of detail.
+
+
+xrandr  --fb  3200x2000 --output LVDS --scale 2.5x2.5 --output
+              VGA              --pos              0x0              --panning
+              3200x2000+0+0/3200x2000+0+0/64/64/64/64

@@ -1,0 +1,40 @@
+===Source===
+<div class="wikiheadnote">
+*获取 当前进程 的时间参量
+*输入1个参数 
+**用于保存时间参量的空间的指针 : 保存在[[code:user|u.u_arg[0]]]
+*返回参量按如下顺序
+**u_utime
+**u_stime
+**u_cutime[2]
+**u_cstime[2]
+*参看 [[code:user|user]]
+</div>
+
+3655 
+
+3656 times() 
+
+3657 { 
+
+3658 &nbsp;&nbsp;&nbsp;&nbsp;register *p; 
+
+3659 
+
+3660 &nbsp;&nbsp;&nbsp;&nbsp;for(p = &[[code:user|u.u_utime]]; p < &[[code:user|u.u_utime]]+6;) { 
+
+3661 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:suword|suword]]([[code:user|u.u_arg]][0], *p++); 
+
+3662 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_arg]][0] =+ 2; 
+
+3663 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+3664 } 
+
+3665 /* ------------------------- */ 
+
+
+
+===Param===
+:(times = 43.; not in assembler)
+:<b>sys times; buffer</b>

@@ -1,0 +1,56 @@
+__TOC__
+=综述=
+*本篇描述的函数调用指一般的C语言函数调用
+*函数调用编译成[[pdp11:JSR|jsr]] PC,DST的形式，参见[[编程技巧]]
+*编译器在函数体前后加入现场保护/还原代码
+**在函数体首加入 [[pdp11:JSR|jsr]] R5,[[code:csv|csv]]
+**在函数体末加入 [[pdp11:JMP|jmp]] [[code:cret|cret]]
+=分析=
+*[[pdp11:JSR|jsr]] PC,DST 
+**将PC[0]入栈
+**程序转入被调用函数
+*[[pdp11:JSR|jsr]] R5,[[code:csv|csv]] 
+**R5[0]入栈
+**当前PC[1]→R5([[code:csv|csv]]程序要求R5指向返回地址)
+**程序转入[[code:csv|csv]]
+*[[code:csv|csv]]函数中
+**R2[0]、R3[0]、R4[0]入栈
+**R5形成勾连(参看[[环境指针]])
+*至此 
+**函数返回地址PC[0]入栈被保护
+**R5[0]、R2[0]、R3[0]、R4[0] 均入栈被保护
+**R5指向R5[0]的栈内地址形成勾连(参看[[环境指针]])
+**所有必要参量均被保护
+*[[pdp11:JMP|jmp]] [[code:cret|cret]]
+**逆序还原R2[0]、R3[0]、R4[0]
+**还原栈顶指针SP←R5
+**R5还原勾连(参看[[环境指针]])
+**函数返回
+=举例=
+C语言代码<br/>
+<div class="wikicode">
+test()<br/>
+{<br/>
+    printf("Hello,World!");<br/>
+}<br/>
+main()<br/>
+{<br/>
+    test();<br/>
+    return(0);<br/>
+}<br/>
+</div>
+经过编译和反汇编，形成代码
+<div class="wikicode">
+:...<br/>
+:<b>[[pdp11:JSR|jsr]] r5,[[code:csv|csv]]</b><br/>
+::mov $cret+16,(sp)<br/>
+::[[pdp11:JSR|jsr]] pc,*$_printf<br/>
+:<b>[[pdp11:JMP|jmp]] [[code:cret|cret]]</b><br/>
+:<b>[[pdp11:JSR|jsr]] r5,[[code:csv|csv]]</b><br/>
+::<b>[[pdp11:JSR|jsr]] pc,_test</b><br/>
+:<b>[[pdp11:JMP|jmp]] [[code:cret|cret]]</b><br/>
+:...<br/>
+</div>
+
+=参考=
+*[[汇编函数调用的现场保护]]

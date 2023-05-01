@@ -1,0 +1,22 @@
+* ice
+
+** intro
+
+zinit ice as"program" cp"httpstat.sh -> httpstat" pick"httpstat"
+zinit light b4b4r07/httpstat
+上面的代码会将插件目录添加到 $PATH 中，并复制文件 httpstat.sh 为 httpstat ，并为 pick 选中的文件（本例中为 httpstat） 添加正确的可执行权限（+x）。还有一个修饰词 mv，它和 cp 的工作方式类似，只不过是移动文件而不是复制。mv的优先级比cp低。
+
+cp 和 mv ice （还有其它的比如 atclone）只会在插件（或代码片段）被安装的时候运行。要想再次运行它们的话需要先使用 zinit delete PZT::modules/osx 这类命令来删除插件）
+
+*** ice list
+
+#+BEGIN_SRC shell
+ZINIT[ice-list]="svn|proto|from|teleid|bindmap|cloneopts|id-as|depth|if|wait|load|\
+unload|blockf|pick|bpick|src|as|ver|silent|lucid|notify|mv|cp|\
+atinit|atclone|atload|atpull|nocd|run-atpull|has|cloneonly|make|\
+service|trackbinds|multisrc|compile|nocompile|nocompletions|\
+reset-prompt|wrap-track|reset|sh|\!sh|bash|\!bash|ksh|\!ksh|csh|\
+\!csh|aliases|countdown|ps-on-unload|ps-on-update|trigger-load|\
+light-mode|is-snippet|atdelete|pack|git|verbose|on-update-of|\
+subscribe|extract|param"
+#+END_SRC

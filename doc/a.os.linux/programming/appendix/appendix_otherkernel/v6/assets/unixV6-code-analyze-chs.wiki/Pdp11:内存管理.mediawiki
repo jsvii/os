@@ -1,0 +1,60 @@
+=概述=
+PDP-11 虚地址字长为16位，而总线和CPU地址字长为18位，需要内存管理机制将虚内存地址转化为物理内存地址
+==内存管理单元==
+*PDP-11提供两组页寄存器，分别对应核心态和用户态(由[[pdp11:PS|PS]]状态字选择)
+*核心态页寄存器组 称为 [[KISA]]
+*用户态页寄存器组 称为 UISA
+*每组页寄存器由8个页寄存器组成
+*每个页寄存器由[[pdp11:页地址寄存器|页地址寄存器]]和[[pdp11:页说明寄存器|页说明寄存器]]组成
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_memory_apr.png"/></p>
+
+==虚地址==
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_memory_va.png"/></p>
+*长度为16位
+*APF = Active Page Field <br/>对应页寄存器的编号
+*BN = Block Number <br/>块号
+*BID = Displacement In Block<br/>块内偏移
+
+==物理地址==
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_memory_pa.png"/></p>
+*长度为18位
+*PHYSICAL BLOCK NO <br/>物理块号
+*DIB = Displacement In Block <br/>块内偏移
+
+==英文和缩写对照==
+{|
+!名称
+!英文
+!英文缩写
+|-
+|页寄存器
+|Active Page Register
+|APR
+|-
+|[[pdp11:页地址寄存器|页地址寄存器]]
+|Page Address Register
+|PAR
+|-
+|[[pdp11:页说明寄存器|页说明寄存器]]
+|Page Descriptor Register
+|PDR
+|-
+|虚地址
+|Visual Address
+|VA
+|-
+|物理地址
+|Physical Address
+|PA
+|}
+
+=地址变换机制=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_memory.png"/></p>
+0] 根据[[pdp11:PS|PS]]中14-15位选取页寄存器组(核心态 或 用户态)<BR/>
+1]2] 根据虚地址VA中APF段从页寄存器组中选取某一页寄存器[APR]<br/>
+3] 选取的页寄存器[APR]中的页地址寄存器[PAR]的0-11位，加上虚地址中块号[BN]段，形成物理块号[PBN]<br/>
+4] 将得到的物理块号[PBN]，与虚地址VA中的块内偏移[DIB]段，拼接成物理地址[PA]<br/>
+
+=参考=
+*[[pdp11:页地址寄存器]]
+*[[pdp11:页说明寄存器]]

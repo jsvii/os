@@ -1,0 +1,6 @@
+* plugins
+
+类似Fish shell的命令提示功能 https://github.com/zsh-users/zsh-autosuggestions
+
+
+类似Fish shell的语法高亮功能  https://github.com/zsh-users/zsh-syntax-highlighting

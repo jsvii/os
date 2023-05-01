@@ -1,0 +1,15 @@
+#+TITLE: manjaro
+
+
+#+BEGIN_SRC bash
+  sudo pacman-mirrors -i -c China -m rank5
+
+  sudo pacman -Syu
+
+  sudo pacman -S base-devel
+
+  # linux-headers
+  uname -r
+
+  sudo pacman -S linux-headers
+#+END_SRC

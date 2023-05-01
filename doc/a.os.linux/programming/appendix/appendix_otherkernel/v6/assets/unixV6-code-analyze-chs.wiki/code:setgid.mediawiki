@@ -1,0 +1,58 @@
+===Source===
+<div class="wikiheadnote">
+*设置组ID
+*共传入一个参数，设为id
+*id的低字节部分为 欲设置的组ID
+*参看[[权限管理]]
+</div>
+
+3459 
+
+3460 setgid() 
+
+3461 { 
+
+3462 &nbsp;&nbsp;&nbsp;&nbsp;register gid; 
+
+3463 
+
+3464 &nbsp;&nbsp;&nbsp;&nbsp;gid = [[skill:u.u_ar0|u.u_ar0]][R0].lobyte; 
+
+<blockquote>
+*取输入参数的低字节(低8位),作为欲设置的组ID gid
+*此处使用了[[编程技巧#无名结构|编程技巧之无名结构]]
+*结构体定义在 [[file:param.h|param.h]] 0180行
+</blockquote>
+3465 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u]].u_rgid == gid.lobyte<nowiki> ||</nowiki> [[code:suser|suser]]()) { 
+
+<blockquote>
+*若 真实组ID==gid 或 当前用户具有超级用户权限，继续进行
+*此处使用gid.lobyte，为保证gid取低字节8位，让比较正常进行
+</blockquote>
+3466 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u]].u_gid = gid; 
+
+3467 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u]].u_rgid = gid; 
+
+<blockquote>
+*置以下量 为 gid
+**组ID u_gid
+**真实组ID u_rgid
+*参看[[权限管理]]
+* 此处赋值 gid 进行了隐式类型转换，传入u_gid、u_rgid的实际是gid 的低字节
+</blockquote>
+3468 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+3469 } 
+
+3470 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[权限管理]]
+*[[编程技巧#无名结构|编程技巧之无名结构]]
+
+===Param===
+:(setgid = 46.; not in assembler)
+:(group ID in r0)
+:<b>sys setgid</b>

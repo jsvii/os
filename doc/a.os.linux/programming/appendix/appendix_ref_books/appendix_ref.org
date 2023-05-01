@@ -1,0 +1,35 @@
+* 参考资料
+
+** linux kernel
+
+  https://makelinux.github.io/kernel/map/
+
+
+** 网络相关
+
+  - route policy的资料  http://www.policyrouting.org/PolicyRoutingBook/ONLINE/TOC.html
+
+** linux学习
+
+  - linux from scratch https://lfs.xry111.site/zh_CN/11.1/
+
+  - http://linux.vbird.org/
+
+  - https://jvns.ca/ Julia Evans博客
+
+
+  - Linux 开发者大会文档 https://github.com/meission/ckernel
+
+
+  - https://www.linux.it/~rubini/docs/
+
+
+  - LWN.net https://lwn.net/ LWN.net is a reader-supported news site dedicated to producing the best coverage from within the Linux and free software development communities.
+
+  - kernel article http://www.linux.it/~rubini/docs/ 内核文档
+
+  - linux kernel map https://makelinux.github.io/kernel/map/ 以地图的方式展示linux内核
+
+** Gurus
+
+https://www.quora.com/profile/Robert-Love-1

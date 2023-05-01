@@ -1,0 +1,57 @@
+===Source===
+<div class="wikiheadnote">
+*stty 的系统调用函数
+*设置 tty参数
+**t_speeds
+**t_erase
+**t_kill
+**t_flags
+*传入2个参数 fildes, arg
+**fildes : 指定tty设备的字符设备装载文件的文件描述号，保存在[[skill:u.u_ar0|u.u_ar0]][R0](参看 [[文件系统]])
+(在 [[code:sgtty|sgtty]] 中处理)
+**arg : 存放tty参数的地址，保存在[[code:user|u.u_arg[0]]]
+
+</div>
+
+8180 /* The routine implementing the stty system call.
+
+8181 &nbsp;* Read in values and call lower level.
+
+8182 &nbsp;*/
+
+8183 stty()
+
+8184 {
+
+8185 &nbsp;&nbsp;&nbsp;&nbsp;register int *up;
+
+8186
+
+8187 &nbsp;&nbsp;&nbsp;&nbsp;up = [[code:user|u.u_arg]][0];
+
+8188 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_arg]][0] = [[code:fuword|fuword]](up);
+
+8189 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_arg]][1] = [[code:fuword|fuword]](++up);
+
+8190 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_arg]][2] = [[code:fuword|fuword]](++up);
+
+<blockquote>
+*[[code:user|u.u_arg[]]] ← 欲设置的tty参数值
+</blockquote>
+8191 &nbsp;&nbsp;&nbsp;&nbsp;[[code:sgtty|sgtty]](0);
+
+<blockquote>
+*根据[[code:user|u.u_arg[]]]设置tty参数
+</blockquote>
+8192 }
+
+8193 /* ------------------------- */ 
+
+
+
+===Param===
+:(stty = 31.)
+:(file descriptor in r0)
+:<b>sys stty; arg</b>
+:...
+:arg: .byte ispeed, ospeed; .byte erase, kill; mode

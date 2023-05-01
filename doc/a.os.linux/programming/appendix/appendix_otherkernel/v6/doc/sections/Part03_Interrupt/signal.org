@@ -1,0 +1,81 @@
+* 信号
+
+信号是事件发生时对进程的通知机制。
+
+信号的设置、检查都是由软件实施的，但处理方式与中断类似，所以信号也被称为软中断。
+
+
+** 基本特征
+
+*** 信号的种类
+
+#+BEGIN_SRC C
+/*
+ * signals
+ * dont change
+ */
+#define	NSIG	20               // 信号的最大值，用户也可以定义其他6个信号
+#define		SIGHUP	1	/* hangup */ //终止
+#define		SIGINT	2	/* interrupt (rubout) */ //中断
+#define		SIGQIT	3	/* quit (FS) */ //终止
+#define		SIGINS	4	/* illegal instruction */
+#define		SIGTRC	5	/* trace or breakpoint */
+#define		SIGIOT	6	/* iot */
+#define		SIGEMT	7	/* emt */
+#define		SIGFPT	8	/* floating exception */
+#define		SIGKIL	9	/* kill */
+#define		SIGBUS	10	/* bus error */
+#define		SIGSEG	11	/* segmentation violation */
+#define		SIGSYS	12	/* sys */
+#define		SIGPIPE	13	/* end of pipe */
+#+END_SRC C
+
+*** 信号的交互方式
+
+
+**** 信号的发送
+
+  - kill调用 / 终端发出
+
+  - 进程收到的信号存放在 proc.p_sig 字段中
+
+     1. 默认为 0 表示没有信号。
+
+     1. 如果在第一个信号处 理前又收到了第二个信号，则第一个信号会被覆盖，信号不会排队，只有一种情况例外，就是第一个信号是 SIGKIL，这时候后续信号会被忽略。
+
+  - 信号对应的处理函数地址存放在u.u_signal[NSIG]中，这样信号procA.p_sig 的处理函数是u.u_signal[procA.p_sig]。
+
+
+
+**** 信号的接收
+
+在以下几个情况时处理信号:
+
+  - proc.p_pri 大于等于0，并准备进入休眠状态时
+
+  - 时钟中断处理函数以每秒1次的频率确认
+
+  - 陷入处理函数
+
+*** 相关实现
+
+=ssig= 是系统调用 =signal= 的处理函数。
+
+#+BEGIN_SRC C
+ssig()
+{
+        register a;
+
+        a = u.u_arg[0];  # 信号数，不能大于NSIG,不能是SIGKIl
+        if(a<=0 || a>=NSIG || a ==SIGKIL) {
+                u.u_error = EINVAL;
+                return;
+        }
+        // u.u_signal[a]是老的信号处理函数。u_ar是个指针，放在上的R0中返回给用户实现。
+        u.u_ar0[R0] = u.u_signal[a];
+        // 设定新的处理函数
+        u.u_signal[a] = u.u_arg[1];
+        if(u.u_procp->p_sig == a)
+                u.u_procp->p_sig = 0;
+}
+#+END_SRC

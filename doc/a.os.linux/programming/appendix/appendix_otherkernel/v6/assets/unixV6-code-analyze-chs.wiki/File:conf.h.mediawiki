@@ -1,0 +1,19 @@
+===Source===
+
+4600 /* Used to dissect integer device code 
+
+4601 &nbsp;* into major (driver designation) and 
+
+4602 &nbsp;* minor (driver parameter) parts. 
+
+4603 &nbsp;*/ 
+
+4604 struct { 
+
+4605 &nbsp;&nbsp;&nbsp;&nbsp;char d_minor; 
+
+4606 &nbsp;&nbsp;&nbsp;&nbsp;char d_major; 
+
+4607 }; 
+
+

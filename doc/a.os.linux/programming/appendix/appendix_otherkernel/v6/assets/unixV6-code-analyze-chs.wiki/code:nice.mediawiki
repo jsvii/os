@@ -1,0 +1,52 @@
+===Source===
+<div class="wikiheadnote">
+*设置 现行进程的优先级
+*共传入一个参数 设为t
+*对普通用户，t的有效范围为 0 ~ 20
+*对超级用户，t的有效范围为 -128 ~ 20
+</div>
+
+3492 
+
+3493 nice() 
+
+3494 { 
+
+3495 &nbsp;&nbsp;&nbsp;&nbsp;register n; 
+
+3496 
+
+3497 &nbsp;&nbsp;&nbsp;&nbsp;n = [[skill:u.u_ar0|u.u_ar0]][R0]; 
+
+3498 &nbsp;&nbsp;&nbsp;&nbsp;if(n > 20) 
+
+3499 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n = 20; 
+
+<blockquote>
+*修正上限
+</blockquote>
+3500 &nbsp;&nbsp;&nbsp;&nbsp;if(n < 0 && ![[code:suser|suser]]()) 
+
+3501 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n = 0; 
+
+<blockquote>
+*对于 普通用户 ，修正下限
+</blockquote>
+3502 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u]].u_procp->[[code:proc|p_nice]] = n; 
+
+<blockquote>
+*设置 [[进程优先级]]
+</blockquote>
+3503 } 
+
+3504 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[进程优先级]]
+
+===Param===
+:(nice = 34.)
+:(priority in r0)
+:<b>sys nice</b>

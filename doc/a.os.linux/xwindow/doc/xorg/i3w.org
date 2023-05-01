@@ -1,0 +1,21 @@
+* i3w
+
+.Xresources 文件
+#+BEGIN_SRC bash
+Xft.dpi: 192
+
+! These might also be useful depending on your monitor and personal preference:
+Xft.autohint: 0
+Xft.lcdfilter:  lcddefault
+Xft.hintstyle:  hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
+#+END_SRC
+
+~.xinitrc~ 文件中加入一行新功能
+
+xrdb -merge ~/.Xresources
+
+
+参考 https://askubuntu.com/questions/1317983/how-to-set-display-scaling-to-200-for-i3-desktop-environment

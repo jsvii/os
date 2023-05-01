@@ -1,0 +1,154 @@
+Preface 1
+* toc
+
+
+** Chapter 1: Shell Something Out 7
+
+Introduction 8
+Printing in the terminal 10
+Playing with variables and environment variables 13
+Function to prepend to environment variables 17
+Math with the shell 19
+Playing with file descriptors and redirection 21
+Arrays and associative arrays 27
+Visiting aliases 29
+Grabbing information about the terminal 31
+Getting and setting dates and delays 32
+Debugging the script 36
+Functions and arguments 37
+Reading the output of a sequence of commands 40
+Reading n characters without pressing the return key 43
+Running a command until it succeeds 44
+Field separators and iterators 45
+Comparisons and tests 48
+
+** Chapter 2: Have a Good Command 53
+Introduction 53
+Concatenating with cat 54
+Recording and playing back of terminal sessions 57
+Finding files and file listing 58
+Playing with xargs 68
+Translating with tr 73
+Checksum and verification 77
+Cryptographic tools and hashes 80
+Sorting unique and duplicates 83
+Temporary file naming and random numbers 89
+Splitting files and data 90
+Slicing filenames based on extension 92
+Renaming and moving files in bulk 95
+Spell checking and dictionary manipulation 97
+Automating interactive input 99
+Making commands quicker by running parallel processes 102
+
+** Chapter 3: File In, File Out 105
+Introduction 106
+Generating files of any size 106
+The intersection and set difference (A-B) on text files 107
+Finding and deleting duplicate files 110
+Working with file permissions, ownership, and the sticky bit 113
+Making files immutable 118
+Generating blank files in bulk 119
+Finding symbolic links and their targets 120
+Enumerating file type statistics 121
+Using loopback files 124
+Creating ISO files and hybrid ISO 127
+Finding the difference between files, patching 130
+Using head and tail for printing the last or first 10 lines 132
+Listing only directories – alternative methods 135
+Fast command-line navigation using pushd and popd 136
+Counting the number of lines, words, and characters in a file 138
+Printing the directory tree 139
+
+** Chapter 4: Texting and Driving 143
+Introduction 143
+Using regular expressions 144
+Searching and mining a text inside a file with grep 147
+Cutting a file column-wise with cut 154
+Using sed to perform text replacement 158
+Using awk for advanced text processing 162
+Finding the frequency of words used in a given file 168
+Compressing or decompressing JavaScript 170
+Merging multiple files as columns 173
+Printing the nth word or column in a file or line 174
+Printing text between line numbers or patterns 175
+Printing lines in the reverse order 176
+Parsing e-mail addresses and URLs from a text 177
+Removing a sentence in a file containing a word 178
+Replacing a pattern with text in all the files in a directory 180
+Text slicing and parameter operations 181
+
+** Chapter 5: Tangled Web? Not At All! 183
+Introduction 184
+Downloading from a web page 184
+Downloading a web page as plain text 187
+A primer on cURL 188
+Accessing Gmail e-mails from the command line 192
+Parsing data from a website 194
+Image crawler and downloader 195
+Web photo album generator 198
+Twitter command-line client 201
+Creating a "define" utility by using the Web backend 206
+Finding broken links in a website 209
+Tracking changes to a website 211
+Posting to a web page and reading the response 214
+
+** Chapter 6: The Backup Plan 217
+Introduction 217
+Archiving with tar 218
+Archiving with cpio 224
+Compressing data with gzip 226
+Archiving and compressing with zip 230
+Faster archiving with pbzip2 231
+Creating filesystems with compression 232
+Backup snapshots with rsync 234
+Version control based backup with Git 237
+Creating entire disk images with fsarchiver 240
+
+** Chapter 7: The Old-boy Network 243
+Introduction 243
+Setting up the network 244
+Let us ping! 250
+Listing all the machines alive on a network 254
+Running commands on a remote host with SSH 257
+Transferring files through the network 261
+Connecting to a wireless network 265
+Password-less auto-login with SSH 267
+Port forwarding using SSH 269
+Mounting a remote drive at a local mount point 270
+Network traffic and port analysis 271
+Creating arbitrary sockets 274
+Sharing an Internet connection 275
+Basic firewall using iptables 276
+
+** Chapter 8: Put on the Monitor's Cap 279
+Introduction 279
+Monitoring disk usage 280
+Calculating the execution time for a command 285
+Collecting information about logged in users, boot logs, and boot failures 288
+Listing the top 10 CPU consuming processes in an hour 291
+Monitoring command outputs with watch 293
+Logging access to files and directories 294
+Logfile management with logrotate 296
+Logging with syslog 297
+Monitoring user logins to find intruders 299
+Remote disk usage health monitor 303
+Finding out active user hours on a system 305
+Measuring and optimizing power usage 308
+Monitoring disk activity 309
+Checking disks and filesystems for errors 310
+
+** Chapter 9: Administration Calls 313
+
+Introduction 313
+Gathering information about processes 314
+Killing processes and send or respond to signals 324
+Sending messages to user terminals 327
+Gathering system information 329
+Using /proc for gathering information 330
+Scheduling with cron 331
+Writing and reading the MySQL database from Bash 335
+User administration script 340
+Bulk image resizing and format conversion 344
+Taking screenshots from the terminal 347
+Managing multiple terminals from one 348
+Index 351

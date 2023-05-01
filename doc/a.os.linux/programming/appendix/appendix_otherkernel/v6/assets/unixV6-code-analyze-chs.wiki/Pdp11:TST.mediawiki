@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===TST<br/>TSTB[字节版本]
+===Code===■053DD
+===Operation===(dst)← (dst)
+===Coden===若 运算结果<0，则置位<br/>否则，清位
+===Codez===若 运算结果=0，则置位<br/>否则，清位
+===Codev===清
+===Codec===清
+===Description===根据目标位置的数据设置[[pdp11:标志位|标志位]]的N位和Z位
+===Example===<p>TST_R1<br/><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_instruction_Tst_r1.png"/></p>

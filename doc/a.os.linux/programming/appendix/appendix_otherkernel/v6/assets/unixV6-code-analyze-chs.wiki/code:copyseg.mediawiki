@@ -1,0 +1,123 @@
+===Source===
+<div class="wikiheadnote">
+*传入2个参数,参数1:块A地址,参数2:块B地址
+*将A块中的内容拷贝到B块中
+</div>
+
+0694 /* -------------------------*/
+
+0695 .globl _copyseg
+
+0696 _copyseg:
+
+<blockquote>
+*[[汇编函数调用的现场保护]]后的堆栈状态:
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Copyseg_0.png"/></p>
+</blockquote>
+0697 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] PS,-(sp)
+
+0698 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] UISA0,-(sp)
+
+0699 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] UISA1,-(sp)
+
+<blockquote>
+*将PS,UISA0,UISA1保护进栈
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Copyseg_1.png"/></p>
+</blockquote>
+0700 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $30340,PS
+
+<blockquote>
+*将处理器当前态设为核心态,先前态设为用户态,处理机优先级设为7([[关中断]])
+*参看[[处理机状态字]]
+</blockquote>
+0701 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 10(sp),UISA0
+
+0702 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] 12(sp),UISA1
+
+<blockquote>
+*将参数1(块A地址)读入UISA0,将参数2(块B地址)读入UISA1,参见[[遗留问题]]
+</blockquote>
+0703 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] UISD0,-(sp)
+
+0704 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] UISD1,-(sp)
+
+<blockquote>
+*将UISD0,UISD1保护进栈
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Copyseg_2.png"/></p>
+</blockquote>
+0705 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $6,UISD0
+
+0706 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $6,UISD1
+
+<blockquote>
+*将UISD0,UISD1置为可读写状态,参见[[Pdp11:页说明寄存器]]
+</blockquote>
+0707 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r2,-(sp)
+
+<blockquote>
+*将R2保护进栈
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Copyseg_3.png"/></p>
+</blockquote>
+0708 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] r0
+
+0709 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $8192.,r1
+
+0710 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $32.,r2
+
+<blockquote>
+*置R0=0=0000000000000000(16位2进制),下图为(R0)的寻址过程
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Copyseg_2_1.png"/></p>
+*置R1=8192=0010000000000000(16位2进制),下图为(R1)的寻址过程
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Copyseg_2_2.png"/></p>
+*详见[[Pdp11:内存管理]]
+*置R2=32,表示拷贝次数
+**由于一内存块为64个字节,而每次拷贝为1个字(2个字节),所以拷贝一块需拷贝32次
+</blockquote>
+0711 1:
+
+0712 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MFPI|mfpi]] (r0)+
+
+<blockquote>
+*(R0)入栈,(R0)++,指向下一个字
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Copyseg_4.png"/></p>
+</blockquote>
+0713 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MTPI|mtpi]] (r1)+
+
+<blockquote>
+*弹出栈顶至(R1)中,(R1)++,指向下一个字
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Copyseg_5.png"/></p>
+</blockquote>
+0714 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:SOB|sob]] r2,1b
+
+<blockquote>
+*将块A中的内容一个字一个字拷贝给块B
+</blockquote>
+0715 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,r2
+
+0716 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,UISD1
+
+0717 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,UISD0
+
+0718 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,UISA1
+
+0719 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,UISA0
+
+0720 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] (sp)+,PS
+
+<blockquote>
+*从栈中恢复R2,UISA0,UISA1,UISD0,UISD1,PS的值
+</blockquote>
+0721 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTS|rts]] pc
+
+<blockquote>
+*恢复原PC值,程序继续执行
+</blockquote>
+0722
+
+
+
+===Caller===
+*[[code:newproc]]
+*[[code:expand]]
+*[[code:sbreak]]
+*[[code:grow]]

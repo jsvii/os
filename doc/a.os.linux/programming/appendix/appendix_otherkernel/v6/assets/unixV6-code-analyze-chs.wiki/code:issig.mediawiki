@@ -1,0 +1,88 @@
+===Source===
+<div class="wikiheadnote">
+*检查 并 处理当前进程信号
+*返回值
+**没有信号，返回0
+**有信号，返回信号值
+</div>
+
+3979 
+
+3980 /* 
+
+3981 &nbsp;* Returns true if the current 
+
+3982 &nbsp;* process has a signal to process. 
+
+3983 &nbsp;* This is asked at least once 
+
+3984 &nbsp;* each time a process enters the 
+
+3985 &nbsp;* system. 
+
+3986 &nbsp;* A signal does not do anything 
+
+3987 &nbsp;* directly to a process; it sets 
+
+3988 &nbsp;* a flag that asks the process to 
+
+3989 &nbsp;* do something to itself. 
+
+3990 &nbsp;*/ 
+
+3991 issig() 
+
+3992 { 
+
+3993 &nbsp;&nbsp;&nbsp;&nbsp;register n; 
+
+3994 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct proc|struct proc]] *p; 
+
+3995 
+
+3996 &nbsp;&nbsp;&nbsp;&nbsp;p = [[code:user|u.u_procp]]; 
+
+3997 &nbsp;&nbsp;&nbsp;&nbsp;if(n = p->p_sig) { 
+
+3998 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (p->p_flag&STRC) { 
+
+3999 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:stop|stop]](); 
+
+<blockquote>
+* 现行进程 带 跟踪标志(STRC)，执行[[code:stop|stop]]
+* 参看[[跟踪]]
+</blockquote>
+4000 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if ((n = p->p_sig) == 0) 
+
+4001 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  return(0); 
+
+<blockquote>
+*信号 为 0，不做处理
+</blockquote>
+4002 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+4003 &nbsp;&nbsp;&nbsp;&nbsp;   if(([[code:user|u.u_signal]][n]&1) == 0) 
+
+4004 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return(n); 
+
+<blockquote>
+*信号处理方式 
+**为 奇数，不做处理
+**为 偶数，返回信号值
+</blockquote>
+4005 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+4006 &nbsp;&nbsp;&nbsp;&nbsp;return(0); 
+
+4007 } 
+
+4008 /* ------------------------- */ 
+
+
+===Ref===
+*[[信号系统]]
+
+===Caller===
+*[[code:sleep]]
+*[[code:trap]]
+*[[code:clock]]

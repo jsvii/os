@@ -1,0 +1,5 @@
+* 文字无法正常显示
+
+https://github.com/Eugeny/tabby/issues/1044
+
+1. issue中的原因是因为被杀毒软件检查了。但本人遭遇到的似乎是多个ssh client造成的

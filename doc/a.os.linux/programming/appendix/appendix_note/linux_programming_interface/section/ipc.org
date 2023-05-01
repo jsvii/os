@@ -1,0 +1,11 @@
+* ipc
+
+msg queue
+
+查看一些信息a
+<udev02@scckf02cduat095:/home/udev02>$cat /proc/sys/kernel/msgmax
+8192
+<udev02@scckf02cduat095:/home/udev02>$cat /proc/sys/kernel/msgmnb
+16384
+<udev02@scckf02cduat095:/home/udev02>$cat /proc/sys/kernel/msgmni
+7549

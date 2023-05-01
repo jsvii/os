@@ -1,0 +1,166 @@
+===Source===
+<div class="wikiheadnote">
+*进程自我终止
+</div>
+
+3212
+
+3213 /* Release resources.
+
+3214 &nbsp;* Save u. area for parent to look at.
+
+3215 &nbsp;* Enter zombie state.
+
+3216 &nbsp;* Wake up parent and init processes,
+
+3217 &nbsp;* and dispose of children.
+
+3218 &nbsp;*/
+
+3219 exit()
+
+3220 {
+
+3221 &nbsp;&nbsp;&nbsp;&nbsp;register int *q, a;
+
+3222 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:proc|struct proc]] *p;
+
+3223
+
+3224 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u]].u_procp->p_flag =& ~STRC;
+
+<blockquote>
+*去除当前进程的STRC标识，参看[[跟踪]]
+</blockquote>
+3225 &nbsp;&nbsp;&nbsp;&nbsp;for(q = &[[code:user|u]].u_signal[0]; q < &[[code:user|u]].u_signal[NSIG];)
+
+3226 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;*q++ = 1;
+
+<blockquote>
+*清空信号处理函数表,参看[[信号系统]]
+</blockquote>
+3227 &nbsp;&nbsp;&nbsp;&nbsp;for(q = &[[code:user|u]].u_ofile[0]; q < &[[code:user|u]].u_ofile[NOFILE]; q++)
+
+3228 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(a = *q) {
+
+3229 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; *q = NULL;
+
+3230 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; [[code:closef|closef]](a);
+
+<blockquote>
+*清空进程打开文件表,并关闭原先启用的[[code:struct file|file结构]],参看[[内存打开文件结构]]
+</blockquote>
+3231 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  }
+
+3232 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]]([[code:user|u]].u_cdir);
+
+<blockquote>
+*释放当前所在目录的内存inode
+</blockquote>
+3233 &nbsp;&nbsp;&nbsp;&nbsp;[[code:xfree|xfree]]();
+
+<blockquote>
+*释放共享正文段
+</blockquote>
+3234 &nbsp;&nbsp;&nbsp;&nbsp;a = [[code:malloc|malloc]](swapmap, 1);
+
+<blockquote>
+*在盘交换区上分配大小为1块(512个字节)的空间,我们且称其为 残留信息块
+</blockquote>
+3235 &nbsp;&nbsp;&nbsp;&nbsp;if(a == NULL)
+
+3236 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:panic|panic]]("out of swap");
+
+<blockquote>
+*若分配失败,提示出错
+</blockquote>
+3237 &nbsp;&nbsp;&nbsp;&nbsp;p = [[code:getblk|getblk]](swapdev, a);
+
+3238 &nbsp;&nbsp;&nbsp;&nbsp;[[code:bcopy|bcopy]](&u, p->b_addr, 256);
+
+3239 &nbsp;&nbsp;&nbsp;&nbsp;[[code:bwrite|bwrite]](p);
+
+<blockquote>
+*若分配成功,在内存中为 残留信息块 分配一缓存块p
+*将进程图像中的[[code:user|USER结构]]以及其他一些内容读入p
+**说明:此处意在保留[[code:user|USER结构]]的信息,其他的内容无所谓
+*将缓存块p写回盘交换区的 残留信息块中
+</blockquote>
+3240 &nbsp;&nbsp;&nbsp;&nbsp;q = [[code:user|u]].u_procp;
+
+3241 &nbsp;&nbsp;&nbsp;&nbsp;[[code:mfree|mfree]](coremap, q->p_size, q->p_addr);
+
+<blockquote>
+*释放内存中 进程图像站的内存空间
+</blockquote>
+3242 &nbsp;&nbsp;&nbsp;&nbsp;q->p_addr = a;
+
+3243 &nbsp;&nbsp;&nbsp;&nbsp;q->p_stat = SZOMB;
+
+<blockquote>
+*将进程ppda区指针指向残留信息块
+*置进程状态为SZOMB,此举是为了让父进程在调用[[code:wait|wait]]函数时搜索自己终止的子进程时使用
+</blockquote>
+3244
+
+3245 loop:
+
+3246 &nbsp;&nbsp;&nbsp;&nbsp;for(p = &[[code:struct proc|proc]][0]; p < &[[code:struct proc|proc]][NPROC]; p++)
+
+3247 &nbsp;&nbsp;&nbsp;&nbsp;if(q->p_ppid == p->p_pid) {
+
+3248 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]](&[[code:struct proc|proc]][1]);
+
+3249 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]](p);
+
+<blockquote>
+*寻找当前进程的父进程
+**若能找到,唤醒父进程与1号进程
+</blockquote>
+3250 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for(p = &[[code:struct proc|proc]][0]; p < &[[code:struct proc|proc]][NPROC]; p++)
+
+3251 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(q->p_pid == p->p_ppid) {
+
+3252 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; p->p_ppid = 1;
+
+3253 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; if (p->p_stat == SSTOP)
+
+3254 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:setrun|setrun]](p);
+
+<blockquote>
+*将当前进程的所有子进程的父进程置为1号进程,你可以把这个动作看作成是交代后事
+*若子进程为SSTOP状态,则将其置为就绪态,交代[[跟踪]]的后事
+</blockquote>
+3255 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;}
+
+3256 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:swtch|swtch]]();
+
+<blockquote>
+*[[进程调度]],切换进程上台
+</blockquote>
+3257 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;/* no return */
+
+3258 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+3259 &nbsp;&nbsp;&nbsp;&nbsp;q->p_ppid = 1;
+
+3260 &nbsp;&nbsp;&nbsp;&nbsp;goto loop;
+
+<blockquote>
+*若不能找到父进程,则强制将1#进程置为父进程,跳转至3245重新搜索
+**搜索的结果肯定是搜到父进程为1号进程,然后再执行后续操作
+</blockquote>
+3261 }
+
+3262 /* ------------------------- */
+
+
+
+===Ref===
+*[[进程状态]]
+
+===Caller===
+*[[code:rexit]]
+*[[code:stop]]
+*[[code:psig]]
+*[[code:procxmt]]

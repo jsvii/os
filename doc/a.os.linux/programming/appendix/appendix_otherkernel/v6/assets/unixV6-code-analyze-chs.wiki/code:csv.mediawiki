@@ -1,0 +1,44 @@
+===Source===
+<div class="wikiheadnote">
+*用于保护函数现场
+*常用于[[函数调用的现场保护]]
+*入口要求R5为函数返回地址
+</div>
+
+1418 /* -------------------------*/ 
+
+1419 .globl csv
+
+<blockquote>
+*进入csv函数前，R5存储函数返回地址PC[0]
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_csv_1.png"/></p></blockquote>
+1420 csv:
+
+1421 &nbsp;&nbsp;&nbsp;&nbsp;[[Pdp11:MOV|mov]] r5,r0
+
+1422 &nbsp;&nbsp;&nbsp;&nbsp;[[Pdp11:MOV|mov]] sp,r5
+
+<blockquote>
+*函数返回地址PC[0]复制到R0
+*SP复制到R5,参考[[环境指针]]
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_csv_2.png"/></p></blockquote>
+1423 &nbsp;&nbsp;&nbsp;&nbsp;[[Pdp11:MOV|mov]] r4,-(sp)
+
+1424 &nbsp;&nbsp;&nbsp;&nbsp;[[Pdp11:MOV|mov]] r3,-(sp)
+
+1425 &nbsp;&nbsp;&nbsp;&nbsp;[[Pdp11:MOV|mov]] r2,-(sp)
+
+<blockquote><p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_csv_3.png"/></p></blockquote>
+1426 &nbsp;&nbsp;&nbsp;&nbsp;[[Pdp11:JSR|jsr]] pc,(r0)
+
+<blockquote>
+*函数返回
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_csv_4.png"/></p>
+</blockquote>
+1427
+
+
+===Ref===
+*[[环境指针]]
+*[[函数调用的现场保护]]
+*[[关于汇编函数的说明]]

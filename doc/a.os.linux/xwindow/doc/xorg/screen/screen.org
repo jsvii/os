@@ -1,0 +1,60 @@
+* screen
+
+i3w时，屏幕的大小不好控制
+
+1080p的dpi 141较为合适
+
+1440p的dpi 120 （120%） 144（150%）
+
+https://www.reddit.com/r/linuxquestions/comments/t9x85s/what_is_the_easiest_way_to_use_linux_with_a_1440p/
+
+.Xresources 文件
+#+BEGIN_SRC bash
+Xft.dpi: 192
+
+! These might also be useful depending on your monitor and personal preference:
+Xft.autohint: 0
+Xft.lcdfilter:  lcddefault
+Xft.hintstyle:  hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
+#+END_SRC
+
+~.xinitrc~ 文件中加入一行新功能
+
+xrdb -merge ~/.Xresources
+
+
+参考 https://askubuntu.com/questions/1317983/how-to-set-display-scaling-to-200-for-i3-desktop-environment
+
+
+** Xft.dpi 是什么意思
+
+https://linuxreviews.org/HOWTO_set_DPI_in_Xorg
+
+鼠标的DPI是每英寸点数,也就是鼠标每移动一英寸指针在屏幕上移动的点数。
+
+联想小新参数
+
+*** File: $HOME/.Xresources
+
+
+Xft.dpi: 141
+
+This font DPI setting can also be configured in desktop environment specific configuration tools. Xfce has a tool called xfce4-appearance-settings (called "Appearance" in its menu). Font DPI can be set in that configuration tools Fonts tab. KDE Plasma has a similar setting available in systemsettings5 ("System settings" in its menu) under Fonts where you can define a Force font DPI value.
+
+You can verify that the right font DPI setting is in effect with xrdb -query |grep dpi
+
+Do note that setting font DPI does NOT change or affect the X server DPI and a X configuration file with a Monitor section and a DisplaySize setting will or a X startup command with a --dpi VALUE will NOT change the Xft.dpi value accordingly. You will need to change both. The MATE desktop environment is an exception; it will set the Xft.dpi value using the X servers DPI value.
+
+*** How DPI Values Are Used
+
+The font DPI setting (Xft.dpi) is used by a lot of programs. You will immediately notice a huge difference when that setting is changed, a majority of software applications will change the font size depending on his setting.
+
+The X server DPI is, on the other hand, barely used. Common GUI toolkits like Qt and GTK don't care about that setting, not even a little. Icons and things like that won't change.
+
+
+https://wiki.archlinux.org/title/HiDPI
+
+xrandr --output eDP1 --scale 1.25x1.25

@@ -1,0 +1,133 @@
+===Source===
+<div class="wikiheadnote">
+*link的系统调用函数
+*将 文件的别名 加入文件系统
+*使用2个隐式参数: name1 , name2
+**name1 : 文件的当前路径，保存在[[code:user|u.u_arg[0]]]
+**name2 : 文件的别名路径，保存在[[code:user|u.u_arg[1]]]
+</div>
+
+5905 
+
+5906 
+
+5907 /* link system call 
+
+5908 &nbsp;*/ 
+
+5909 link() 
+
+5910 { 
+
+5911 &nbsp;&nbsp;&nbsp;&nbsp;register *[[code:struct inode|ip]], *xp; 
+
+5912 &nbsp;&nbsp;&nbsp;&nbsp;extern uchar; 
+
+5913 
+
+5914 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]] = [[code:namei|namei]](&[[code:uchar|uchar]], 0); 
+
+<blockquote>
+*ip ← name1 对应的 INODE
+</blockquote>
+5915 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct inode|ip]] == NULL) 
+
+5916 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+5917 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct inode|ip]]->i_nlink >= 127) { 
+
+5918 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = EMLINK; 
+
+5919 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto out; 
+
+5920 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若ip 别名数 >=127，抛出错误
+**[[错误代码]] : EMLINK
+</blockquote>
+5921 &nbsp;&nbsp;&nbsp;&nbsp;if(([[code:struct inode|ip]]->i_mode&IFMT)==IFDIR && ![[code:suser|suser]]()) 
+
+5922 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto out; 
+
+<blockquote>
+*只有 超级用户 才可以给目录起别名
+</blockquote>
+5923 &nbsp;&nbsp;&nbsp;&nbsp;/* 
+
+5924 &nbsp;&nbsp;&nbsp;&nbsp; * ulock to avoid possible hanging in namei 
+
+5925 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+5926 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]]->i_flag =& ~ILOCK; 
+
+<blockquote>
+*解锁ip (在5914 [[code:namei|namei]]置锁)
+</blockquote>
+5927 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_dirp]] = [[code:user|u.u_arg]][1]; 
+
+5928 &nbsp;&nbsp;&nbsp;&nbsp;xp = [[code:namei|namei]](&[[code:uchar|uchar]], 1); 
+
+<blockquote>
+*xp ← 查找 name2 对应的 INODE
+</blockquote>
+5929 &nbsp;&nbsp;&nbsp;&nbsp;if(xp != NULL) { 
+
+5930 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = EEXIST; 
+
+5931 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]](xp); 
+
+5932 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*xp 若已存在，则抛出错误，释放xp
+**[[错误代码]] : EEXIST
+</blockquote>
+5933 &nbsp;&nbsp;&nbsp;&nbsp;if(u.u_error) 
+
+5934 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto out; 
+
+5935 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_pdir]]->i_dev != [[code:struct inode|ip]]->i_dev) { 
+
+5936 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]]([[code:user|u.u_pdir]]); 
+
+5937 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = EXDEV; 
+
+5938 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto out; 
+
+5939 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若name1 和 name2 INODE不在同一设备，抛出错误
+**[[错误代码]] : EXDEV
+</blockquote>
+5940 &nbsp;&nbsp;&nbsp;&nbsp;[[code:wdir|wdir]]([[code:struct inode|ip]]); 
+
+<blockquote>
+*将 ip (再次) 链入目录结构 (新文件名name2为参数)
+</blockquote>
+5941 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]]->i_nlink++; 
+
+5942 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]]->i_flag <nowiki>=|</nowiki> IUPD; 
+
+<blockquote>
+*修正ip参数
+</blockquote>
+5943 
+
+5944 out: 
+
+5945 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]]([[code:struct inode|ip]]); 
+
+5946 } 
+
+5947 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[文件系统]]
+
+===Param===
+:(link = 9.)
+:<b>sys link; name1; name2</b>

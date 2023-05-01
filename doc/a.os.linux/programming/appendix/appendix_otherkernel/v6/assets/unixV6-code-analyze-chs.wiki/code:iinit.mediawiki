@@ -1,0 +1,119 @@
+===Source===
+<div class="wikiheadnote">
+*该函数在系统启动时调用
+*初始化 [[文件系统]]
+*初始化 系统时间
+</div>
+
+6911 
+
+6912 /* 
+
+6913 &nbsp;* iinit is called once (from main) 
+
+6914 &nbsp;* very early in initialization. 
+
+6915 &nbsp;* It reads the root’s super block 
+
+6916 &nbsp;* and initializes the current date 
+
+6917 &nbsp;* from the last modified date. 
+
+6918 &nbsp;* 
+
+6919 &nbsp;* panic: iinit -- cannot read the super 
+
+6920 &nbsp;* block. Usually because of an IO error. 
+
+6921 &nbsp;*/ 
+
+6922 iinit() 
+
+6923 { 
+
+6924 &nbsp;&nbsp;&nbsp;&nbsp;register *cp, *bp; 
+
+6925 
+
+6926 &nbsp;&nbsp;&nbsp;&nbsp;(*[[code:bdevsw|bdevsw]][ [[code:rootdev|rootdev]][[skill:.d_major|.d_major]] ].d_open)([[code:rootdev|rootdev]], 1); 
+
+<blockquote>
+*调用 根设备的d_open函数
+*对于 [[RK磁盘]]，d_open函数为空函数，参看[[code:bdevsw|设备函数描述]]
+</blockquote>
+6927 &nbsp;&nbsp;&nbsp;&nbsp;bp = [[code:bread|bread]]([[code:rootdev|rootdev]], 1); 
+
+<blockquote>
+*读取 根设备的第一块 bp
+*根设备的第一块 为 超级块
+*关于 超级块，参考 [[文件系统]]
+</blockquote>
+6928 &nbsp;&nbsp;&nbsp;&nbsp;cp = [[code:getblk|getblk]](NODEV); 
+
+<blockquote>
+*申请512字节长的缓存 cp
+*这里以NODEV为参数，使用了[[code:getblk|getblk]]的第二功能
+</blockquote>
+6929 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_error]]) 
+
+6930 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:panic|panic]]("iinit"); 
+
+<blockquote>
+*若检测出错误(由前几行的函数抛出错误)，调用[[code:panic|panic]]处理错误
+</blockquote>
+6931 &nbsp;&nbsp;&nbsp;&nbsp;[[code:bcopy|bcopy]](bp->b_addr, cp->b_addr, 256); 
+
+6932 &nbsp;&nbsp;&nbsp;&nbsp;[[code:brelse|brelse]](bp); 
+
+<blockquote>
+*将bp对应的缓存内容 复制到 cp的缓存内容
+*释放bp
+*此时，cp([[file:bio.c|buffers]]的一个元素)成为了 设备超级块 的缓存
+</blockquote>
+6933 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct mount|mount]][0].m_bufp = cp; 
+
+6934 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct mount|mount]][0].m_dev = [[code:rootdev|rootdev]]; 
+
+<blockquote>
+*[[code:struct mount|mount]][0] 置初值
+**m_bufp 指向 cp
+**m_dev 置为根设备
+</blockquote>
+6935 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct filsys|cp]] = [[code:struct buf|cp]]->b_addr; 
+
+<blockquote>
+*之前 cp 为 [[code:struct buf|struct buf]] 类型
+*之后 cp 为 [[code:struct filsys|filsys]] 类型
+</blockquote>
+6936 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct filsys|cp]]->s_flock = 0; 
+
+6937 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct filsys|cp]]->s_ilock = 0; 
+
+6938 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct filsys|cp]]->s_ronly = 0; 
+
+<blockquote>
+*置 超级块 的参数,参看[[code:struct filsys|filsys]]
+**两个操作锁 清零
+**只读标志 清零
+</blockquote>
+6939 &nbsp;&nbsp;&nbsp;&nbsp;time[0] = [[code:struct filsys|cp]]->s_time[0]; 
+
+6940 &nbsp;&nbsp;&nbsp;&nbsp;time[1] = [[code:struct filsys|cp]]->s_time[1]; 
+
+<blockquote>
+*用 根设备的最近修改时间 置 系统时间
+*由此看到系统时间不精确，如果根设备停止运转一段时间，需要手动设置系统时间
+</blockquote>
+6941 } 
+
+6942 /* ------------------------- */ 
+
+6943 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[文件系统]]
+
+===Caller===
+*[[code:main]]

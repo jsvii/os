@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===JMP
+===Code===0001DD
+===Operation===PC ← (dst)
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===程序控制跳转到目标地址 [ [[遗留问题]] ]
+===Example===无

@@ -1,0 +1,133 @@
+|source = 
+<div class="wikiheadnote">
+*用于释放已分配的内/外存块，合并入空闲块管理链表进行管理
+*共传入三个参数 : mp , size , aa
+*mp : 用于管理空闲块的链表
+*size : 欲释放的块大小
+*aa : 欲释放的块的首地址
+</div>
+
+2549
+
+2550 /*
+
+2551 &nbsp;* Free the previously allocated space aa
+
+2552 &nbsp;* of size units into the specified map.
+
+2553 &nbsp;* Sort aa into map and combine on
+
+2554 &nbsp;* one or both ends if possible.
+
+2555 &nbsp;*/
+
+2556 mfree(mp, size, aa)
+
+2557 [[code:struct map|struct map]] *mp;
+
+2558 {
+
+2559 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct map|struct map]] *bp;
+
+2560 &nbsp;&nbsp;&nbsp;&nbsp;register int t;
+
+2561 &nbsp;&nbsp;&nbsp;&nbsp;register int a;
+
+2562
+
+2563 &nbsp;&nbsp;&nbsp;&nbsp;a = aa;
+
+2564 &nbsp;&nbsp;&nbsp;&nbsp;for (bp = mp; bp->m_addr<=a && bp->m_size!=0; bp++);
+
+<blockquote>将bp指向第一个首地址大于a的元素，或指向队列末</blockquote>
+2565 &nbsp;&nbsp;&nbsp;&nbsp;if (bp>mp && (bp-1)->m_addr+(bp-1)->m_size == a) {
+
+2566 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;(bp-1)->m_size =+ size; 
+
+<blockquote>[[code:mfree#举例|[1]]] 若释放块可并入bp前一元素，则合并</blockquote>
+2567 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (a+size == bp->m_addr) { 
+
+2568 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   (bp-1)->m_size =+ bp->m_size; 
+
+2569 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   while (bp->m_size) { 
+
+2570 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  bp++; 
+
+2571 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  (bp-1)->m_addr = bp->m_addr; 
+
+2572 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  (bp-1)->m_size = bp->m_size; 
+
+2573 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } 
+
+2574 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>[[code:mfree#举例|[2]]] 若释放块可并入bp，则合并</blockquote>
+2575 &nbsp;&nbsp;&nbsp;&nbsp;} else {
+
+2576 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if (a+size == bp->m_addr && bp->m_size) { 
+
+<blockquote>[[code:mfree#举例|[3]]] 若释放块可并入bp，则合并</blockquote>
+2577 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  bp->m_addr =- size; 
+
+2578 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  bp->m_size =+ size; 
+
+2579 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } else if(size) do { 
+
+2580 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  t = bp->m_addr; 
+
+2581 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  bp->m_addr = a; 
+
+2582 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  a = t; 
+
+2583 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  t = bp->m_size; 
+
+2584 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  bp->m_size = size; 
+
+2585 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  bp++; 
+
+2586 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } while (size = t); 
+
+<blockquote>[[code:mfree#举例|[4]]] 若释放块不可并入链表，则插入链表</blockquote>
+2587 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+2588 }
+
+2589 /*----------------------- */
+
+2590
+
+2591
+
+2592
+
+2593
+
+2594
+
+2595
+
+2596
+
+2597
+
+2598
+
+2599
+
+
+===Extend===
+=举例=
+<p>图中1、2、3、4标记对应于源代码分析中的标记<img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_mfree.png"/></p>
+
+
+===Ref===
+*[[空闲块管理]]
+===Caller===
+*[[code:main]]
+*[[code:sched]]
+*[[code:expand]]
+*[[code:exit]]
+*[[code:wait]]
+*[[code:xswap]]
+*[[code:xfree]]
+*[[code:xccdec]]

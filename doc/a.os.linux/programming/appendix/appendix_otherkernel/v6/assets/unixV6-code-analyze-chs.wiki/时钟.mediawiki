@@ -1,0 +1,10 @@
+=概述=
+*UNIX 使用的时钟发生器型号为 KW11-L型线频时钟<br/>若KW11-L不存在，则使用KW11-P型可编程实时时钟
+*关于这两种时钟发生器以及其寄存器的说明<br/>参看[[参考文献|PDP-11 Peripherals Handbook]] 91页<br/>这里只讨论其使用
+
+=时钟使用=
+*[[file:systm.h|lks(0226)]] 指向时钟发生器的控制/状态寄存器
+*启动/重启 时钟发生器<div class="wikicode">*lks = 0115;</div>
+
+=时钟中断=
+*处理函数 [[code:clock|clock]]

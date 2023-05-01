@@ -1,0 +1,87 @@
+===Source===
+<div class="wikiheadnote">
+*mknod 的系统调用，只能由超级用户调用
+*根据参数生成 INODE(一般是特殊INODE，如 设备装载INODE)，详细参看UNIX手册
+*使用3个隐式参数
+**name : 文件路径名(文件实体一般不存在，只用于生成INODE)
+**mode : 设置为 INODE 模式位，模式常量参看[[file:inode.h|inode.h]]
+**addr : 设置为 INODE 的i_addr[0]位
+</div>
+
+5948 
+
+5949 /* 
+
+5950 &nbsp;* mknod system call 
+
+5951 &nbsp;*/ 
+
+5952 mknod() 
+
+5953 { 
+
+5954 &nbsp;&nbsp;&nbsp;&nbsp;register *[[code:struct inode|ip]]; 
+
+5955 &nbsp;&nbsp;&nbsp;&nbsp;extern uchar; 
+
+5956 
+
+5957 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:suser|suser]]()) { 
+
+5958 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]] = [[code:namei|namei]](&[[code:uchar|uchar]], 1); 
+
+<blockquote>
+*ip ← 根据 name 查找INODE
+</blockquote>
+5959 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct inode|ip]] != NULL) { 
+
+5960 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:user|u.u_error]] = EEXIST; 
+
+5961 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   goto out; 
+
+5962 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 ip 已存在，抛出错误，释放ip
+**[[错误代码]] : EEXIST
+</blockquote>
+5963 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+5964 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_error]]) 
+
+5965 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+<blockquote>
+*若 之前存在错误，则函数返回
+*此处检测到的错误分为两类
+**[[code:namei|namei]] 抛出的错误
+**[[code:suser|suser]] 抛出的错误(当前用户并非超级用户)
+</blockquote>
+5966 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]] = [[code:maknode|maknode]]([[code:user|u.u_arg]][1]); 
+
+5967 &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:struct inode|ip]]==NULL) 
+
+5968 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+5969 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]]->i_addr[0] = [[code:user|u.u_arg]][2]; 
+
+5970 
+
+5971 out: 
+
+5972 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]]([[code:struct inode|ip]]); 
+
+5973 } 
+
+5974 /* ------------------------- */ 
+
+5975 
+
+
+
+===Ref===
+*[[文件系统]]
+
+===Param===
+:(mknod = 14.; not in assembler)
+:<b>sys mknod; name; mode; addr</b>

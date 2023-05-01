@@ -1,0 +1,13 @@
+* pull
+
+从镜像仓库中拉取或者更新指定镜像
+
+#+BEGIN_SRC sh
+docker pull [OPTIONS] NAME[:TAG|@DIGEST]
+#+END_SRC
+
+|  Name, shorthand              | Default | Description |
+|-------------------------------+---------+-------------|
+| --all-tags , -a		|  -   | Download all tagged images in the repository |
+| --disable-content-trust	| true | Skip image verification |
+| --platform                    |  -   | experimental (daemon)API 1.32+ Set platform if server is multi-platform capable |

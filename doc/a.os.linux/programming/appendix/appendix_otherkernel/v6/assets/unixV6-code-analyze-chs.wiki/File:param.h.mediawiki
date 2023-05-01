@@ -1,0 +1,218 @@
+===Source===
+
+0100 /* fundamental constants: do not change */
+
+0101
+
+0102
+
+0103 #define USIZE 16 /* size of user block (*64) */
+
+<blockquote>
+*PPDA区的大小（块数），参考[[内存管理]]
+</blockquote>
+0104 #define NULL 0
+
+0105 #define NODEV (-1)
+
+0106 #define ROOTINO 1 /* i number of all roots */
+
+<blockquote>
+*超级块 的 INODE号
+</blockquote>
+0107 #define DIRSIZ 14 /* max characters per directory */
+
+0108
+
+0109
+
+0110 /* signals: do not change */
+
+0111
+
+0112
+
+0113 #define NSIG 20
+
+<blockquote>
+*信号总数，参看[[信号系统]]
+</blockquote>
+0114 #define SIGHUP 1 /* hangup */ 
+
+0115 #define SIGINT 2 /* interrupt (rubout) */ 
+
+0116 #define SIGQIT 3 /* quit (FS) */ 
+
+0117 #define SIGINS 4 /* illegal instruction */ 
+
+0118 #define SIGTRC 5 /* trace or breakpoint */ 
+
+0119 #define SIGIOT 6 /* iot */ 
+
+0120 #define SIGEMT 7 /* emt */
+
+0121 #define SIGFPT 8 /* floating point exception */ 
+
+0122 #define SIGKIL 9 /* kill */ 
+
+0123 #define SIGBUS 10 /* bus error */ 
+
+0124 #define SIGSEG 11 /* segmentation violation */ 
+
+0125 #define SIGSYS 12 /* sys */ 
+
+0126 #define SIGPIPE 13 /* end of pipe */ 
+
+0127
+
+0128 /* tunable variables */
+
+0129
+
+0130 #define NBUF 15 /* size of buffer cache */
+
+0131 #define NINODE 100 /* number of in core inodes */
+
+0132 #define NFILE 100 /* number of in core file structures */ 
+
+0133 #define NMOUNT 5 /* number of mountable file systems */ 
+
+0134 #define NEXEC 3 /* number of simultaneous exec’s */
+
+<blockquote>
+*调用[[code:exec|exec]] 生成进程的 最大进程数
+</blockquote>
+0135 #define MAXMEM (64*32) /* max core per process;
+
+0136 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; first number is kw */ 
+
+0137 #define SSIZE 20 /* initial stack size (*64 bytes) */
+
+0138 #define SINCR 20 /* increment of stack (*64 bytes) */
+
+0139 #define NOFILE 15 /* max open files per process */
+
+0140 #define CANBSIZ 256 /* max size of typewriter line */ 
+
+0141 #define CMAPSIZ 100 /* size of core allocation area */ 
+
+0142 #define SMAPSIZ 100 /* size of swap allocation area */ 
+
+0143 #define NCALL 20 /* max simultaneous time callouts */
+
+0144 #define NPROC 50 /* max number of processes */
+
+0145 #define NTEXT 40 /* max number of pure texts */
+
+0146 #define NCLIST 100 /* max total clist size */
+
+0147 #define HZ 60/* Ticks/second of the clock */ 
+
+<blockquote>
+*60 滴答数/秒
+</blockquote>
+0148
+
+0149
+
+0150
+
+0151 /* priorities: do not alter much */
+
+0152
+
+0153
+
+0154 #define PSWP -100 
+
+0155 #define PINOD -90 
+
+0156 #define PRIBIO -50
+
+0157 #define PPIPE 1 
+
+0158 #define PWAIT 40 
+
+0159 #define PSLEP 90 
+
+0160 #define PUSER 100 
+
+0161
+
+0162 /* Certain processor registers */
+
+0163
+
+0164 #define PS 0177776
+
+0165 #define KL 0177560
+
+0166 #define SW 0177570
+
+0167
+
+0168 /* ------------------------- */ 
+
+0169
+
+0170 /* structures to access integers : */
+
+0171
+
+0172
+
+0173 /* single integer */
+
+0174
+
+0175 struct { int integ; };
+
+0176
+
+0177
+
+0178 /* in bytes */
+
+0179
+
+0180 struct { char lobyte; char hibyte; };
+
+0181
+
+0182
+
+0183 /* as a sequence */
+
+0184
+
+0185 struct { int r[];}; 
+
+0186
+
+0187
+
+0188 /* -------------------------*/ 
+
+0189
+
+0190
+
+0191
+
+0192
+
+0193
+
+0194
+
+0195
+
+0196
+
+0197
+
+0198
+
+0199
+
+

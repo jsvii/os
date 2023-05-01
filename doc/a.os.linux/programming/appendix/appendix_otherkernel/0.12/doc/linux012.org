@@ -1,0 +1,30 @@
+#+TITLE: Linux 0.12内核源码剖析
+#+LANGUAGE: en
+#+OPTIONS: toc:nil h:4 html-postamble:nil html-preamble:t tex:t f:t
+#+OPTIONS: prop:("VERSION")
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+AUTHOR: Leo Zhang
+
+#+LINK: gh    https://github.com/
+#+LINK: rfc   https://tools.ietf.org/html/
+#+LINK: thing https://github.com/thi-ng/
+#+LINK: w3    https://w3.org/TR/
+#+LINK: wiki  https://en.wikipedia.org/wiki/
+
+#+HTML: <div class="outline-2" id="meta">
+| *Author* | {{{author}}}     |
+| *Date*   | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+#+TOC: headlines 3
+
+#+BEGIN_COMMENT
+本文档为linux 0.12学习笔记，用于理解操作系统原理。
+#+END_COMMENT
+
+
+#+BEGIN_COMMENT
+整理pdp-11的机器特性，处理器
+#+END_COMMENT
+
+#+INCLUDE: "./sections/pdp11-intro.org" :minlevel 1

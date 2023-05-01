@@ -1,0 +1,12 @@
+{{pdp11:instruction
+===Instruction===RTI
+===Code===000002
+===Operation===PC ← (SP)↑<br/>PS ← (SP)↑
+===Coden===从处理器堆栈读取
+===Codez===从处理器堆栈读取
+===Codev===从处理器堆栈读取
+===Codec===从处理器堆栈读取
+===Description===用于从中断或陷入子程序返回<br/>PC和PS从处理器堆栈中恢复<br/>与[[pdp11:RTI|RTI]]类似<br/>不同的是指令RTT禁止[[pdp11:跟踪陷入|跟踪陷入]]而指令[[pdp11:RTI|RTI]]允许[[pdp11:跟踪陷入|跟踪陷入]]：<br/>如有[[pdp11:跟踪陷入|跟踪陷入]]请求<br/>
+*RTI执行后立即进入[[pdp11:跟踪陷入|跟踪陷入]]
+*RTT执行后，不进入[[pdp11:跟踪陷入|跟踪陷入]]，而是RTT下一指令执行后才进入[[pdp11:跟踪陷入|跟踪陷入]]
+===Example===无

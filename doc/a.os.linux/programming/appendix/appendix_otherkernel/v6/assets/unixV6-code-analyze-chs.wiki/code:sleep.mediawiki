@@ -1,0 +1,197 @@
+===Source===
+<div class="wikiheadnote">
+*按照指定的优先权使进程进入睡眠状态,并且调用swtch进行进程切换调度
+*传入2个参数 , chan ,pri
+**chan: [[睡眠原因]]
+**pri: [[睡眠优先级]]
+</div>
+
+2054
+
+2055 /*
+
+2056 &nbsp;* Give up the processor till a wakeup occurs
+
+2057 &nbsp;* on chan, at which time the process
+
+2059 &nbsp;* The most important effect of pri is that when
+
+2060 &nbsp;* pri<0 a signal cannot disturb the sleep;
+
+2061 &nbsp;* if the pri>=0 signals will be processed.
+
+2062 &nbsp;* Callers of this routine must be prepared for
+
+2063 &nbsp;* premature return, and check that the reason for
+
+2064 &nbsp;* sleeping has gone away.
+
+2065 &nbsp;*/
+
+2066 sleep(chan, pri)
+
+2067 {
+
+2068 &nbsp;&nbsp;&nbsp;&nbsp;register *rp, s;
+
+2069
+
+2070 &nbsp;&nbsp;&nbsp;&nbsp;s = [[PS]]->[[skill:integ|integ]];
+
+2071 &nbsp;&nbsp;&nbsp;&nbsp;rp = [[code:user|u]].u_procp;
+
+<blockquote>
+*将s置为当前[[处理机状态字]],以待将来恢复时用
+*将rp指向当前进程的[[code:proc|proc 结构]]
+</blockquote>
+2072 &nbsp;&nbsp;&nbsp;&nbsp;if(pri >= 0) {
+
+2073 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; if([[code:issig|issig]]())
+
+2074 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto psig;
+
+<blockquote>
+*当进程睡眠优先权大于等于0时,在睡眠前先判断有无 [[信号系统|信号]],若有,则进入 信号处理
+</blockquote>
+2075 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; [[code:spl|spl]]6();
+
+<blockquote>
+*[[关中断]]
+*此处关中断的原因:
+**为了防止在2076与2077之间由于中断而插入[[code:wakeup|wakeup(chan)]],将p_wchan置回为0
+**接着2007行继续会进入睡眠状态,于是造成进程的睡眠原因为0,从而永远都无法被唤醒
+</blockquote>
+2076 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; [[code:proc|rp]]->p_wchan = chan;
+
+2077 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; [[code:proc|rp]]->p_stat = SWAIT;
+
+2078 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; [[code:proc|rp]]->p_pri = pri;
+
+<blockquote>
+*睡眠原因置为 chan
+*状态置为低优先权睡眠状态,参看[[进程优先级]]
+*进程优先权置为 pri
+</blockquote>
+2079 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; [[code:spl|spl]]0();
+
+<blockquote>
+*[[开中断]]
+</blockquote>
+2080 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; if(runin != 0) {
+
+2081 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;runin = 0;
+
+2082 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]](&runin);
+
+<blockquote>
+*如果runin被置,清runin标志,唤醒在runin上睡眠的0#进程,执行进程图象调入调出的工作
+*关于为何唤醒的是0#进程,参看[[进程调度# 0#进程|进程调度之0#进程]]
+</blockquote>
+2083 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; }
+
+2084 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; [[code:swtch|swtch]]();
+
+<blockquote>
+*调用swtch进行 [[进程调度]]
+</blockquote>
+2085 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; if([[code:issig|issig]]())
+
+2086 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto psig;
+
+<blockquote>
+*在结束时再判断一下是否有 信号
+*若有,则进入 信号处理
+</blockquote>
+2087 &nbsp;&nbsp;&nbsp;&nbsp;} else {
+
+2088 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:spl|spl]]6();
+
+<blockquote>
+*[[关中断]]
+*此处关中断的原因同2075行
+</blockquote>
+2089 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:proc|rp]]->p_wchan = chan;
+
+2090 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:proc|rp]]->p_stat = SSLEEP;
+
+2091 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:proc|rp]]->p_pri = pri;
+
+<blockquote>
+*若进程睡眠优先权小于0 
+*则将睡眠原因置为chan
+*将进程状态置为高优先级睡眠状态,参见[[进程优先级]]
+*将进程优先权置为pri
+</blockquote>
+2092 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:spl|spl]]0();
+
+<blockquote>
+*[[开中断]]
+</blockquote>
+2093 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:swtch|swtch]]();
+
+<blockquote>
+*调用swtch进行 [[进程调度]]
+</blockquote>
+2094 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+2095 &nbsp;&nbsp;&nbsp;&nbsp;[[处理机状态字|PS->integ]] = s;
+
+<blockquote>
+*睡眠结束并且被选中上台时恢复睡眠前的处理机状态字
+</blockquote>
+2096 &nbsp;&nbsp;&nbsp;&nbsp;return;
+
+2097
+
+2098 &nbsp;&nbsp;&nbsp;&nbsp;/*
+
+2099 &nbsp;&nbsp;&nbsp;&nbsp;* If priority was low (>=0) and
+
+2100 &nbsp;&nbsp;&nbsp;&nbsp;* there has been a signal,
+
+2101 &nbsp;&nbsp;&nbsp;&nbsp;* execute non-local goto to
+
+2102 &nbsp;&nbsp;&nbsp;&nbsp;* the qsav location.
+
+2103 &nbsp;&nbsp;&nbsp;&nbsp;* (see trap1/trap.c)
+
+2104 &nbsp;&nbsp;&nbsp;&nbsp;*/
+
+2105 psig:
+
+2106 &nbsp;&nbsp;&nbsp;&nbsp;[[code:aretu|aretu]]([[code:user|u]].u_qsav);
+
+<blockquote>
+*从 [[code:user|u.u_qsav]] 恢复R5,R6
+*用途 参看 [[code:trap1|trap1]] 2847注解
+</blockquote>
+2107 }
+
+2108 /*-------------------------- */
+
+
+
+===Ref===
+*[[睡眠原因]]
+*[[睡眠优先级]]
+
+===Caller===
+*[[code:sched]]
+*[[code:exec]]
+*[[code:wait]]
+*[[code:ptrace]]
+*[[code:getblk]]
+*[[code:iowait]]
+*[[code:swap]]
+*[[code:physio]]
+*[[code:sslep]]
+*[[code:alloc]]
+*[[code:free]]
+*[[code:ialloc]]
+*[[code:iget]]
+*[[code:readp]]
+*[[code:writep]]
+*[[code:plock]]
+*[[code:wflushtty]]
+*[[code:canon]]
+*[[code:ttwrite]]

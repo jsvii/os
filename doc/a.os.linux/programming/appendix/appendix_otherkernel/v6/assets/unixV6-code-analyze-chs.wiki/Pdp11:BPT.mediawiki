@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===BPT
+===Code===000003
+===Operation===↓(SP) ← PS<br/>↓(SP) ← PC<br/>PC ← (14)<br/>PS ← (16)
+===Coden===从 [[中断|中断向量]] 读取
+===Codez===从 [[中断|中断向量]] 读取
+===Codev===从 [[中断|中断向量]] 读取
+===Codec===从 [[中断|中断向量]] 读取
+===Description===执行断点陷入操作<br/>用于调试<br/>The user is cautioned against employing code 000003 in programs run under these debugging aids [ [[遗留问题]] ]
+===Example===类似 [[pdp11:TRAP|TRAP]]

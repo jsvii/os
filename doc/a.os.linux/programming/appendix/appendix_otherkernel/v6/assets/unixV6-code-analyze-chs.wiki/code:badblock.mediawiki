@@ -1,0 +1,76 @@
+===Source===
+<div class="wikiheadnote">
+*判断 指定盘块 是否为 指定设备的一般盘块
+**参看[[文件系统]]
+*共传入三个参数 afp,abn,dev
+**afp : 指定设备的超级块结构，类型为[[code:struct filsys|struct filsys]]
+**abn : 指定块号
+**dev : 指定设备的设备号
+*返回值
+**若指定盘块是一般盘块，则返回0
+**若指定盘块不是一般盘块，例如是超级块或INODE块，则返回1
+</div>
+
+7030 
+
+7031 /* 
+
+7032 &nbsp;* Check that a block number is in the 
+
+7033 &nbsp;* range between the I list and the size 
+
+7034 &nbsp;* of the device. 
+
+7035 &nbsp;* This is used mainly to check that a 
+
+7036 &nbsp;* garbage file system has not been mounted. 
+
+7037 &nbsp;* 
+
+7038 &nbsp;* bad block on dev x/y -- not in range 
+
+7039 &nbsp;*/ 
+
+7040 badblock(afp, abn, dev) 
+
+7041 { 
+
+7042 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct filsys|struct filsys]] *fp; 
+
+7043 &nbsp;&nbsp;&nbsp;&nbsp;register char *bn; 
+
+7044 
+
+7045 &nbsp;&nbsp;&nbsp;&nbsp;fp = afp; 
+
+7046 &nbsp;&nbsp;&nbsp;&nbsp;bn = abn; 
+
+7047 &nbsp;&nbsp;&nbsp;&nbsp;if (bn &lt; fp->s_isize+2<nowiki> || </nowiki>bn >= fp->s_fsize) { 
+
+7048 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:prdev|prdev]]("bad block", dev); 
+
+7049 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return(1); 
+
+7050 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若指定盘块不是一般盘块，例如是超级块或INODE块或越界，则
+**输出错误信息
+**函数返回1
+</blockquote>
+7051 &nbsp;&nbsp;&nbsp;&nbsp;return(0); 
+
+7052 } 
+
+7053 /* ------------------------- */ 
+
+7054 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[文件系统]]
+
+===Caller===
+*[[code:alloc]]
+*[[code:free]]

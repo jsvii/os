@@ -1,0 +1,55 @@
+* build
+
+Android Gradle 插件版本所需的 Gradle 版本。为了获得最佳性能，您应使用 Gradle 和插件这两者的最新版本。
+
+|  插件版本             | 所需的 Gradle 版本
+|-----------------------+----------------------------|
+| 1.0.0 - 1.1.3         | 2.2.1 - 2.3                |
+| 1.2.0 - 1.3.1         | 2.2.1 - 2.9                |
+| 1.5.0                 | 2.2.1 - 2.13               |
+| 2.0.0 - 2.1.2         | 2.10 - 2.13                |
+| 2.1.3 - 2.2.3         | 2.14.1+                    |
+| 2.3.0+                | 3.3+                       |
+| 3.0.0+                | 4.1+                       |
+| 3.1.0+                | 4.4+                       |
+| 3.2.0 - 3.2.1         | 4.6+                       |
+| 3.3.0 - 3.3.3         | 4.10.1+                    |
+| 3.4.0 - 3.4.3         | 5.1.1+                     |
+| 3.5.0 - 3.5.4         | 5.4.1+                     |
+| 3.6.0 - 3.6.4         | 5.6.4+                     |
+| 4.0.0+                | 6.1.1+                     |
+| 4.1.0+                | 6.5+                       |
+
+
+
+** 比较好的参考文档
+
+1. https://juejin.cn/post/6844904142725447687
+
+
+#+BEGIN_SRC groovy
+maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
+maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
+maven { url 'http://maven.aliyun.com/nexus/content/repositories/gradle-plugin' }
+#+END_SRC
+
+2. test
+
+
+
+* direct
+
+
+implementation
+
+
+
+configurations {
+    // declare a "configuration" named "someConfiguration"
+    someConfiguration
+}
+dependencies {
+    // add a project dependency to the "someConfiguration" configuration
+    someConfiguration project(":lib")
+}

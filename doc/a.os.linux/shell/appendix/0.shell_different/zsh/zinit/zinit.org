@@ -1,0 +1,8 @@
+* zinit
+
+
+https://asmcn.icopy.site/awesome/awesome-zsh-plugins/#completions
+
+- load 会启用分析功能——你可以通过 zinit report {plugin-spec} 跟踪插件具体做了什么，也可以使用 zinit unload {plugin-spec} 卸载插件。
+
+- light不会跟踪加载过程，可以提升加载速度，但是会导致失去查看插件报告和动态卸载插件的能力。

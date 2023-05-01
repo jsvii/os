@@ -1,0 +1,42 @@
+=综述=
+*对于管理 内存和盘交换区的空间分配、释放，主要采用对空闲块信息进行管理的方法
+*采用表示空闲块信息的数组，作为用于管理的数据结构
+*如需分配空间，则在管理数组中移除被分配空间的信息，即标记该部分不空闲
+*如需释放空间，则在管理数组中插入被分配空间的信息，即标记该部分空闲
+
+=用于管理的数据结构=
+*对于内存采用coremap数组进行管理
+*对于盘交换区采用swapmap数组进行管理
+*coremap 和 swapmap 定义在 [[file:systm.h|systm.h]]中,定义为
+<div class="wikiheadcode">
+0203 int coremap[CMAPSIZ]; /* space for core allocation */<br/>
+0204 int swapmap[SMAPSIZ]; /* space for swap allocation */<br/> 
+</div>
+* CMAPSIZ和 SMAPSIZ 定义在 [[file:param.h|param.h]]中,定义为
+<div class="wikiheadcode">
+0141 #define CMAPSIZ 100 /* size of core allocation area */ <br/>
+0142 #define SMAPSIZ 100 /* size of swap allocation area */ <br/>
+</div>
+*coremap 和 swapmap的实际类型为 [[code:struct map|struct map]],实际长度为 CMAPSIZ/2 和 SMAPSIZ/2
+:以coremap为例
+::coremap[0] 和 coremap[1] 分别为第一个空闲块信息的m_size 和 m_addr
+::coremap[2] 和 coremap[3] 分别为第二个空闲块信息的m_size 和 m_addr
+::...
+::coremap[98] 和 coremap[99] 分别为第五十个空闲块的m_size 和 m_addr
+
+=管理策略=
+*对于分配空间的请求,查找第一个不小于请求空间大小的块并进行分配,并优化管理数组
+*对于释放空间的请求,向管理数组中插入待释放空间的信息,并优化管理数组
+*管理数组的优化策略
+**合并能合并的块信息
+**删除长度为零的块信息
+=用于管理的函数=
+*[[code:malloc|malloc]] 进行分配
+*[[code:mfree|mfree]] 进行释放
+=举例=
+参见 [[code:malloc|malloc]] 和 [[code:mfree|mfree]] 的举例
+=参考=
+*[[code:malloc|malloc]]
+*[[code:mfree|mfree]]
+*[[file:systm.h|systm.h]]
+*[[file:param.h|param.h]]

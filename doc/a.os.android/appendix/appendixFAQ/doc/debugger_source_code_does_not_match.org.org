@@ -1,0 +1,11 @@
+* debugger_source_code_does_not_match.org
+
+调试时，源码无法对应
+  https://stackoverflow.com/questions/39990752/source-code-does-not-match-the-bytecode-when-debugging-on-a-device
+
+There's an open issue for this in Google's IssueTracker.
+
+The potential solutions given in the issue (as of the date of this post) are:
+
+Click Build -> Clean
+Disable Instant Run, in Settings -> Build, Execution, Deployment

@@ -1,0 +1,15 @@
+* Xorg
+
+https://wiki.archlinux.org/title/Xorg/Keyboard_configuration
+
+
+* X11
+
+
+
+X11也叫做X Window系统，是一种位图显示的视窗系统，是在Unix和类Unix操作系统，以及OpenVMS上建立图形用户界面的标准工具包和协议，并可用于几乎所有已有的现代操作系统。
+
+X11转发是TCP/IP端口转发服务的特殊情况，与其他TCP / IP端口转发略有不同，可以轻松的搞定端口转发设置。
+
+
+X11 R6 是指 X Protocol version 11 Release 6(X协议第11版第六次发行)的意思，就是说目前用的X协议是第11版的，然后经过了6次小的修正.不同版本的X协议是不能通信的。就象我们现在IPV4和IPV6不能通信一样，不过不用担心，现在的X服务器软件和X应用程序都遵循X11R6.

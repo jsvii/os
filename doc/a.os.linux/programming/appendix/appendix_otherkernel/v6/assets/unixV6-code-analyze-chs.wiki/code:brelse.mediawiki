@@ -1,0 +1,117 @@
+===Source===
+<div class="wikiheadnote">
+*释放指定的缓存块
+**唤醒所有等待使用该缓存块的进程
+**唤醒所有等待可用缓存块的进程
+**清除该块 B_WANTED B_BUSY B_ASYN 标志
+**将该块插入[[自由队列]]队尾
+</div>
+
+4866 
+
+4867 /* release the buffer, with no I/O implied. 
+
+4868 &nbsp;*/ 
+
+4869 brelse(bp) 
+
+4870 [[code:struct buf|struct buf]] *bp; 
+
+4871 { 
+
+4872 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct buf|struct buf]] *rbp, **backp; 
+
+4873 &nbsp;&nbsp;&nbsp;&nbsp;register int sps; 
+
+4874 
+
+4875 &nbsp;&nbsp;&nbsp;&nbsp;rbp = bp; 
+
+4876 &nbsp;&nbsp;&nbsp;&nbsp;if (rbp->b_flags&B_WANTED) 
+
+4877 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]](rbp); 
+
+<blockquote>
+*唤醒所有等待使用该缓存块的进程
+</blockquote>
+4878 &nbsp;&nbsp;&nbsp;&nbsp;if ([[File:buf.h|bfreelist]].b_flags&B_WANTED) { 
+
+4879 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[File:buf.h|bfreelist]].b_flags =& ~B_WANTED; 
+
+4880 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]](&[[File:buf.h|bfreelist]]); 
+
+4881 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*唤醒所有等待可用缓存块的进程
+*这些进程在[[睡眠原因#bfreelist|bfreelist]]上睡眠(bfreelist此时为空，且置标志B_WANTED),参看[[睡眠原因#bfreelist|睡眠原因]]
+</blockquote>
+4882 &nbsp;&nbsp;&nbsp;&nbsp;if (rbp->b_flags&B_ERROR) 
+
+4883 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rbp->b_dev[[skill:.d_minor|.d_minor]] = -1; /* no assoc. on error */ 
+
+<blockquote>
+*如果该缓存块存在错误，作此操作 防止进程错误引用此块
+*(以上引自 Lions 代码分析)
+</blockquote>
+4884 &nbsp;&nbsp;&nbsp;&nbsp;backp = &[[File:buf.h|bfreelist]].av_back; 
+
+4885 &nbsp;&nbsp;&nbsp;&nbsp;sps = PS[[skill:integ|->integ]]; 
+
+<blockquote>
+*[[PS]]保存到sps
+</blockquote>
+4886 &nbsp;&nbsp;&nbsp;&nbsp;[[code:spl|spl6]](); 
+
+<blockquote>
+*处理机优先级设为6
+</blockquote>
+4887 &nbsp;&nbsp;&nbsp;&nbsp;rbp->b_flags =& <nowiki>~(B_WANTED|B_BUSY|B_ASYNC); </nowiki>
+
+4888 &nbsp;&nbsp;&nbsp;&nbsp;(*backp)->av_forw = rbp; 
+
+4889 &nbsp;&nbsp;&nbsp;&nbsp;rbp->av_back = *backp; 
+
+4890 &nbsp;&nbsp;&nbsp;&nbsp;*backp = rbp; 
+
+4891 &nbsp;&nbsp;&nbsp;&nbsp;rbp->av_forw = &[[File:buf.h|bfreelist]]; 
+
+<blockquote>
+*清除该块 B_WANTED B_BUSY B_ASYN 标志
+*将该块插入[[自由队列]]队尾
+</blockquote>
+4892 &nbsp;&nbsp;&nbsp;&nbsp;PS[[skill:integ|->integ]] = sps; 
+
+<blockquote>
+*从sps还原[[PS]]
+*还原[[PS]] 相当于 开中断
+</blockquote>
+
+4893 } 
+
+4894 /* ------------------------- */ 
+
+
+===Ref===
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:exec]]
+*[[code:wait]]
+*[[code:breada]]
+*[[code:bwrite]]
+*[[code:bdwrite]]
+*[[code:iodone]]
+*[[code:binit]]
+*[[code:stat1]]
+*[[code:smount]]
+*[[code:sumount]]
+*[[code:readi]]
+*[[code:writei]]
+*[[code:bmap]]
+*[[code:iinit]]
+*[[code:alloc]]
+*[[code:ialloc]]
+*[[code:iget]]
+*[[code:itrunc]]
+*[[code:namei]]

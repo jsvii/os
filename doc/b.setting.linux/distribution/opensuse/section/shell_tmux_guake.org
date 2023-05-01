@@ -1,0 +1,66 @@
+* shell & tmux & Guake
+
+** zsh & terminal
+
+  - zsh
+
+  - oh-my-zsh
+
+#+BEGIN_SRC bash
+chsh -s /bin/zsh
+#+END_SRC
+
+#+BEGIN_SRC bash
+#在zshrc中加入下面代码，以防multi-term时文件路径有问题
+if [ -n "$INSIDE_EMACS" ]; then
+    chpwd() { print -P "\033AnSiTc %d" }
+    print -P "\033AnSiTu %n"
+    print -P "\033AnSiTc %d"
+fi
+
+# If you come from bash you might have to change your $PATH.
+# 在zsh 启动脚本中导出xterm的配置，防止xsehll这一类的软件无颜色
+if [ -z "$INSIDE_EMACS" ]; then
+    export TERM="xterm-256color"
+fi
+
+** tmux
+
+#+BEGIN_SRC shell
+# config
+touch ~/.tmux.conf
+#+END_SRC
+
+内容请参考 [[./setting/.tmux.conf]]
+
+*** tmux theme
+
+在wsl下有bug: https://github.com/gpakosz/.tmux
+
+https://github.com/jimeh/tmux-themepack
+
+** Guake
+
+Guake 桌面版中比较优秀的Terminal
+
+#+BEGIN_SRC shell
+zypper in guake
+#+END_SRC
+
+*** 设置
+
+Start & Tabs 勾除全部checkbox
+
+Main Window
+
+  1. Main Window Options
+
+     - [y] stay on top
+
+     - [y] start fullscreen
+
+     - [x] show tab bar fullscreen
+
+   1. Height & Width 变为全部
+
+2019年5月15日，经过一系列的试验，发现“文泉驿正黑”是表现得最好的。noto-sans系列的字体者不能正常地显示出标点符号，会显示非常乱。

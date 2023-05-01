@@ -1,0 +1,106 @@
+===Source===
+
+7915 
+
+7916 /* 
+
+7917 &nbsp;* A tty structure is needed for 
+
+7918 &nbsp;* each UNIX character device that 
+
+7919 &nbsp;* is used for normal terminal IO. 
+
+7920 &nbsp;* The routines in tty.c handle the 
+
+7921 &nbsp;* common code associated with 
+
+7922 &nbsp;* these structures. 
+
+7923 &nbsp;* The definition and device dependent 
+
+7924 &nbsp;* code is in each driver (kl.c dc.c dh.c) 
+
+7925 &nbsp;*/ 
+
+7926 struct tty 
+
+7927 { 
+
+7928 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct clist|struct clist]] t_rawq; /* input chars right off device */ 
+
+<blockquote>
+*原始输入队列
+</blockquote>
+7929 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct clist|struct clist]] t_canq; /* input chars after erase and kill */ 
+
+<blockquote>
+*非原始输入队列
+</blockquote>
+7930 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct clist|struct clist]] t_outq; /* output list to device */ 
+
+<blockquote>
+*输出队列
+</blockquote>
+7931 &nbsp;&nbsp;&nbsp;&nbsp;int t_flags; /* mode, settable by stty call */ 
+
+<blockquote>
+*模式位，模式常量定义参看 [[file:tty.h|tty.h]]
+</blockquote>
+7932 &nbsp;&nbsp;&nbsp;&nbsp;int *t_addr; /* device address (register or 
+
+7933 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; startup fcn) */ 
+
+<blockquote>
+*指向 设备寄存器
+*或 特殊启动函数(置SSTART标志)
+</blockquote>
+7934 &nbsp;&nbsp;&nbsp;&nbsp;char t_delct; /* number of delimiters in raw q */ 
+
+<blockquote>
+*原始队列中 的 定界符数
+</blockquote>
+7935 &nbsp;&nbsp;&nbsp;&nbsp;char t_col; /* printing column of device */ 
+
+<blockquote>
+*当前 列位置
+</blockquote>
+7936 &nbsp;&nbsp;&nbsp;&nbsp;char t_erase; /* erase character */ 
+
+<blockquote>
+*"擦除"字符
+</blockquote>
+7937 &nbsp;&nbsp;&nbsp;&nbsp;char t_kill; /* kill character */ 
+
+<blockquote>
+*"删除行"字符
+</blockquote>
+7938 &nbsp;&nbsp;&nbsp;&nbsp;char t_state; /* internal state, not visible 
+
+7939 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; externally */ 
+
+7940 &nbsp;&nbsp;&nbsp;&nbsp;char t_char; /* character temporary */ 
+
+7941 &nbsp;&nbsp;&nbsp;&nbsp;int t_speeds; /* output+input line speed */ 
+
+7942 &nbsp;&nbsp;&nbsp;&nbsp;int t_dev; /* device name */ 
+
+7943 }; 
+
+7944 /* ------------------------- */ 
+
+
+
+===Caller===
+*[[code:klclose]]
+*[[code:klxint]]
+*[[code:klrint]]
+*[[code:klsgtty]]
+*[[code:wflushtty]]
+*[[code:flushtty]]
+*[[code:canon]]
+*[[code:ttyinput]]
+*[[code:ttyoutput]]
+*[[code:ttrstrt]]
+*[[code:ttstart]]
+*[[code:ttread]]
+*[[code:ttwrite]]

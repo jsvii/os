@@ -1,0 +1,47 @@
+* cmb linux 环境设置
+
+** 网卡设置
+
+*** 硬件基础
+
+- 以太网网卡 intel Ethernet Connection (标记为 ~网卡Alpha~ )
+
+- PC上的 绿联USB千兆网卡 ASIX AX88179(标
+  记为 ~网卡Beta~ )
+
+- linux上的 绿联USB千兆网卡 ASIX AX88179(标记为 ~网卡Gamma~ )
+
+*** 设置步骤
+
+1. ~网卡Alpha~ 属性中选择共享，若还有两张以上的网卡，下面会出现下拉框，如仅剩 ~网卡Beta~ 则无选项
+
+1. ~网卡Beta~ 的地址会设置为 192.168.137.1 这个IP地址是可以重新修改的， 设置为 192.168.1.91
+
+1. linux 中 nmtui 编辑有线网卡 ~网卡Gamma~ ,会有个添加routing 的选项，编辑即可
+
+上面的命令本质上是执行下面的操作，但每次重启都会丢失，不太方便
+#+BEGIN_SRC bash
+ip route add -net 99.48.64.0/24 via 192.168.1.91
+#+END_SRC
+
+网上也有很多编辑 ~/etc/sysconfig/network/routes~ 的教程，因为是用networkmanager来管理的，所以这些都无效。
+
+通过下列方式查看路由：
+
+#+BEGIN_SRC bash
+<udev02@scckf02cddev046:/>$ip route
+99.47.148.0/22 dev eth0  proto kernel  scope link  src 99.47.149.238
+default via 99.47.151.254 dev eth0
+#+END_SRC
+
+本质上是把一些信息写入 ~/etc/NetworkManager/system-connections/connectionA~
+
+#+BEGIN_SRC text
+[ipv4]
+address1=192.168.1.95/24,192.168.1.1
+dns-search=
+may-fail=false
+method=manual
+route1=99.48.64.0/24,192.168.1.91,100
+route2=99.47.192.0/22,192.168.1.91,100
+#+END_SRC

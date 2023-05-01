@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===SUB
+===Code===16SSDD
+===Operation===(dst) ← (dst) - (src) 
+===Coden===若 运算结果<0，则置位<br/>否则，清位
+===Codez===若 运算结果=0，则置位<br/>否则，清位
+===Codev===若 运算过程存在溢出，则置位<br/>否则，清位<br/>说明:存在溢出的情况是两个操作数符号相反，运算结果的符号和(src)的符号相同
+===Codec===若 运算结果的符号位被改变，则清位<br/>否则，置位[ [[遗留问题]] ]
+===Description=== 将目标地址的数据和源地址的数据相减，将结果送入目标地址 
+===Example===<p>SUB_R1,R2<br/><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_instruction_Sub_r1_r2.png"/></p>

@@ -1,0 +1,5 @@
+o* tips
+
+** quite
+
+Ctrl-C 或者 Ctrl-a  x

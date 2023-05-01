@@ -1,0 +1,257 @@
+===Source===
+<div class="wikiheadnote">
+*[[跟踪]] 机制的 子进程跟踪处理函数
+*[[code:ipc|ipc]] 是父进程设置的跟踪 请求结构
+*对 [[code:ipc|ipc.ip_req]]不同取值作出解释
+**1,2 : 用户 指令/数据空间，从指定地址[[code:ipc|ipc.ip-addr]]读入一个字，到[[code:ipc|ipc.ipc-data]]
+**3 : PPDA区，从指定地址[[code:ipc|ipc.ip-addr]]读入一个字，到[[code:ipc|ipc.ipc-data]]
+**4,5 : 用户 指令/数据空间，向指定地址[[code:ipc|ipc.ip-addr]]写入一个字[[code:ipc|ipc.ipc-data]]
+**6 : PPDA区，向指定地址[[code:ipc|ipc.ip-addr]]写入一个字[[code:ipc|ipc.ipc-data]]
+只能写入特殊的位置，包括 [[code:user|u.u_fsav]] 和 [[skill:u.u_ar0|u.u_ar0]]
+**7 : 设置子进程信号，[[code:ipc|ipc.ip-data]] 送入 p_sig
+**8 : 终止子进程
+*对于 pdp11/40 ，指令空间和数据空间不分开
+*返回值
+**[[code:ipc|ipc.ip_req]] == 7时，返回1
+**[[code:ipc|ipc.ip_req]] == 8时，没有返回值(也不需要返回值...)
+**其余情况，返回0
+</div>
+
+4198 
+
+4199 /* 
+
+4200 &nbsp;* Code that the child process 
+
+4201 &nbsp;* executes to implement the command 
+
+4202 &nbsp;* of the parent process in tracing. 
+
+4203 &nbsp;*/ 
+
+4204 procxmt() 
+
+4205 { 
+
+4206 &nbsp;&nbsp;&nbsp;&nbsp;register int i; 
+
+4207 &nbsp;&nbsp;&nbsp;&nbsp;register int *p; 
+
+4208 
+
+4209 &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:ipc|ipc.ip_lock]] != [[code:user|u.u_procp]]->p_pid) 
+
+4210 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return(0); 
+
+<blockquote>
+*[[code:ipc|ipc]] 的参数 被错误地设置(并非针对子进程)，则直接返回0
+</blockquote>
+4211 &nbsp;&nbsp;&nbsp;&nbsp;i = [[code:ipc|ipc.ip_req]]; 
+
+4212 &nbsp;&nbsp;&nbsp;&nbsp;[[code:ipc|ipc.ip_req]] = 0; 
+
+4213 &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]](&[[code:ipc|ipc]]); 
+
+<blockquote>
+*唤醒父进程
+*在此处唤醒的正确性值得讨论... 列入[[遗留问题]]
+</blockquote>
+4214 &nbsp;&nbsp;&nbsp;&nbsp;switch (i) { 
+
+4215 
+
+4216 &nbsp;&nbsp;&nbsp;&nbsp;/* read user I */ 
+
+4217 &nbsp;&nbsp;&nbsp;&nbsp;case 1: 
+
+4218 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:fuibyte|fuibyte]]([[code:ipc|ipc.ip_addr]]) == -1) 
+
+4219 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   goto error; 
+
+4220 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:ipc|ipc.ip_data]] = [[code:fuiword|fuiword]]([[code:ipc|ipc.ip_addr]]); 
+
+4221 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;break; 
+
+4222 
+
+4223 &nbsp;&nbsp;&nbsp;&nbsp;/* read user D */ 
+
+4224 &nbsp;&nbsp;&nbsp;&nbsp;case 2: 
+
+4225 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:fubyte|fubyte]]([[code:ipc|ipc.ip_addr]]) == -1) 
+
+4226 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   goto error; 
+
+4227 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:ipc|ipc.ip_data]] = [[code:fuword|fuword]]([[code:ipc|ipc.ip_addr]]); 
+
+4228 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;break; 
+
+4229 
+
+4230 &nbsp;&nbsp;&nbsp;&nbsp;/* read u */ 
+
+4231 &nbsp;&nbsp;&nbsp;&nbsp;case 3: 
+
+4232 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;i = [[code:ipc|ipc.ip_addr]]; 
+
+4233 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (i<0 <nowiki>||</nowiki> i >= (USIZE<<6)) 
+
+4234 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   goto error; 
+
+<blockquote>
+*地址 不在 PPDA区，进入错误处理
+</blockquote>
+4235 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:ipc|ipc.ip_data]] = [[code:user|u]][[skill:.inta|.inta]][i>>1]; 
+
+<blockquote>
+* i>>1 将单位从 字节 转化为 字
+</blockquote>
+4236 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;break; 
+
+4237 
+
+4238 &nbsp;&nbsp;&nbsp;&nbsp;/* write user I (for now, always an error) */ 
+
+4239 &nbsp;&nbsp;&nbsp;&nbsp;case 4: 
+
+4240 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:suiword|suiword]]([[code:ipc|ipc.ip_addr]], 0) < 0) 
+
+4241 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   goto error; 
+
+4242 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:suiword|suiword]]([[code:ipc|ipc.ip_addr]], [[code:ipc|ipc.ip_data]]); 
+
+4243 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;break; 
+
+4244 
+
+4245 &nbsp;&nbsp;&nbsp;&nbsp;/* write user D */ 
+
+4246 &nbsp;&nbsp;&nbsp;&nbsp;case 5: 
+
+4247 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:suword|suword]]([[code:ipc|ipc.ip_addr]], 0) < 0) 
+
+4248 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   goto error; 
+
+<blockquote>
+*关于 为什么要用0作为参数 尝试写入，原因不明，列入[[遗留问题]]
+</blockquote>
+4249 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:suword|suword]]([[code:ipc|ipc.ip_addr]], [[code:ipc|ipc.ip_data]]); 
+
+4250 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;break; 
+
+4251 
+
+4252 &nbsp;&nbsp;&nbsp;&nbsp;/* write u */ 
+
+4253 &nbsp;&nbsp;&nbsp;&nbsp;case 6: 
+
+4254 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;p = &[[code:user|u]][[skill:.inta|.inta]][ [[code:ipc|ipc.ip_addr|]]>>1 ]; 
+
+4255 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (p >= [[code:user|u.u_fsav]] && p < &[[code:user|u.u_fsav]][25]) 
+
+4256 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   goto ok; 
+
+4257 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for (i=0; i<9; i++) 
+
+4258 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if (p == &[[skill:u.u_ar0|u.u_ar0]][regloc[i]]) 
+
+4259 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  goto ok; 
+
+<blockquote>
+*只有PPDA区特殊位置 能被写入
+**[[code:user|u.u_fsav]]
+**[[skill:u.u_ar0|u.u_ar0]] 指向的 堆栈中现场保护区
+</blockquote>
+4260 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto error; 
+
+4261 &nbsp;&nbsp;&nbsp;&nbsp;ok: 
+
+4262 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (p == &[[skill:u.u_ar0|u.u_ar0]][RPS]) { 
+
+4263 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  /* assure user space */ 
+
+4264 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:ipc|ipc.ip_data]] <nowiki>=|</nowiki> 0170000; 
+
+4265 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  /* priority 0 */ 
+
+4266 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:ipc|ipc.ip_data]] =& ~0340; 
+
+4267 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 想设置 堆栈中保存的PS，需要特殊操作
+**禁止 设置 先前态和当前态 为 核心态
+**禁止 提高 处理机优先级
+*当然，做法有些粗暴...
+</blockquote>
+4268 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;*p = [[code:ipc|ipc.ip_data]]; 
+
+4269 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;break; 
+
+4270 
+
+4271 &nbsp;&nbsp;&nbsp;&nbsp;/* set signal and continue */ 
+
+4272 &nbsp;&nbsp;&nbsp;&nbsp;case 7: 
+
+4273 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_procp]]->p_sig = [[code:ipc|ipc.ip_data]]; 
+
+4274 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return(1); 
+
+4275 
+
+4276 &nbsp;&nbsp;&nbsp;&nbsp;/* force exit */ 
+
+4277 &nbsp;&nbsp;&nbsp;&nbsp;case 8: 
+
+4278 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:exit|exit]](); 
+
+4279 
+
+4280 &nbsp;&nbsp;&nbsp;&nbsp;default: 
+
+4281 &nbsp;&nbsp;&nbsp;&nbsp;error: 
+
+4282 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:ipc|ipc]].ip_req = -1; 
+
+4283 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+4284 &nbsp;&nbsp;&nbsp;&nbsp;return(0); 
+
+4285 } 
+
+4286 /* ------------------------- */ 
+
+4287 
+
+4288 
+
+4289 
+
+4290 
+
+4291 
+
+4292 
+
+4293 
+
+4294 
+
+4295 
+
+4296 
+
+4297 
+
+4298 
+
+4299 
+
+
+
+===Ref===
+*[[跟踪]]
+
+===Caller===
+*[[code:stop]]

@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===INC<br/>INCB[字节版本]
+===Code===■052DD
+===Operation===(dst)← (dst)+1
+===Coden===若 运算结果<0，则置位<br/>否则，清位
+===Codez===若 运算结果=0，则置位<br/>否则，清位
+===Codev===若 (dst)=077777(运算将发生向上溢出)，则置位<br/>否则，清位
+===Codec===无影响
+===Description===将目标位置的数据加1
+===Example===<p>INC_R2<br/><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_instruction_Inc_r2.png"/></p>

@@ -1,0 +1,60 @@
+
+|source = 
+<div class="wikiheadnote">
+*定义 管理内外存空闲块 的链表类型
+*链表中每一项由两项参数: m_addr , m_size
+*m_addr : 该空闲块的起始地址
+*m_size : 该空闲块的大小
+*末元素m_size = 0,用于表示链表结束
+</div>
+
+2500 #
+
+2501 /*
+
+2502 */
+
+2503
+
+2504 /*
+
+2505 * Structure of the coremap and swapmap
+
+2506 * arrays. Consists of non-zero count
+
+2507 * and base address of that many
+
+2508 * contiguous units.
+
+2509 * (The coremap unit is 64 bytes,
+
+2510 * the swapmap unit is 512 bytes)
+
+2511 * The addresses are increasing and
+
+2512 * the list is terminated with the
+
+2513 * first zero count.
+
+2514 */
+
+2515 struct map
+
+2516 {
+
+2517 &nbsp;&nbsp;&nbsp;&nbsp;char *m_size;
+
+2518 &nbsp;&nbsp;&nbsp;&nbsp;char *m_addr;
+
+2519 };
+
+2520 /* ------------------------- */
+
+
+
+===Ref===
+*[[空闲块管理]]
+
+===Caller===
+*[[code:malloc]]
+*[[code:mfree]]

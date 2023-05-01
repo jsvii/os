@@ -1,0 +1,21 @@
+* wsl
+
+** 迁移
+
+
+https://github.com/DDoSolitary/LxRunOffline
+
+#+BEGIN_SRC powershell
+# 查看安装的发行版
+.\LxRunOffline.exe list
+
+ .\LxRunOffline.exe move -n Arch -d 'D:\wsl\install\arch'
+#+END_SRC
+
+查看注册表，确认已经完成
+
+HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Lxss
+
+** 扩容
+
+https://docs.microsoft.com/en-us/windows/wsl/compare-versions#understanding-wsl-2-uses-a-vhd-and-what-to-do-if-you-reach-its-max-size

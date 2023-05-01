@@ -1,0 +1,11 @@
+* logcat
+
+
+export ANDROID_LOG_TAGS="ActivityManager:I MyApp:D *:S"
+
+
+
+adb logcat --pid=`adb shell pidof -s com.example.app`
+or
+
+adb logcat --pid=$(adb shell pidof -s com.example.app)

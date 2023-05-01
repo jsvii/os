@@ -1,0 +1,39 @@
+* term
+
+** 设置启动脚本，解决颜色问题
+
+#+BEGIN_SRC bash
+# only in tty export fbterm
+case "$( tty | grep -oE .{4}$ )" in
+  tty1|tty2|tty3|tty4|tty5|tty6)
+    export FBTERM=fbterm
+  ;;
+esac
+
+# tmuxs config
+case "$TERM" in
+    xterm*)
+        if [ -e /usr/share/terminfo/x/xterm-256color ]; then
+            export TERM=xterm-256color
+        elif [ -e /usr/share/terminfo/x/xterm-color ]; then
+            export TERM=xterm-color;
+        else
+            export TERM=xterm
+        fi
+        initpowerlevel10k
+        ;;
+    linux)
+        [ -n "$FBTERM" ] && export TERM=fbterm
+        ;;
+    screen-256color)
+        [ -z "$FBTERM" ] && initpowerlevel10k
+        ;;
+esac
+#+END_SRC
+
+
+- 必须在fbterm中设置环境变量 ~export TERM=fbterm~ ，才支持256colors，
+
+- 如果是linux，就会是tty这一类term，即启动fbterm
+
+- ~screen-256color~  非tty终端时，term还是使用powerlevel10k这一主题

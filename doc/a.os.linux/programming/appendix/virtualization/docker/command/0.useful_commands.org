@@ -1,0 +1,44 @@
+* Usefull Commands
+
+** lifecycle
+
+** commands
+
+*** images 相关
+
+**** pull images
+
+#+BEGIN_SRC bash
+docker pull myimage:1.0
+#+END_SRC
+
+**** images 查看
+
+docker images : 列出本地镜像。
+
+#+BEGIN_SRC bash
+docker images -a
+#+END_SRC
+
+
+*** run 创建
+
+docker run ：创建一个新的容器并运行一个命令
+
+Build an image from the Dockerfile in the
+current directory and tag the image
+docker build -t myimage:1.0 .
+List all images that are locally stored with
+the Docker Engine
+docker image ls
+Delete an image from the local image store
+docker image rm alpine:3.4
+
+
+
+Retag a local image with a new image name
+and tag
+docker tag myimage:1.0 myrepo/
+myimage:2.0
+Push an image to a registry
+docker push myrepo/myimage:2.0

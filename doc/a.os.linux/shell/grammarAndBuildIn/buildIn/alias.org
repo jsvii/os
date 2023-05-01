@@ -1,0 +1,15 @@
+* alias
+
+Alias in bash can't have arguments, but you can use functions.
+
+#+BEGIN_SRC bash
+e() { emacs "$@" & }
+#+END_SRC
+
+** alias 实践
+
+不要做成不同的命令，用相同的命令来代替
+
+#+BEGIN_SRC bash
+display() { /usr/bin/display "$@" & }
+#+END_SRC

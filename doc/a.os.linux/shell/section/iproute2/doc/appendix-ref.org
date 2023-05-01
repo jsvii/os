@@ -1,0 +1,21 @@
+* refs
+
+** 下载地址
+
+iproute2 是linux kernel中的一部分
+
+https://mirrors.edge.kernel.org/pub/linux/utils/net/iproute2/
+
+** docs
+
+https://baturin.org/docs/iproute2/
+
+Linux Advanced Routing & Traffic Control HOWTO https://lartc.org/howto/
+
+http://policyrouting.org/iproute2-toc.html
+
+
+https://blog.51cto.com/lucifer119/1551393
+
+
+https://blog.csdn.net/astrotycoon/article/details/52317288 比较好

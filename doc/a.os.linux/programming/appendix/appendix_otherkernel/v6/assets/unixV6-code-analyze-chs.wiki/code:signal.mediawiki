@@ -1,0 +1,51 @@
+===Source===
+<div class="wikiheadnote">
+*传入两个参数
+**tp:终端号
+**sig:信号类型号
+*向终端号为tp的所有进程发送类型为sig的信号
+</div>
+
+3941
+
+3942 /*
+
+3943 &nbsp;* Send the specified signal to
+
+3944 &nbsp;* all processes with 'tp' as its
+
+3945 &nbsp;* controlling teletype.
+
+3946 &nbsp;* Called by tty.c for quits and
+
+3947 &nbsp;* interrupts.
+
+3948 &nbsp;*/
+
+3949 signal(tp, sig)
+
+3950 {
+
+3951 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct proc|struct proc]] *p;
+
+3952
+
+3953 &nbsp;&nbsp;&nbsp;&nbsp;for(p = &[[code:struct proc|proc]][0]; p < &[[code:struct proc|proc]][NPROC]; p++)
+
+3954 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  if([[code:struct proc|p->p_ttyp]] == tp)
+
+3955 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:psignal|psignal]](p, sig);
+
+<blockquote>
+*遍历PROC数组,搜索终端号为tp的进程
+*对于每个搜索到的进程,向其发送sig类型的信号
+</blockquote>
+3956 }
+
+3957 /* ------------------------- */
+
+
+===Ref===
+*[[信号系统]]
+===Caller===
+*[[code:ttyinput]]

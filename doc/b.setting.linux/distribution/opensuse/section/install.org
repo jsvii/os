@@ -1,0 +1,5 @@
+* 安装Opensuse
+
+** tools
+
+  - windows https://www.osforensics.com/tools/write-usb-images.html

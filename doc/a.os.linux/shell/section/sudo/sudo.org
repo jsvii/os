@@ -1,0 +1,17 @@
+* sudo
+
+~/etc/sudoers~
+
+#+BEGIN_SRC
+@includedir /etc/sudoers.d
+#+END_SRC
+
+
+#+BEGIN_SRC
+%wheel ALL=(ALL) ALL
+#+END_SRC
+
+
+#+BEGIN_SRC
+usermod -a -G wheel leo
+#+END_SRC

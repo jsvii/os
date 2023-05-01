@@ -1,0 +1,6 @@
+* tr
+
+#+BEGIN_SRC bash
+  echo sit-long | tr '[:lower:]' '[:upper:]' | tr '-' "_"
+  # SIT_LONG
+#+END_SRC

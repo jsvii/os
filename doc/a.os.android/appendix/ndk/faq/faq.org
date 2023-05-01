@@ -1,0 +1,15 @@
+* NDK
+
+** toolchains found in the NDK toolchains folder for ABI with prefix: arm-linux-androideabi
+
+   https://stackoverflow.com/questions/56228822/ndk-does-not-contain-any-platforms
+
+For people seeing this in 2021:
+
+The Android NDK's platform directory has been obsolete since r19. The NDK team removed it altogether in r21 in January 2021. Although it is obsolete, it can still cause the above error in the Project Structure window. The stable version of the Android Studio IDE (at least on Mac) is still looking for the platform directory when you select an r21 or higher version and try to Apply it. The IDE gives the error "NDK does not contain any platforms."
+
+Until Android Studio is updated to stop looking for platform, you can edit the local.properties file yourself, like so:
+
+ndk.dir=/Users/[username]/Library/Android/sdk/ndk/22.0.7026061
+sdk.dir=/Users/[username]/Library/Android/sdk
+This is what the Project Structure window would normally do for you behind the scenes.

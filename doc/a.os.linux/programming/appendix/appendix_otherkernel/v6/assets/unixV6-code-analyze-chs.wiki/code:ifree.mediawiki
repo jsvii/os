@@ -1,0 +1,74 @@
+===Source===
+<div class="wikiheadnote">
+*释放 指定的INODE块
+*共传入两个参数 dev ino
+**dev : 指定设备的设备号
+**ino : 指定INODE块在INODE区的序号
+</div>
+
+7126 
+
+7127 /* 
+
+7128 &nbsp;* Free the specified I node 
+
+7129 &nbsp;* on the specified device. 
+
+7130 &nbsp;* The algorithm stores up 
+
+7131 &nbsp;* to 100 I nodes in the super 
+
+7132 &nbsp;* block and throws away any more. 
+
+7133 &nbsp;*/ 
+
+7134 ifree(dev, ino) 
+
+7135 { 
+
+7136 &nbsp;&nbsp;&nbsp;&nbsp;register *[[code:struct filsys|fp]]; 
+
+7137 
+
+7138 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct filsys|fp]] = [[code:getfs|getfs]](dev); 
+
+<blockquote>
+*得到设备的filsys结构
+</blockquote>
+7139 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct filsys|fp]]->s_ilock) 
+
+7140 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+7141 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct filsys|fp]]->s_ninode >= 100) 
+
+7142 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+<blockquote>
+*发生以下两种情况，函数直接返回
+** inode空闲数组 置锁
+** inode空闲数组 已满
+*参看[[文件系统#空闲INODE管理|文件系统之空闲INODE管理]]
+</blockquote>
+7143 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct filsys|fp]]->s_inode[ [[code:struct filsys|fp]]->s_ninode++] = ino; 
+
+7144 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct filsys|fp]]->s_fmod = 1; 
+
+<blockquote>
+*指定INODE块 放入 inode空闲数组
+*置 filsys 修改标志
+</blockquote>
+7145 } 
+
+7146 /* ------------------------- */ 
+
+7147 /* ------------------------- */ 
+
+7148 
+
+
+
+===Ref===
+*[[文件系统]]
+
+===Caller===
+*[[code:iput]]

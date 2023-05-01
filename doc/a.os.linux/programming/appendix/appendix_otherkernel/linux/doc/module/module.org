@@ -1,0 +1,57 @@
+* module
+
+** intro
+
+模块的全称是 ~动态可加载内核模块~ ，它是具有独立功能的程序，可以被单独编译，但不能独立运行。内核模块被安放在  ~/lib/modules/$(uname -r)/kernel/~ 目录夹下。
+
+#+BEGIN_SRC bash
+$ cd /lib/modules/5.7.19-2-MANJARO/kernel
+$ ls
+arch     # 与硬件相关的模块
+crypto   #内核支持的加密技术的相关模块
+drivers  #硬件的驱动程序模块，如显卡、网卡等
+fs       #文件系统模块，如 fat、vfat、nfs等
+lib      #函数库
+net      #网络协议相关模块
+sound    #音效相关模块
+#+END_SRC
+
+
+** demo
+
+本案例来自于《鸟哥的私房菜》
+
+*** 硬件开发商提供的额外模块
+
+很多时候，可能由於核心默认的核心驱动模块所提供的功能你不满意，或者是硬件开发商所提供的核心模块具有更强大的功能， 又或者该硬件是新的，所以默认的核心并没有该硬件的驱动模块时，那你只好自行由硬件开发商处取得驱动模块， 然后自行编译罗！
+
+如果你的硬件开发商有提供驱动程序的话，那么真的很好解决，直接下载该原始码，重新编译， 将他放置到核心模块该放置的地方后就能够使用了！举个例子来说，为了省电，鸟哥在 2009 年初买了整合型主板来架设家用的服务器，没想到 ~CentOS 5.1~ 以前的版本对鸟哥新买的主板内建网卡支持度不足， 使用的网卡驱动程序 r8169 有问题！搜寻了 google 才发现大家都有这个问题。
+
+解决方法就是到 Realtek 官网下载网卡驱动程序来编译即可。
+
+1. Realtek 的 r8168 网卡驱动程序：http://www.realtek.com.tw/downloads/
+
+1.  选择『Communications Network ICs』-->『Network Interface Controlllers』--> 『10/100/1000M GigabitEthernet』--> 『PCI Express』--> 『Software』就能够下载了！
+
+你可以利用各种方法将他下载后，假设这个文件放置到 /root ，那么直接将他解压缩吧！ 之后就可以读一读INSTALL/README ，然后找一下 Makefile ，就能够编译了。整体流程有点像这样：
+
+#+BEGIN_SRC bash
+# 1. 将文件解压缩：
+[root@www ~]# cd /usr/local/src
+[root@www src]# tar -jxvf /root/r8168-8.013.00.tar.bz2
+[root@www src]# cd r8168-8.013.00/
+
+# 2. 开始进行编译与安装：
+[root@www r8168-8.013.00]# vi readme  <==注意查一下该文件内容
+[root@www r8168-8.013.00]# make clean modules
+[root@www r8168-8.013.00]# ll src/*.ko  <==创建底下的模块档！
+-rw-r--r-- 1 root root 112216  7月 31 01:11 src/r8168.ko
+[root@www r8168-8.013.00]# make install
+install -m 744 -c r8168.ko /lib/modules/2.6.30.3vbird/kernel/drivers/net/
+# 重点在上面这行！会发现模块已经被移动到核心模块目录！
+
+# 3. 升级模块相依属性！
+[root@www r8168-8.013.00]# depmod -a
+#+END_SRC
+
+有趣吧！透过这样的动作，我们就可以轻易的将模块编译起来，并且还可以将他直接放置到核心模块目录中， 同时以 depmod 将模块创建相关性，未来就能够利用 modprobe 来直接取用啦！ 但是需要提醒你的是，当自行编译模块时， 若你的核心有升级 (例如利用自动升级机制进行线上升级) 时，则你必须要重新编译该模块一次， 重复上面的步骤才行！因为这个模块仅针对目前的核心来编译的啊！对吧！

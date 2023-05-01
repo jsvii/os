@@ -1,0 +1,101 @@
+===Source===
+<div class="wikiheadnote">
+*仅在[[code:rkstart|rkstart]]中被调用,用来对[[RK磁盘#RKCS|RKCS]],[[RK磁盘#RKWC|RKWC]],[[RK磁盘#RKBA|RKBA]],[[RK磁盘#RKDA|RKDA]]这四个寄存器进行赋值
+*传入四个参数 bp,devloc,devblk,hbcom
+**bp:在被调用时传入RK磁盘设备队列管理块的指针
+**devloc:在被调用时传入RK磁盘RKDA寄存器的地址
+**devblk:在被调用时传入根据当前b_blkno与b_dev.d_minor对应的RKDA寄存器的值
+**hbcom:在被调用时传入0
+</div>
+
+5087  
+
+5088  /* Device start routine for disks
+
+5089 &nbsp;* and other devices that have the register
+
+5090 &nbsp;* layout of the older DEC controllers (RF, RK, RP, TM)
+
+5091 &nbsp;*/
+
+5092  #define IENABLE 0100
+
+5093  #define WCOM 02
+
+5094  #define RCOM 04
+
+5095  #define GO 01
+
+5096  devstart(bp, devloc, devblk, hbcom)
+
+5097  struct buf *bp;
+
+5098  int *devloc;
+
+5099  {
+
+5100 &nbsp;&nbsp;&nbsp;&nbsp; register int *dp;
+
+5101 &nbsp;&nbsp;&nbsp;&nbsp; register [[code:struct buf|struct buf]] *rbp;
+
+5102 &nbsp;&nbsp;&nbsp;&nbsp; register int com;
+
+<blockquote>
+*com为待传给寄存器RKCS的局部变量
+</blockquote>
+5103
+
+5104 &nbsp;&nbsp;&nbsp;&nbsp; dp = devloc;
+
+<blockquote>
+*RKDA地址赋给dp
+**则 dp-1 为RKBA地址, dp-2 为RKWC地址, dp-3 为RKCS地址,详见[[RK磁盘#寄存器|RK磁盘 寄存器]]
+</blockquote>
+5105 &nbsp;&nbsp;&nbsp;&nbsp; rbp = bp;
+
+5106 &nbsp;&nbsp;&nbsp;&nbsp; *dp = devblk; /* block address */
+
+5107 &nbsp;&nbsp;&nbsp;&nbsp; *--dp = rbp->b_addr; /* buffer address */
+
+5108 &nbsp;&nbsp;&nbsp;&nbsp; *--dp = rbp->b_wcount; /* word count */
+
+<blockquote>
+*将[[RK磁盘#RKDA|RKDA]]置为devblk
+*将[[RK磁盘#RKBA|RKBA]]置为b_addr
+*将[[RK磁盘#RKWC|RKWC]]置为b_wcount
+</blockquote>
+5109 &nbsp;&nbsp;&nbsp;&nbsp; com = (hbcom&lt;&lt;8) <nowiki>|</nowiki> IENABLE <nowiki>|</nowiki> GO <nowiki>|</nowiki>
+
+5110 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  ((rbp->b_xmem & 03) << 4);
+
+<blockquote>
+*com置IENABLE,GO标志
+*将第4,5两位置为rbp->xmem的高2位,rbp->xmem的意义参见[[code:struct buf|struct buf]]
+</blockquote>
+5111 &nbsp;&nbsp;&nbsp;&nbsp; if (rbp->b_flags&B_READ)
+
+5112 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  com =<nowiki>|</nowiki> RCOM;
+
+<blockquote>
+*如果为读,置RCOM标志
+</blockquote>
+5113 &nbsp;&nbsp;&nbsp;&nbsp; else
+
+5114 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  com =<nowiki>|</nowiki> WCOM;
+
+<blockquote>
+*如果为写,置WCOM标志
+</blockquote>
+5115 &nbsp;&nbsp;&nbsp;&nbsp; *--dp = com;
+
+<blockquote>
+*将com赋值给[[RK磁盘#RKCS|RKCS]]
+</blockquote>
+5116  }
+
+5117 /* ------------------------- */
+
+
+
+===Caller===
+*[[code:rkstart]]

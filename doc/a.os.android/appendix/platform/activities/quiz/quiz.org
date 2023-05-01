@@ -1,0 +1,42 @@
+* quiz
+
+** this  vs Activity.this
+
+For example
+#+BEGIN_SRC java
+Intent intent = new Intent(this, SecondActivity.class);
+#+END_SRC
+
+#+BEGIN_SRC bash
+eclipse error:
+The method setClass(Context, Class) in the type Intent is not applicable for the arguments (FirstActivity.ClickEvent, Class)
+#+END_SRC
+
+#+BEGIN_SRC java
+Intent intent = new Intent(FirstActivity.this, SecondActivity.class);
+#+END_SRC
+
+
+But that will be correct. Anybody can explain the difference between those two ? Thanks.
+
+*** 答案
+
+Usually, you can use only this. But, sometimes this makes reference to an inner class... so, for example:
+
+#+BEGIN_SRC java
+Button button = (Button)findViewById(R.id.ticket_details_sell_ticket);
+button.setOnClickListener(new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        // it will be wrong to use only "this", because it would
+        // reference the just created OnClickListener object
+        Intent login = new Intent(ClassName.this, Login.class);
+        startActivityForResult(login, LOGIN_REQUEST);
+    }
+});
+#+END_SRC
+
+
+** RecycleView的逻辑是什么 LayoutInflater 的实现逻辑是什么
+
+为什么可以充实界面？

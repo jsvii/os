@@ -1,0 +1,125 @@
+* Squid & Shadowsocks & privoxy
+
+** squid
+
+  - zypper in squid
+
+  - systemctrl start squid.service
+
+  - =firewall-cmd --zone=public --add-port=3128/tcp --permanent= 打开防火墙上的这一端口
+
+*** opensuse  Could not determine this machines public hostname Please configure one or set 'visible_hostname'
+
+squid.conf 中配置域名。
+
+#+BEGIN_SRC txt
+visible_hostname squidproxy.com
+#+END_SRC
+
+然后在/etc/hosts之中，将配置的名字改为本地的
+
+#+BEGIN_SRC txt
+127.0.0.1       squidproxy.com
+#+END_SRC
+
+
+** shadowsocks
+
+下面的安装方式有问题，不能zypper默认安装。shadowsock在默认的版本下有错误
+
+https://github.com/shadowsocks/shadowsocks/issues/646
+
+#+BEGIN_SRC bash
+sudo pip install --upgrade pip
+sudo pip install shadowsocks
+#+END_SRC
+
+使用源码安装的方式
+#+BEGIN_SRC bash
+pip install git+https://github.com/shadowsocks/shadowsocks.git@master
+#+END_SRC
+
+#+BEGIN_SRC bash
+touch /usr/lib/systemd/system/shadowsocks-client.service
+#+END_SRC
+
+#+BEGIN_SRC txt
+[Unit]
+Description=Shadowsocks Client
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/run/shadowsocks/ss-client.pid
+PermissionsStartOnly=yes
+ExecStartPre=/bin/mkdir -p /run/shadowsocks
+ExecStartPre=/bin/chown root:root /run/shadowsocks
+ExecStart=/usr/bin/sslocal --pid-file /var/run/shadowsocks/ss-client.pid -c /etc/shadowsocks/config.json -d start
+Restart=on-abort
+User=root
+Group=root
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target
+#+END_SRC
+
+内容格式：
+
+#+BEGIN_SRC json
+{
+        "server": "host",
+        "server_port": 443,
+        "local_address": "0.0.0.0",
+        "local_port": 1086,
+        "password": "password",
+        "timeout": 300,
+        "workers": 4
+}
+#+END_SRC
+
+*** ss  Account
+
+  - wuzhi1234.synology.me
+
+  - ss.simplecoder.xyz
+
+
+** privoxy
+
+*** 注意
+
+provixy 的systemd unit 默认设置中有 --chroot --user privoxy，理论上是正确的，但实际过程中总是出错。
+
+#+BEGIN_SRC configure
+[Unit]
+Description=Privoxy Web Proxy With Advanced Filtering Capabilities
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/run/privoxy.pid
+ExecStartPre=-/usr/bin/cp -upf /etc/resolv.conf /etc/host.conf /etc/hosts /etc/localtime /var/lib/privoxy/etc/
+ExecStartPre=-/usr/bin/cp -upf /lib64/libresolv.so.2 /lib64/libnss_dns.so.2 /var/lib/privoxy/lib64/
+ExecStart=/usr/sbin/privoxy --pidfile /run/privoxy.pid /var/lib/privoxy/etc/config
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+#+END_SRC
+
+CONFIG文件中注意修改
+
+#+BEGIN_SRC txt
+logdir /var/log
+
+listen-address  0.0.0.0:8118
+
+forward-socks5t   /               127.0.0.1:1086 .
+#+END_SRC
+
+*** firewalld
+
+  - =firewall-cmd --zone=public --add-port=3128/tcp --permanent= 打开防火墙上的这一端口
+
+  - firewall-cmd --reload

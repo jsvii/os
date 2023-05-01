@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===BGT
+===Code===003000 + 偏移[offset]
+===Operation===PC ← PC + ( 2 * offset ) if Z ∨ ( N ¤ V ) = 0
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===若标志位满足 Z ∨ ( N ¤ V ) = 0 ，进行程序控制转移 <br/>BGT跟指令[[pdp11:BGE|BGE]]类似，只是对0结果不发生程序控制跳转
+===Example===无

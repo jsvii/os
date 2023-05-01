@@ -1,0 +1,78 @@
+===Source===
+<div class="wikiheadnote">
+*"释放" 指定 [[code:struct file|struct file]] 结构 fp
+**若fp是管道，做相应操作
+**若释放的是fp的最后一个引用，则释放fp对应inode
+</div>
+
+6634 
+
+6635 /* 
+
+6636 &nbsp;* Internal form of close. 
+
+6637 &nbsp;* Decrement reference count on 
+
+6638 &nbsp;* file structure and call closei 
+
+6639 &nbsp;* on last closef. 
+
+6640 &nbsp;* Also make sure the pipe protocol 
+
+6641 &nbsp;* does not constipate. 
+
+6642 &nbsp;*/ 
+
+6643 closef(fp) 
+
+6644 int *fp; 
+
+6645 { 
+
+6646 &nbsp;&nbsp;&nbsp;&nbsp;register *rfp, *ip; 
+
+6647 
+
+6648 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct file|rfp]] = fp; 
+
+6649 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct file|rfp]]->f_flag&FPIPE) { 
+
+6650 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]] = [[code:struct file|rfp]]->f_inode; 
+
+6651 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]]->i_mode =& ~(IREAD<nowiki>|</nowiki>IWRITE); 
+
+6652 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]]([[code:struct inode|ip]]+1); 
+
+6653 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]]([[code:struct inode|ip]]+2); 
+
+6654 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若fp是管道文件，ip是fp对应的inode
+**释放ip的读写标志
+**唤醒 等待读/写 ip的进程
+***参看[[睡眠原因#(struct inode)+1]]
+***参看[[睡眠原因#(struct inode)+2]]
+</blockquote>
+6655 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct file|rfp]]->f_count &lt;= 1) 
+
+6656 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:closei|closei]]([[code:struct file|rfp]]->f_inode, [[code:struct file|rfp]]->f_flag&FWRITE); 
+
+<blockquote>
+*若释放的是fp的最后一个引用，则释放fp对应[[code:struct inode|inode]]
+*关于 为什么 标志位赋 &FWRITE ，并不清楚，列入[[遗留问题]]
+</blockquote>
+6657 &nbsp;&nbsp;&nbsp;&nbsp;rfp->f_count--; 
+
+6658 } 
+
+6659 /* ------------------------- */ 
+
+
+===Ref===
+*[[文件系统]]
+*[[内存打开文件结构]]
+
+===Caller===
+*[[code:exit]]
+*[[code:close]]

@@ -1,0 +1,336 @@
+__TOC__
+描述PDP11-40提供的汇编指令<br/>
+=概述=
+PDP11-40提供一系列汇编指令来方便编程，汇编指令都被编译为机器指令
+=符号约定=
+为方便叙述汇编指令，做如下符号约定
+{|
+|-
+!style="width:80px"|符号
+!margin="10px"|意义
+!意义[英文]
+|-
+!align="center"|数
+|除特殊说明的情况，数一般以八进制出现<br/>八进制表现为6位八进制数，有符号数末第6位为符号位(等同于二进制形式末第16位)<br/>转化为二进制表现为16位二进制数，有符号数末第16位为符号位
+|
+|-
+!align="center"|( )
+|...的内容
+|contents of
+|-
+!align="center"|SS / src
+|源地址
+|source address
+|-
+!align="center"|DD / dst
+|目标地址
+|destination address
+|-
+!align="center"|↑
+|从堆栈出栈
+|is popped from stack
+|-
+!align="center"|↓
+|向堆栈入栈
+|is pushed onto stack
+|-
+!align="center"|~
+|逻辑非[按位取反]
+|boolean NOT
+|-
+!align="center"|∧
+|逻辑与
+|boolean AND
+|-
+!align="center"|∨
+|逻辑或
+|boolean OR
+|-
+!align="center"|¤
+|不可兼或
+|Exclusive OR
+|-
+!align="center"|Reg / R
+|寄存器
+|Register
+|-
+!align="center"|B
+|字节
+|Byte
+|-
+!align="center"|■
+|这一位为0则代表指令是字指令<br/>为1则代表指令是字节指令
+|0 for word <br/> 1 for byte
+|-
+!align="center"|XXX
+|某个内存地址[ [[遗留问题]] ]
+|XXX is a programmer-defined mnemonic for a memory location
+
+|}
+
+=指令列表=
+{|
+!style="width:100px"|指令
+!说明
+!英文简介
+|-
+|[[pdp11:CLR|CLR]]<br/>[[pdp11:CLRB|CLRB]]
+|将目标位置的数据清零
+|clear destination
+|-
+|[[pdp11:COM|COM]]<br/>[[pdp11:COMB|COMB]]
+|将目标位置的数据按位取反
+|complement dst
+|-
+|[[pdp11:INC|INC]]<br/>[[pdp11:INCB|INCB]]
+|将目标位置的数据加1
+|increment dst
+|-
+|[[pdp11:DEC|DEC]]<br/>[[pdp11:DECB|DECB]]
+|将目标位置的数据减1
+|decrement dst
+|-
+|[[pdp11:NEG|NEG]]<br/>[[pdp11:NEGB|NEGB]]
+|将目标位置的数据取补
+|negate dst
+|-
+|[[pdp11:TST|TST]]<br/>[[pdp11:TSTB|TSTB]]
+|根据目标位置的数据设置[[pdp11:标志位|标志位]]的N位和Z位
+|test dst
+|-
+|[[pdp11:ASR|ASR]]<br/>[[pdp11:ASRB|ASRB]]
+|将目标位置的数据按位右移一位
+|arithmetic shift right
+|-
+|[[pdp11:ASL|ASL]]<br/>[[pdp11:ASLB|ASLB]]
+|将目标位置的数据按位左移一位
+|arithmetic shift left
+|-
+|[[pdp11:ROR|ROR]]<br/>[[pdp11:RORB|RORB]]
+|将目标位置的数据按位循环右移一位
+|rotate right
+|-
+|[[pdp11:ROL|ROL]]<br/>[[pdp11:ROLB|ROLB]]
+|将目标位置的数据按位循环左移一位
+|rotate left
+|-
+|[[pdp11:SWAB|SWAB]]
+|将目标位置的字数据的高位字节与低位字节互换
+|swap bytes
+|-
+|[[pdp11:ADC|ADC]]<br/>[[pdp11:ADCB|ADCB]]
+|对目标位置的数据处理进位
+|add carry
+|-
+|[[pdp11:SBC|SBC]]<br/>[[pdp11:SBCB|SBCB]]
+|对目标位置的数据处理借位
+|subtract carry
+|-
+|[[pdp11:SXT|SXT]]
+|根据标志位N改变目标位置的数值
+|sign extend
+|-
+|[[pdp11:MOV|MOV]]<br/>[[pdp11:MOVB|MOVB]]
+|移动[复制]源地址的数据到目标地址
+|move source to destination
+|-
+|[[pdp11:CMP|CMP]]<br/>[[pdp11:CMPB|CMPB]]
+|比较源地址的数据和目标地址的数据
+|compare src to dst
+|-
+|[[pdp11:ADD|ADD]]
+|将源地址的数据和目标地址的数据相加，将结果送入目标地址
+|add src to dst
+|-
+|[[pdp11:SUB|SUB]]
+|将目标地址的数据和源地址的数据相减，将结果送入目标地址
+|subtract src from dst
+|-
+|[[pdp11:BIT|BIT]]<br/>[[pdp11:BITB|BITB]]
+|将源地址的数据和目标地址的数据做逻辑与运算，据此改变标志位
+|bit test
+|-
+|[[pdp11:BIC|BIC]]<br/>[[pdp11:BICB|BICB]]
+|按源地址的数据的指示，将目标地址的数据的二进制形式的某些数位清位
+|bit clear
+|-
+|[[pdp11:BIS|BIS]]<br/>[[pdp11:BISB|BISB]]
+|将源地址的数据和目标地址的数据做逻辑或运算，将结果送入目标地址<br/>[按源地址的数据的指示，将目标地址的数据的二进制形式的某些数位置位]
+|bit set
+|-
+|[[pdp11:MUL|MUL]]
+|将源地址的数据和目标地址的数据相乘，将结果送入目标地址(参见详细说明)
+|multiply
+|-
+|[[pdp11:DIV|DIV]]
+|将源地址的数据和目标地址(32位长)的数据相除，将结果送入目标地址
+|divide
+|-
+|[[pdp11:ASH|ASH]]
+|根据源地址的数据，将目标寄存器的数据按位向左/向右移动指定位数
+|shift arithmetically
+|-
+|[[pdp11:ASHC|ASHC]]
+|根据源地址的数据，将目标寄存器[双字长]的数据按位向左/向右移动指定位数
+|arithmetic shift combined 
+|-
+|[[pdp11:XOR|XOR]]
+|将给定寄存器与目标地址的数据做不可兼或运算，结果送入目标地址
+|exclusive OR
+|-
+|[[pdp11:BR|BR]]
+|进行无条件程序控制转移，偏移范围 -128 ~ 127
+|branch (unconditional)
+|-
+|[[pdp11:BNE|BNE]]
+|若标志位Z未被置位，进行程序控制转移
+|branch if not equal (to zero)
+|-
+|[[pdp11:BEQ|BEQ]]
+|若标志位Z被置位，进行程序控制转移
+|branch if equal (to zero)
+|-
+|[[pdp11:BPL|BPL]]
+|若标志位N未被置位，进行程序控制转移
+|branch if plus
+|-
+|[[pdp11:BMI|BMI]]
+|若标志位N被置位，进行程序控制转移
+|branch if minus
+|-
+|[[pdp11:BVC|BVC]]
+|若标志位V未被置位，进行程序控制转移
+|branch if overflow is clear
+|-
+|[[pdp11:BVS|BVS]]
+|若标志位V被置位，进行程序控制转移
+|branch if overflow is set
+|-
+|[[pdp11:BCC|BCC]]
+|若标志位C未被置位，进行程序控制转移
+|branch if carry is clear
+|-
+|[[pdp11:BGE|BGE]]
+|若标志位满足 N ∨ V = 0 ，进行程序控制转移
+|branch if greater than or equal (to zero)
+|-
+|[[pdp11:BLT|BLT]]
+|若标志位满足 N ¤ V = 0 ，进行程序控制转移
+|branch if less than (zero)
+|-
+|[[pdp11:BGT|BGT]]
+|若标志位满足 Z ∨ ( N ¤ V ) = 0 ，进行程序控制转移
+|branch if greater than (zero)
+|-
+|[[pdp11:BLE|BLE]]
+|若标志位满足 Z ∨ ( N ¤ V ) = 1 ，进行程序控制转移
+|branch if less than or equal (to zero)
+|-
+|[[pdp11:BHI|BHI]]
+|若标志位满足 Z = 0 and C = 0 ，进行程序控制转移
+|branch if higher
+|-
+|[[pdp11:BLOS|BLOS]]
+|若标志位满足 C ∨ Z = 1 ，进行程序控制转移
+|branch if lower or same
+|-
+|[[pdp11:BHIS|BHIS]]
+|若标志位满足 C = 0 ，进行程序控制转移
+|branch if higher or same
+|-
+|[[pdp11:BLO|BLO]]
+|若标志位满足 C = 1 ，进行程序控制转移
+|branch if lower
+|-
+|[[pdp11:JMP|JMP]]
+|程序控制跳转到目标地址
+|jump
+|-
+|[[pdp11:JSR|JSR]]
+|程序控制跳转到指定子程序并进行现场保护
+|jump to subroutine
+|-
+|[[pdp11:RTS|RTS]]
+|程序控制从子程序返回，进行现场恢复
+|return from subroutine
+|-
+|[[pdp11:MARK|MARK]]
+|标记退栈位置，方便子程序返回时的退栈操作
+|mark
+|-
+|[[pdp11:SOB|SOB]]
+|对目标寄存器进行减1，若结果不为0，进行程序控制转移
+|subtract one and branch (if ≠ 0)
+|-
+|[[pdp11:TRAP|TRAP]]
+|陷入
+|trap
+|-
+|[[pdp11:BPT|BPT]]
+|断点陷入
+|breakpoint trap
+|-
+|[[pdp11:IOT|IOT]]
+|I/O陷入
+|Input/Output trap
+|-
+|[[pdp11:RTI|RTI]]
+|从中断返回
+|return from interrupt
+|-
+|[[pdp11:RTT|RTT]]
+|从中断返回
+|return from interrupt
+|-
+|[[pdp11:MFPI|MFPI]]
+|从上一指令空间读取数据
+|move from previous instruction space
+|-
+|[[pdp11:MTPI|MTPI]]
+|向上一指令空间写入数据
+|move to previous instruction space
+|-
+|[[pdp11:CLC|CLC]]
+|清标志位C
+|Clear C
+|-
+|[[pdp11:CLV|CLV]]
+|清标志位V
+|Clear V
+|-
+|[[pdp11:CLZ|CLZ]]
+|清标志位Z
+|Clear Z
+|-
+|[[pdp11:CLN|CLN]]
+|清标志位N
+|Clear N
+|-
+|[[pdp11:SEC|SEC]]
+|置标志位C
+|Set C
+|-
+|[[pdp11:SEV|SEV]]
+|置标志位V
+|Set V
+|-
+|[[pdp11:SEZ|SEZ]]
+|置标志位Z
+|Set Z
+|-
+|[[pdp11:SEN|SEN]]
+|置标志位N
+|Set N
+|-
+|[[pdp11:SCC|SCC]]
+|置所有标志位
+|Set all CC's (Condition Codes)
+|-
+|[[pdp11:CCC|CCC]]
+|清所有标志位
+|Clear all CC's
+|-
+|[[pdp11:NOP|NOP]]
+|空操作
+|No Operation
+|}

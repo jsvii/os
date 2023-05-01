@@ -1,0 +1,36 @@
+* Wired Connection
+
+
+https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html
+
+
+#+BEGIN_SRC  txt
+[connection]
+id=Wired connection 1
+uuid=93844899-e657-39d9-94ff-4ee91a4737ea
+type=ethernet
+autoconnect-priority=-100
+permissions=
+timestamp=1587000256
+
+[ethernet]
+duplex=half
+mac-address=00:0E:C6:A0:A8:B3
+mac-address-blacklist=
+speed=100
+
+[ipv4]
+address1=192.168.1.95/24,192.168.1.1
+dns-search=
+may-fail=false
+method=manual
+route1=99.48.64.0/24,192.168.1.91,100
+route2=99.47.192.0/22,192.168.1.91,100
+route3=99.47.148.0/22,192.168.1.91,100
+
+[ipv6]
+addr-gen-mode=stable-privacy
+dns-search=
+method=auto
+
+#+END_SRC

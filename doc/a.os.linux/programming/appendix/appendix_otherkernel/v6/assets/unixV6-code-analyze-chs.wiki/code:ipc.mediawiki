@@ -1,0 +1,51 @@
+===Source===
+<div class="wikiheadnote">
+*全局变量，用于跟踪系统进程间传递参数
+</div>
+
+3924
+
+3925 /*
+
+3926 &nbsp;* Tracing variables.
+
+3927 &nbsp;* Used to pass trace command from
+
+3928 &nbsp;* parent to child being traced.
+
+3929 &nbsp;* This data base cannot be
+
+3930 &nbsp;* shared and is locked
+
+3931 &nbsp;* per user.
+
+3932 &nbsp;*/
+
+3933 struct
+
+3934 {
+
+3935 &nbsp;&nbsp;&nbsp;&nbsp;int ip_lock;
+
+<blockquote>
+*ipc 的锁变量
+*进程 锁 ipc，置此值为进程号n
+</blockquote>
+3936 &nbsp;&nbsp;&nbsp;&nbsp;int ip_req;
+
+3937 &nbsp;&nbsp;&nbsp;&nbsp;int ip_addr;
+
+3938 &nbsp;&nbsp;&nbsp;&nbsp;int ip_data;
+
+3939 } ipc;
+
+3940 /* ------------------------- */
+
+
+
+===Ref===
+*[[跟踪]]
+
+===Caller===
+*[[code:ptrace]]
+*[[code:procxmt]]

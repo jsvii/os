@@ -1,0 +1,209 @@
+===Source===
+
+2900 # 
+
+2901 /* 
+
+2902 &nbsp;*/ 
+
+2903 
+
+2904 /* 
+
+2905 &nbsp;* This table is the switch used to transfer 
+
+2906 &nbsp;* to the appropriate routine for processing a system call. 
+
+2907 &nbsp;* Each row contains the number of arguments expected 
+
+2908 &nbsp;* and a pointer to the routine. 
+
+2909 &nbsp;*/ 
+
+2910 int sysent[] 
+
+<blockquote>
+*[[系统调用|系统调用函数]]入口
+*每项包括 函数参数个数 和 函数地址
+</blockquote>
+2911 { 
+
+2912 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nullsys|nullsys]], /* 0 = indir */ 
+
+2913 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:rexit|rexit]], /* 1 = exit */ 
+
+2914 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:fork|fork]], /* 2 = fork */ 
+
+2915 &nbsp;&nbsp;&nbsp;&nbsp;2, &[[code:read|read]], /* 3 = read */ 
+
+2916 &nbsp;&nbsp;&nbsp;&nbsp;2, &[[code:write|write]], /* 4 = write */ 
+
+2917 &nbsp;&nbsp;&nbsp;&nbsp;2, &[[code:open|open]], /* 5 = open */ 
+
+2918 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:close|close]], /* 6 = close */ 
+
+2919 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:wait|wait]], /* 7 = wait */ 
+
+2920 &nbsp;&nbsp;&nbsp;&nbsp;2, &[[code:creat|creat]], /* 8 = creat */ 
+
+2921 &nbsp;&nbsp;&nbsp;&nbsp;2, &[[code:link|link]], /* 9 = link */ 
+
+2922 &nbsp;&nbsp;&nbsp;&nbsp;1, &[[code:unlink|unlink]], /* 10 = ulink */ 
+
+2923 &nbsp;&nbsp;&nbsp;&nbsp;2, &[[code:exec|exec]], /* 11 = exec */ 
+
+2924 &nbsp;&nbsp;&nbsp;&nbsp;1, &[[code:chdir|chdir]], /* 12 = chdir */ 
+
+2925 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:gtime|gtime]], /* 13 = time */ 
+
+2926 &nbsp;&nbsp;&nbsp;&nbsp;3, &[[code:mknod|mknod]], /* 14 = mknod */ 
+
+2927 &nbsp;&nbsp;&nbsp;&nbsp;2, &[[code:chmod|chmod]], /* 15 = chmod */ 
+
+2928 &nbsp;&nbsp;&nbsp;&nbsp;2, &[[code:chown|chown]], /* 16 = chown */ 
+
+2929 &nbsp;&nbsp;&nbsp;&nbsp;1, &[[code:sbreak|sbreak]], /* 17 = break */ 
+
+2930 &nbsp;&nbsp;&nbsp;&nbsp;2, &[[code:stat|stat]], /* 18 = stat */ 
+
+2931 &nbsp;&nbsp;&nbsp;&nbsp;2, &[[code:seek|seek]], /* 19 = seek */ 
+
+2932 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:getpid|getpid]], /* 20 = getpid */ 
+
+2933 &nbsp;&nbsp;&nbsp;&nbsp;3, &[[code:smount|smount]], /* 21 = mount */ 
+
+2934 &nbsp;&nbsp;&nbsp;&nbsp;1, &[[code:sumount|sumount]], /* 22 = unmount */ 
+
+2935 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:setuid|setuid]], /* 23 = setuid */ 
+
+2936 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:getuid|getuid]], /* 24 = getuid */ 
+
+2937 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:stime|stime]], /* 25 = stime */ 
+
+2938 &nbsp;&nbsp;&nbsp;&nbsp;3, &[[code:ptrace|ptrace]], /* 26 = ptrace */ 
+
+2939 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 27 = x */ 
+
+2940 &nbsp;&nbsp;&nbsp;&nbsp;1, &[[code:fstat|fstat]], /* 28 = fstat */ 
+
+2941 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 29 = x */ 
+
+2942 &nbsp;&nbsp;&nbsp;&nbsp;1, &[[code:nullsys|nullsys]], /* inoperative /* 30 = [[code:smdate|smdate]] */ 
+
+2943 &nbsp;&nbsp;&nbsp;&nbsp;1, &[[code:stty|stty]], /* 31 = stty */ 
+
+2944 &nbsp;&nbsp;&nbsp;&nbsp;1, &[[code:gtty|gtty]], /* 32 = gtty */ 
+
+2945 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 33 = x */ 
+
+2946 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nice|nice]], /* 34 = nice */ 
+
+2947 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:sslep|sslep]], /* 35 = sleep */ 
+
+2948 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:sync|sync]], /* 36 = sync */ 
+
+2949 &nbsp;&nbsp;&nbsp;&nbsp;1, &[[code:kill|kill]], /* 37 = kill */ 
+
+2950 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:getswit|getswit]], /* 38 = switch */ 
+
+2951 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 39 = x */ 
+
+2952 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 40 = x */ 
+
+2953 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:dup|dup]], /* 41 = dup */ 
+
+2954 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:pipe|pipe]], /* 42 = pipe */ 
+
+2955 &nbsp;&nbsp;&nbsp;&nbsp;1, &[[code:times|times]], /* 43 = times */ 
+
+2956 &nbsp;&nbsp;&nbsp;&nbsp;4, &[[code:profil|profil]], /* 44 = prof */ 
+
+2957 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 45 = tui */ 
+
+2958 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:setgid|setgid]], /* 46 = setgid */ 
+
+2959 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:getgid|getgid]], /* 47 = getgid */ 
+
+2960 &nbsp;&nbsp;&nbsp;&nbsp;2, &[[code:ssig|ssig]], /* 48 = sig */ 
+
+2961 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 49 = x */ 
+
+2962 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 50 = x */ 
+
+2963 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 51 = x */ 
+
+2964 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 52 = x */ 
+
+2965 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 53 = x */ 
+
+2966 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 54 = x */ 
+
+2967 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 55 = x */ 
+
+2968 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 56 = x */ 
+
+2969 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 57 = x */ 
+
+2970 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 58 = x */ 
+
+2971 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 59 = x */ 
+
+2972 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 60 = x */ 
+
+2973 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 61 = x */ 
+
+2974 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 62 = x */ 
+
+2975 &nbsp;&nbsp;&nbsp;&nbsp;0, &[[code:nosys|nosys]], /* 63 = x */ 
+
+2976 }; 
+
+2977 /* ------------------------- */ 
+
+2978 
+
+2979 
+
+2980 
+
+2981 
+
+2982 
+
+2983 
+
+2984 
+
+2985 
+
+2986 
+
+2987 
+
+2988 
+
+2989 
+
+2990 
+
+2991 
+
+2992 
+
+2993 
+
+2994 
+
+2995 
+
+2996 
+
+2997 
+
+2998 
+
+2999 
+
+
+===Ref===
+*[[系统调用]]

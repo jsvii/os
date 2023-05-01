@@ -1,0 +1,5 @@
+[repo-update-oss]
+enabled=1
+autorefresh=1
+baseurl=https://mirrors.163.com/openSUSE/update/leap/15.1/oss/
+type=rpm-md

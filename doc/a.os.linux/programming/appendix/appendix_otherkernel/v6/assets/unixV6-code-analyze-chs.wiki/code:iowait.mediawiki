@@ -1,0 +1,66 @@
+===Source===
+<div class="wikiheadnote">
+*等待 某缓存块的I/O操作完成
+*如有错误，将I/O错误返回给[[code:user|user结构]]
+*共传入一个参数 bp
+*bp : 该缓存块的控制结构[[code:struct buf|struct buf]]
+</div>
+
+4978 
+
+4979 /* Wait for I/O completion on the buffer; return errors 
+
+4980 &nbsp;* to the user. 
+
+4981 &nbsp;*/ 
+
+4982 iowait(bp) 
+
+4983 [[code:struct buf|struct buf]] *bp; 
+
+4984 { 
+
+4985 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct buf|struct buf]] *rbp; 
+
+4986 
+
+4987 &nbsp;&nbsp;&nbsp;&nbsp;rbp = bp; 
+
+4988 &nbsp;&nbsp;&nbsp;&nbsp;[[code:spl|spl6]](); 
+
+<blockquote>
+*处理机优先级设为6,防止其他进程对该缓存块进行操作
+</blockquote>
+4989 &nbsp;&nbsp;&nbsp;&nbsp;while ((rbp->b_flags&B_DONE)==0) 
+
+4990 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:sleep|sleep]](rbp, PRIBIO); 
+
+<blockquote>
+*若该缓存块未就绪，则进程睡眠
+**[[睡眠原因#struct buf]]
+**[[进程优先级]]置为PRIBIO
+</blockquote>
+4991 &nbsp;&nbsp;&nbsp;&nbsp;[[code:spl|spl0]](); 
+
+<blockquote>
+*[[开中断]]
+</blockquote>
+4992 &nbsp;&nbsp;&nbsp;&nbsp;[[code:geterror|geterror]](rbp); 
+
+<blockquote>
+*检查该缓存块I/O错误
+*如有I/O错误，传递给[[code:user|user]]
+</blockquote>
+4993 } 
+
+4994 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:bread]]
+*[[code:breada]]
+*[[code:bwrite]]

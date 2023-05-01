@@ -1,0 +1,203 @@
+|
+===Source===
+
+0200 /* various global variables */
+
+0201
+
+0202 char canonb[CANBSIZ]; /* buffer for erase and kill */ 
+
+0203 int coremap[CMAPSIZ]; /* space for core allocation */ 
+
+<blockquote>
+*内存 空闲空间管理结构，参看[[空闲块管理]]
+</blockquote>
+0204 int swapmap[SMAPSIZ]; /* space for swap allocation */ 
+
+<blockquote>
+*盘交换区 空闲空间管理结构，参看[[空闲块管理]]
+</blockquote>
+0205
+
+0206 int *rootdir; /* pointer to inode of root directory */ 
+
+<blockquote>
+*指向 根目录 的[[code:struct inode|inode块]]
+</blockquote>
+0207
+
+0208 int cputype; /* type of cpu =40, 45, or 70 */ 
+
+0209
+
+0210 int execnt; /* number of processes in exec */ 
+
+<blockquote>
+*执行[[code:exec|exec]]的进程数
+</blockquote>
+0211
+
+0212 int lbolt; /* time of day in 60th not in time */ 
+
+<blockquote>
+*在 [[code:clock|clock]] 中使用，作为已经过的时钟滴答数
+</blockquote>
+0213 int time[2]; /* time in sec from 1970 */ 
+
+<blockquote>
+*系统时间，从1970年起始的秒数
+</blockquote>
+0214 int tout[2]; /* time of day of next sleep */ 
+
+<blockquote>
+详见[[睡眠原因#tout|睡眠原因]]
+</blockquote>
+0215
+
+0216 int mpid; /* generic for unique process id’s */
+
+0217
+
+0218 char runin; /* scheduling flag */ 
+
+<blockquote>
+*用于表示盘交换区上有进程想调入内存但无法调入的标志
+</blockquote>
+0219 char runout; /* scheduling flag */ 
+
+<blockquote>
+*用于表示盘交换区上没有可以调入内存的就绪进程的标志
+</blockquote>
+0220 char runrun; /* scheduling flag */ 
+
+<blockquote>
+*用于 [[进程调度]]，申请 [[进程调度]] 的标志
+</blockquote>
+0221
+
+0222 char curpri; /* more scheduling */ 
+
+<blockquote>
+*当前进程 的优先级
+</blockquote>
+0223
+
+0224 int maxmem; /* actual max memory per process */ 
+
+<blockquote>
+*每进程 能 使用的最大内存块数
+</blockquote>
+0225
+
+0226 int *lks; /* pointer to clock device */
+
+<blockquote>
+*指向 时钟发生器 状态/控制 寄存器
+*参看 [[时钟]]
+</blockquote>
+0227
+
+0228 int rootdev; /* dev of root see conf.c */ 
+
+<blockquote>
+*根设备
+</blockquote>
+0229 int swapdev; /* dev of swap see conf.c */ 
+
+<blockquote>
+*盘交换区 设备
+</blockquote>
+0230
+
+0231 int swplo; /* block number of swap space */ 
+
+0232 int nswap; /* size of swap space */ 
+
+0233
+
+0234 int updlock; /* lock for sync */ 
+
+<blockquote>
+*函数[[code:update|update]]的锁标识
+</blockquote>
+0235 int rablock; /* block to be read ahead */ 
+
+<blockquote>
+*要预读的磁盘块
+</blockquote>
+
+0236
+
+0237 char regloc[]; /* locs. of saved user registers
+
+0238 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  (see trap.c) */ 
+
+0239
+
+0240
+
+0241 /* ------------------------- */ 
+
+0242
+
+0243
+
+0244
+
+0245
+
+0246
+
+0247
+
+0248
+
+0249
+
+0250
+
+0251 /* -------------------------*/ 
+
+0252
+
+0253 /* The callout structure is for a routine
+
+0254 * arranging to be called by the the clock interrupt
+
+0255 * (see clock.c), with a specified argument,
+
+0256 * within a specified amount of time.
+
+0257 * It is used, for example, to time tab delays
+
+0258 * on teletypes. */
+
+0259
+
+0260 struct callo
+
+0261 {
+
+0262 &nbsp;&nbsp;&nbsp;&nbsp;int c_time; /* incremental time */
+
+<blockquote>
+*相邻事件 间隔的时钟滴答数
+</blockquote>
+0263 &nbsp;&nbsp;&nbsp;&nbsp;int c_arg; /* argument to routine */ 
+
+<blockquote>
+*事件函数的参数
+</blockquote>
+0264 &nbsp;&nbsp;&nbsp;&nbsp;int (*c_func)(); /* routine */ 
+
+<blockquote>
+*事件函数
+</blockquote>
+0265 } callout[NCALL];
+
+<blockquote>
+*事件执行链表(由[[code:clock|clock]]调用，按时间执行事件)
+</blockquote>
+0266 /* -------------------------*/ 
+
+

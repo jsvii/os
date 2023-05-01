@@ -1,0 +1,175 @@
+* ffmpeg
+
+** 如何用ffmpeg来截屏
+
+ https://trac.ffmpeg.org/wiki/Capture/Desktop
+
+
+*** linux
+
+使用 x11grab device
+
+
+#+BEGIN_SRC bash
+ffmpeg -video_size 1024x768 -framerate 25 -f x11grab -i :0.0+100,200 output.mp4
+#+END_SRC
+
+**** with audio
+
+use ALSA (see Capture/ALSA for more info):
+
+#+BEGIN_SRC bash
+ffmpeg -video_size 1024x768 -framerate 25 -f x11grab -i :0.0+100,200 -f alsa -ac 2 -i hw:0 output.mkv
+#+END_SRC
+
+**** with the pulse input device
+
+ffmpeg -video_size 1024x768 -framerate 25 -f x11grab -i :0.0+100,200 -f pulse -ac 2 -i default output.mkv
+
+*** mac
+
+使用 avfoundation device:
+
+#+BEGIN_SRC bash
+ffmpeg -f avfoundation -list_devices true -i ""
+#+END_SRC
+
+This will enumerate all the available input devices including screens ready to be captured.
+
+Once you've figured out the device index corresponding to the screen to be captured, use:
+
+#+BEGIN_SRC bash
+ffmpeg -f avfoundation -i "<screen device index>:<audio device index>" output.mkv
+#+END_SRC
+
+This will capture the screen from <screen device index> and audio from <audio device index> into the output file output.mkv.
+
+*** Windows
+
+Use DirectShow
+
+Use a DirectShow ​device:
+
+#+BEGIN_SRC bash
+ffmpeg -f dshow -i video="screen-capture-recorder" output.mkv
+#+END_SRC
+
+This will grab the image from entire desktop. You can refer to a ​list of alternative devices.
+
+If you need audio too:
+
+ffmpeg -f dshow -i video="UScreenCapture":audio="Microphone" output.mkv
+
+If you want to capture the audio that is playing from your speakers you may also need to configure so-called "Stereo Mix" device.
+
+or
+
+#+BEGIN_SRC bash
+ffmpeg -f dshow -i video="UScreenCapture" -f dshow -i audio="Microphone" output.mkv
+#+END_SRC
+
+You can list your devices with:
+
+#+BEGIN_SRC bash
+ffmpeg -list_devices true -f dshow -i dummy
+#+END_SRC
+
+Use built-in GDI screengrabber
+
+You can also use gdigrab as input device to grab video from the Windows screen.
+
+To capture all your displays as one big contiguous display:
+
+#+BEGIN_SRC bash
+ffmpeg -f gdigrab -framerate 30 -i desktop output.mkv
+#+END_SRC
+
+If you want to limit to a region, and show the area being grabbed:
+
+#+BEGIN_SRC bash
+ffmpeg -f gdigrab -framerate 30 -offset_x 10 -offset_y 20 -video_size 640x480 -show_region 1 -i desktop output.mkv
+#+END_SRC
+
+To grab the contents of the window named "Calculator":
+
+#+BEGIN_SRC bash
+ffmpeg -f gdigrab -framerate 30 -i title=Calculator output.mkv
+#+END_SRC
+
+*** other options
+
+**** Hardware Encoding
+
+You can use hardware acceleartion to speed up encoding and reduce the load on your CPU. For example, with NVIDIA hardware encoding:
+
+#+BEGIN_SRC bash
+ffmpeg -f gdigrab -framerate 30 -i desktop -c:v h264_nvenc -qp 0 output.mkv
+#+END_SRC
+
+**** Lossless Recording
+
+If your CPU is not fast enough, the encoding process might take too long. To speed up the encoding process, you can use lossless encoding and
+disable advanced encoder options, e.g.:
+
+ffmpeg -video_size 1920x1080 -framerate 30 -f x11grab -i :0.0 -c:v libx264 -crf 0 -preset ultrafast output.mkv
+
+-crf 0 tells x264 to encode in lossless mode; -preset ultrafast advises it to do so fast.
+
+The encoder should be fast enough on most modern hardware to record without any framedrop, and even leave enough CPU headroom for other
+applications.
+
+If you're going to archive the recording or are concerned about file size, re-encode it losslessly again, but with a slower preset. Note that
+since the initial recording was lossless, and the re-encode is lossless too, no quality loss is introduced in this process in any way.
+
+ffmpeg -i output.mkv -c:v libx264 -crf 0 -preset veryslow output-smaller.mkv
+Last modified 2 years ago Last modified on Dec 1, 2017, 2:35:19 PM
+
+
+** options
+
+-f
+ 强制指定格式(format)，这个format我不是很理解，看样子是指输入设备、格式的意思。指定成x11grab就会从Ｘ里抓取视频源，所以只在Linux下有效。
+-s
+ 视频分辨率。
+-i
+ 指定格式为x11grab时，需要设置成 [hostname]:display_number.screen_number[+x_offset,y_offset] 的格式。x_offset，
+ y_offset可以指定录制的起点。
+-r
+ frame rate，帧率。
+-vcodec
+ 强制使用某种编码器。
+
+按照开始时间和结束时间剪切视频
+
+ffmpeg -i movie.mp4 -ss 00:00:03 -to 00:00:08 -async 1 cut.mp4
+
+参考https://stackoverflow.com/questions/18444194/cutting-the-videos-based-on-start-and-end-time-using-ffmpeg
+
+-ss
+ seek到指定时间最近的帧
+-to
+ 截至到某个时间点
+-async 1
+ audio sync, -async 1 是特殊参数，只在音频流开始时校正。
+
+-ss 和 -to 放在 -i 前或者后的效果是不一样的。
+
+将mp4转换成gif文件
+
+ffmpeg -ss 0 -i cut1.mp4 -vf "fps=6,scale=1366:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 output.gif
+
+参考https://superuser.com/questions/556029/how-do-i-convert-a-video-to-gif-using-ffmpeg-with-reasonable-quality
+
+fps=6
+ 每秒截取6帧
+scale=1366:-1
+ 将分辨率转为宽度为1366px，高度成比例对应。
+-loop=0
+ 无限循环。
+
+
+*** AVFoundation
+
+AVFoundation是可以用它来播放和创建基于时间的视听媒体的几个框架之一，它提供了基于时间的视听数据的详细界别上的OC接口。可以用它来检查、创建、编辑、重新编码媒体文件。也可以从设备得到输入流和实时捕捉回放过程中操控视频
+
+用于处理基于时间的媒体数据的高级OC框架。充分利用了多核硬件的优势并大量使用block和Grand Central Dispatch(GCD)机制将复杂的计算进程放在后台线程运行。自动提供硬件加速操作，确保在大部分设备上应用程序能以最佳性能运行。

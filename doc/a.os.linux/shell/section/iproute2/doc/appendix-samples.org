@@ -1,0 +1,44 @@
+* samples
+
+** linux 添加 windows 10route
+
+
+99.48.64.62
+
+1. windows开启 ~IP路由转发功能~ 。
+
+Windows中IP路由转发功能缺省是关闭的。
+关闭的话
+1) 打开注册表编辑器。
+2) 在注册表编辑器中，定位以下注册表项：
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters
+
+选择项目：
+
+IPEnableRouter:REG_DWORD:0x0
+3) 要对该计算机安装和使用的所有网络连接都启用 IP 转发，请指定值为 1。
+   要对该计算机安装和使用的所有网络连接都关闭 IP 转发，请指定值为 0。
+
+注：必须以管理员或管理组成员的身份登录才能完成该过程。 默认情况下，将禁用 IP 转发。
+
+
+change the startup type of the service “Routing and Remote Access” to auto
+
+sc config RemoteAccess start= auto
+
+and start the service
+
+sc start RemoteAccess
+
+Thats it
+
+Michael
+
+参考文档：
+
+https://www.dslreports.com/forum/r30590206-routing-2-subnet-with-windows-10-computer
+
+https://michlstechblog.info/blog/windows-howto-enable-ip-routing/
+
+
+** window

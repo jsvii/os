@@ -1,0 +1,68 @@
+* 文本处理
+
+** 拿到文本中某一类型的文字
+
+下文中，怎样拿出 ~http://s3.amazonaws.com/lyah/dognap.png~ 这样的图片
+
+#+BEGIN_SRC shell
+./making-our-own-types-and-typeclasses:893:<div><img src="http://s3.amazonaws.com/lyah/functor.png" alt="I AM FUNCTOOOOR!!!" class="right" width="220" height="441"></div>
+./input-and-output:35:<img src="http://s3.amazonaws.com/lyah/dognap.png" alt="poor dog" class="right" width="261" height="382">
+./input-and-output:40:<img src="http://s3.amazonaws.com/lyah/helloworld.png" alt="HELLO!" class="left" width="223" height="179">
+./input-and-output:84:<img src="http://s3.amazonaws.com/lyah/luggage.png" alt="luggage" class="left" width="204" height="200">
+./input-and-output:355:<img src="http://s3.amazonaws.com/lyah/streams.png" alt="streams" class="right" width="464" height="322">
+#+END_SRC
+
+*** answer
+
+#+BEGIN_SRC shell
+find ./ -type f | xargs grep -oh "http*.png"
+#+END_SRC
+
+~-o~ 代表only match
+
+~-h~ 代表 hide file name
+
+** Sed 删除换行，合并多行文字
+
+Use this solution with GNU sed:
+
+#+BEGIN_SRC shell
+sed ':a;N;$!ba;s/\n/ /g' file
+#+END_SRC
+
+This will read the whole file in a loop, then replaces the newline(s) with a space.
+
+Explanation:
+
+1. Create a label via :a.
+1. Append the current and next line to the pattern space via N.
+1. If we are before the last line, branch to the created label $!ba ($! means not to do it on the last line as there should be one final newline).
+
+1. Finally the substitution replaces every newline with a space on the pattern space (which is the whole file).
+
+Here is cross-platform compatible syntax which works with BSD and OS X's sed (as per @Benjie comment):
+
+#+BEGIN_SRC shell
+sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g' file
+#+END_SRC
+
+参考文档： https://stackoverflow.com/questions/1251999/how-can-i-replace-a-newline-n-using-sed
+
+** 删除一行文字
+
+#+BEGIN_SRC shell
+for i in *.html ; do  sed -i "/fonts\.googleapis/d" $i; done;
+#+END_SRC
+
+** 批量替换图片位置
+
+scripts/change_image_dir.zsh
+
+** 变量之痛
+
+#+BEGIN_SRC shell
+var1=something
+sed -i 's~${var1}~somethingnew~g' somefile
+#+END_SRC
+
+如果 var1 为 ~./~ 那么 ~.~ 会被解释为任意

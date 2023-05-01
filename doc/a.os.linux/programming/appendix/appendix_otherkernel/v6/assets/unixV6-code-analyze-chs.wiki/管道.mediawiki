@@ -1,0 +1,15 @@
+=概述=
+*管道(pipe) 是 UNIX 进程间通讯的一种方式
+*原理参看 [[参考文献|参考文献 之 UNIX操作系统教程]]
+=相关函数=
+*[[code:pipe|pipe]]
+*[[code:readp|readp]]
+*[[code:writep|writep]]
+=管道生成时的数据结构=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pipe_data_structure.png"/></p>
+
+=管道通讯时的数据结构=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pipe_data_structure_2.png"/></p>
+
+=参考=
+*[[参考文献|参考文献 之 UNIX操作系统教程]]

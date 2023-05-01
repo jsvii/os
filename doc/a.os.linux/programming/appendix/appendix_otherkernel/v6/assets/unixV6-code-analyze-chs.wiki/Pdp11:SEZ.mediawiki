@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===SEZ
+===Code===000264
+===Operation===Set Z
+===Coden===无影响
+===Codez===置
+===Codev===无影响
+===Codec===无影响
+===Description===置标志位Z
+===Example===无

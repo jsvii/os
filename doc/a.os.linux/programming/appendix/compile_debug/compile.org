@@ -1,0 +1,245 @@
+* compile
+
+** ref
+
+1. https://www.kernel.org/doc/
+
+1. https://github.com/g0dA/linuxStack/blob/master/linux%E5%86%85%E6%A0%B8%E8%B0%83%E8%AF%95.md +  https://blog.csdn.net/jasonLee_lijiaqi/article/details/80967912
+
+1. https://ops.tips/notes/booting-linux-on-qemu/
+
+1. https://www.zachpfeffer.com/single-post/build-the-linux-kernel-and-busybox-and-run-on-qemu
+
+** 编译busybox
+
+
+#+BEGIN_SRC bash
+  make defconfig
+
+  make menuconfig
+
+  make install
+#+END_SRC
+
+menuconfig时选择 ~Busybox Settings  --->  Press the down arrow until you hit Build BusyBox as a static binary (no shared libs).~
+
+make install 会生成 ~_install~ 文件夹
+
+
+
+*** 在 _install 文件夹下添加目录文件
+
+添加更多目录
+
+#+BEGIN_SRC bash
+  mkdir -p {bin,sbin,etc,proc,sys,usr/{bin,sbin}}
+#+END_SRC
+
+#+BEGIN_SRC txt
+  - ramdisk
+    + bin
+    + etc
+    + proc
+    + sbin
+    + sys
+    + usr
+     init
+     linuxrc
+#+END_SRC
+
+*** init
+
+#+BEGIN_SRC bash
+  ln -s bin/busybox init
+#+END_SRC
+
+~etc/inittab~ 文件
+
+#+BEGIN_SRC bash
+::sysinit:/etc/init.d/rcS
+::askfirst:-/bin/sh
+::restart:/sbin/init
+::ctrlaltdel:/sbin/reboot
+::shutdown:/bin/umount
+::shutdown:/sbin/swapoff
+#+END_SRC
+
+
+~etc/init.d/rcS~ 文件
+
+#+BEGIN_SRC bash
+#!/bin/sh
+
+mount proc
+mount -o remount,rw /
+mount -a
+clear
+echo "My Tiny Linux Start :D ......"
+#+END_SRC
+
+
+~/etc/fstab~
+
+#+BEGIN_SRC bash
+proc       /proc       proc       defaults          0    0
+sysfs      /sys        sysfs      defaults          0    0
+devtmpfs   /dev        devtmpfs   defaults          0    0
+#!/bin/sh
+
+#+BEGIN_SRC bash
+#!/bin/sh
+
+mount -t proc none /proc
+mount -t sysfs none /sys
+
+echo -e "\nBoot took $(cut -d' ' -f1 /proc/uptime) seconds\n"
+
+exec /bin/sh
+#+END_SRC
+
+*** initramfs.gz 文件生成
+
+#+BEGIN_SRC bash
+find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../initramfs.gz
+#+END_SRC
+
+** 编译linux
+
+
+*** 说明
+
+1. vmlinux  编译出来的最原始的内核文件，未压缩。
+
+1. zImage   是vmlinux经过gzip压缩后的文件。
+
+1. bzImage bz表示“big zImage”，不是用bzip2压缩的。两者的不同之处在于，zImage解压缩内核到低端内存(第一个640K)，bzImage解压缩内核到高端内存(1M以上)。如果内核比较小，那么采用zImage或bzImage都行，如果比较大应该用bzImage。
+
+1. uImage   U-boot专用的映像文件，它是在zImage之前加上一个长度为0x40的tag。
+
+1. vmlinuz  是bzImage/zImage文件的拷贝或指向bzImage/zImage的链接。
+
+1. initrd   是“initial ramdisk”的简写。一般被用来临时的引导硬件到实际内核vmlinuz能够接管并继续引导的状态。
+
+
+*** make
+
+#+BEGIN_SRC bash
+make defconfig
+
+make menuconfig
+
+make -j10
+#+END_SRC
+
+#+BEGIN_SRC conf
+# menuconfig时，找不到选项时，直接按 / ，进行搜索，有详细信息
+  CONFIG_GDB_SCRIPTS=y
+  CONFIG_DEBUG_INFO=y
+  CONFIG_FRAME_POINTER=y
+  #CONFIG_DEBUG_INFO_REDUCED 不开
+#+END_SRC
+
+
+
+
+1. CONFIG_DEBUG_INFO 只要修改
+#+BEGIN_SRC txt
+Main menu
+  -> Kernel hacking
+    -> Compile-time checks and compiler options
+      Debug Information
+         Generate DWARF Version 5 debuginfo
+#+END_SRC
+
+1. ~CONFIG_RANDOMIZE_BASE~ =n
+#+BEGIN_SRC txt
+Main menu
+  │       -> Processor type and features
+  │ (1)     -> Build a relocatable kernel (RELOCATABLE [=y]
+  │        [ ]   Randomize the address of the kernel image (KASLR) # 不选
+#+END_SRC
+
+1. CONFIG_FRAME_POINTER 比较麻烦
+
+   不是说明上介绍的那样，而是在
+
+#+BEGIN_SRC txt
+ Symbol: UNWINDER_FRAME_POINTER [=y]
+  │ Type  : bool
+  │ Defined at arch/x86/Kconfig.debug:252
+  │   Prompt: Frame pointer unwinder
+  │   Depends on: <choice>
+  │   Location:
+  │     Main menu
+  │       -> Kernel hacking
+  │         -> x86 Debugging
+  │ (3)       -> Choose kernel unwinder (<choice> [=y])
+  │ Selects: FRAME_POINTER [=y]
+#+END_SRC
+
+*** menuconfig 说明
+
+1. 按 ~/~ 进行配置项搜索
+
+1. 搜索出结果后，可以看到 ~(1)、（2）~ 这样的数字，按 u 加数字，可以跳到结果中对应的位置
+
+*** 启动
+
+#+BEGIN_SRC bash
+qemu-system-x86_64 -kernel ./arch/x86/boot/bzImage -initrd initramfs.gz -nographic -append "init=/bin/sh earlyprintk=serial,ttyS0 console=ttyS0 nokaslr" -S -s
+#+END_SRC
+
+
+发生错误：
+#+BEGIN_SRC bash
+(gdb) lx-symbols
+loading vmlinux
+Python Exception <class 'gdb.MemoryError'>: Cannot access memory at address 0xffffffff8293b900
+Error occurred in Python: Cannot access memory at address 0xffffffff8293b900
+(gdb) exit
+#+END_SRC
+
+参考： https://blog.csdn.net/nust20/article/details/96493101
+
+CONFIG_RANDOMIZE_BASE=  似乎没有作用
+
+*** 调试
+
+GEF插件
+
+执行命令先把内核运行起来：
+
+qemu-system-i386 -kernel /usr/src/linux-2.6.32.1/arch/x86/boot/bzImage -initrd initramfs.img -S -s
+挂起状态等待gdb连接，端口是默认的1234 然后开启gdb连接，到编译的内核文件目录下执行：
+
+gdb vmlinux
+(gdb)target remote:1234
+(gdb)b start_kernel   //下个测试断点
+(gdb)c
+此时在qemu中执行cat /proc/cmdline即可看到断点信息
+
+VMware+gdb双机调试
+这个调试方式比qemu更实用，上面一样的，调试配置都打开，然后可能还涉及一个CONFIG_DEBUG_RODATA，低版本可能是CONFIG_DEBUG_RODATA_TEST的关闭，不然你的断点没有用。
+
+生成内核镜像后，复制到宿主机的相同路径下，开启GDB:
+
+(gdb)>file vmlinux
+(gdb)>target remote localhost:8864
+修改要调试的虚拟机的配置文件
+
+vim /tools/centos7/CentOS7/CentOS7.vmx
+然后添加如下内容：
+
+debugStub.listen.guest64 = "TRUE"
+debugStub.listen.guest64.remote = "TRUE"
+debugStub.hideBreakpoints = "FALSE"
+monitor.debugOnStartGuest64 = "TRUE"
+接着就按照正常的调试方式下断点调试就行，可以先看看b start_kernel，但是会存在编译优化的问题，导致断点断错位，因此要降低编译优化，修改Makefile
+
+ifeq ($(DEBUG),y)
+    DEBFLAGS = -O -g3 -DSBULL_DEBUG
+else
+    DEBFLAGS = -O0
+endif
+EXTRA_CFLAGS += $(DEBFLAGS)
+最后就是随机化的问题，kernel加载到内存后起始地址随机化，因此调试地址和真实地址不太相同，会导致断点失败，所以需要禁用随机化kaslr。 然而内核编译优化的问题依然没有得到解决，在-O0的情况下内核无法编译通过，因为kernel本身的设计思想中就包含了编译优化的假想，这就导致不优化的情况下大量底层汇编代码根本无法编译通过，那么只能通过__attribute__((optimize("O0")))修饰函数来跳过优化了，不过这个方法我没有去尝试，不过编译时候好像有报错，最后还是用打patch的方式。

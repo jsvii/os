@@ -1,0 +1,25 @@
+* xrandr
+
+** 常用命令
+
+你可以使用 xrandr 设置不同的分辨率（必须是出现在上面输出列表中的分辨率）：
+
+#+BEGIN_SRC bash
+xrandr --output HDMI-1 --mode 1920x1080
+
+# 当列表中出现多个刷新率，可以通过 --rate 选项改变，一次性设置或者分开设置，例如：
+$ xrandr --output HDMI-1 --mode 1920x1080 --rate 60
+
+# 如果输出设备已经连接但被禁用，--auto 选项会以系统偏好的分辨率（最大分辨率）开启特定的输出设备：
+$ xrandr --output HDMI-1 --auto
+
+# 还可以用一条命令设置多个输出设备，例如，使用系统偏好的选项关闭 HDMI-1 并打开 HDMI-2：
+$ xrandr --output HDMI-1 --off --output HDMI-2 --auto
+#+END_SRC
+
+--off其中一项非常常用，尤其是在用xmonad是，linux笔记本本身的显示器可以被off掉
+
+** ref
+
+
+https://wiki.archlinux.org/title/Xrandr_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)

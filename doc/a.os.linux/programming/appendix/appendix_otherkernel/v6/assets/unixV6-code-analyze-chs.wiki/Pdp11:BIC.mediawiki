@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===BIC<br/>BICB[字节版本]
+===Code===■4SSDD
+===Operation===(dst) ← ~(src)∧(dst)
+===Coden===若 运算结果<0（最高位[符号位]被置位），则置位<br/>否则，清位
+===Codez===若 运算结果=0，则置位<br/>否则，清位
+===Codev===清
+===Codec===无影响
+===Description=== 按源地址的数据的指示，将目标地址的数据的二进制形式的某些数位清零
+===Example===<p>BIC_R3,R4。根据R3的数据的指示，清零了R4的数据的特定位(末第3，4，5，8，10位)<img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_instruction_Bic_r3_r4.png"/></p>

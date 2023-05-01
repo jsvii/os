@@ -1,0 +1,447 @@
+===Source===
+<div class="wikiheadnote">
+*根据 文件/目录路径 返回 对应的inode(并置锁)
+*共传入两个参数 func , flag
+**func : 函数指针，该函数用于得到 文件路径的下一个字符，只能取以下两个函数
+***[[code:uchar|uchar]]
+***[[code:schar|schar]]
+**flag : 标志位，参看 [[code:namei#标志位说明|标志位说明]]
+*** flag = 0，查找模式
+*** flag = 1，添加模式
+*** flag = 2，删除模式
+**返回值 : 参看 [[code:namei#标志位说明|标志位说明]]
+</div>
+
+<blockquote>
+总体说明
+*[[code:iget|iget]] 和 [[code:iput|iput]] 分别为申请和释放inode
+*eo变量 用于记录第一个空闲目录项位置
+*所有抛出的错误 参看 [[错误代码]]
+</blockquote>
+7506 
+
+7507 /* 
+
+7508 &nbsp;* Convert a pathname into a pointer to 
+
+7509 &nbsp;* an inode. Note that the inode is locked. 
+
+7510 &nbsp;* 
+
+7511 &nbsp;* func = function called to get next char of name 
+
+7512 &nbsp;* &uchar if name is in user space 
+
+7513 &nbsp;* &schar if name is in system space 
+
+7514 &nbsp;* flag = 0 if name is sought 
+
+7515 &nbsp;* 1 if name is to be created 
+
+7516 &nbsp;* 2 if name is to be deleted 
+
+7517 &nbsp;*/ 
+
+7518 namei(func, flag) 
+
+7519 int (*func)(); 
+
+7520 { 
+
+7521 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct inode|struct inode]] *dp; 
+
+7522 &nbsp;&nbsp;&nbsp;&nbsp;register c; 
+
+7523 &nbsp;&nbsp;&nbsp;&nbsp;register char *cp; 
+
+7524 &nbsp;&nbsp;&nbsp;&nbsp;int eo, *bp; 
+
+7525 
+
+7526 &nbsp;&nbsp;&nbsp;&nbsp;/* 
+
+7527 &nbsp;&nbsp;&nbsp;&nbsp; * If name starts with ’/’ start from 
+
+7528 &nbsp;&nbsp;&nbsp;&nbsp; * root: otherwise start from current dir. 
+
+7529 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+7530 
+
+7531 &nbsp;&nbsp;&nbsp;&nbsp;dp = [[code:user|u.u_cdir]]; 
+
+7532 &nbsp;&nbsp;&nbsp;&nbsp;if((c=(*func)()) == ’/’); 
+
+7533 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;dp = rootdir; 
+
+7534 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iget|iget]](dp->i_dev, dp->i_number); 
+
+<blockquote>
+*若 文件路径 以 '/' 开头，则使用根目录inode
+*否则，使用当前目录的inode
+*[[code:iget|iget]] 在此处 由于根目录或当前目录的inode已经读入内存（常驻内存），所以不需要从磁盘读，而只是置锁
+</blockquote>
+7535 &nbsp;&nbsp;&nbsp;&nbsp;while(c == ’/’) 
+
+7536 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;c = (*func)(); 
+
+<blockquote>
+*诸如 "///a//b" 这样的路径也可以被解析，多余的'/'在此被屏蔽
+</blockquote>
+7537 &nbsp;&nbsp;&nbsp;&nbsp;if(c == ’\0’ && flag != 0) { 
+
+7538 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = ENOENT; 
+
+7539 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto out; 
+
+7540 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 企图对 当前目录或根目录 进行操作(如删除)，则抛出错误
+*[[错误代码]]:ENOENT
+</blockquote>
+7541 
+
+7542 cloop: 
+
+7543 &nbsp;&nbsp;&nbsp;&nbsp;/* 
+
+7544 &nbsp;&nbsp;&nbsp;&nbsp; * Here dp contains pointer 
+
+7545 &nbsp;&nbsp;&nbsp;&nbsp; * to last component matched. 
+
+7546 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+7547 
+
+7548 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_error]]) 
+
+7549 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto out; 
+
+7550 &nbsp;&nbsp;&nbsp;&nbsp;if(c == ’\0’) 
+
+7551 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return(dp); 
+
+
+7552 
+
+7553 &nbsp;&nbsp;&nbsp;&nbsp;/* 
+
+7554 &nbsp;&nbsp;&nbsp;&nbsp; * If there is another component, 
+
+7555 &nbsp;&nbsp;&nbsp;&nbsp; * dp must be a directory and 
+
+7556 &nbsp;&nbsp;&nbsp;&nbsp; * must have x permission. 
+
+7557 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+7558 
+
+7559 &nbsp;&nbsp;&nbsp;&nbsp;if((dp->i_mode&IFMT) != IFDIR) { 
+
+7560 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = ENOTDIR; 
+
+7561 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto out; 
+
+7562 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 当前元素 不是目录项，则抛出错误
+**[[错误代码]]:ENOTDIR
+*7559用法参考[[文件系统#inode类型|文件系统之inode类型]]
+</blockquote>
+7563 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:access|access]](dp, IEXEC)) 
+
+7564 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto out; 
+
+<blockquote>
+*若 当前目录项 不具有执行权限(实为查找目录的权限)，则抛出错误
+</blockquote>
+7565 
+
+7566 &nbsp;&nbsp;&nbsp;&nbsp;/* Gather up name into 
+
+7567 &nbsp;&nbsp;&nbsp;&nbsp; * users’ dir buffer. 
+
+7568 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+7569 
+
+7570 &nbsp;&nbsp;&nbsp;&nbsp;cp = &[[code:user|u.u_dbuf]][0]; 
+
+7571 &nbsp;&nbsp;&nbsp;&nbsp;while(c!=’/’ && c!=’\0’ && u.u_error==0) { 
+
+7572 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(cp &lt; &[[code:user|u.u_dbuf]][DIRSIZ]) 
+
+7573 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*cp++ = c; 
+
+7574 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;c = (*func)(); 
+
+7575 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+7576 &nbsp;&nbsp;&nbsp;&nbsp;while(cp < &[[code:user|u.u_dbuf]][DIRSIZ]) 
+
+7577 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;*cp++ = ’\0’; 
+
+7578 &nbsp;&nbsp;&nbsp;&nbsp;while(c == ’/’) 
+
+7579 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;c = (*func)(); 
+
+<blockquote>
+*将 文件/目录名 复制到 [[code:user|u.u_dbuf]]
+*文件名 多余 DIRSIZ(14)的部分将被删除
+*[[code:user|u.u_dbuf]]多余部分将以'/0'充填
+*7578 - 7579 修正c的位置，参看 7535-7536的注释
+</blockquote>
+7580 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_error]]) 
+
+7581 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto out; 
+
+7582 
+
+7583 &nbsp;&nbsp;&nbsp;&nbsp;/* Set up to search a directory. */ 
+
+7584 
+
+7585 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_offset]][1] = 0; 
+
+7586 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_offset]][0] = 0; 
+
+7587 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_segflg]] = 1; 
+
+7588 &nbsp;&nbsp;&nbsp;&nbsp;eo = 0; 
+
+7589 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_count]] = [[code:ldiv|ldiv]](dp->i_size1, DIRSIZ+2); 
+
+<blockquote>
+*[[code:user|u.u_count]]置为 当前inode的目录项总数
+</blockquote>
+7590 &nbsp;&nbsp;&nbsp;&nbsp;bp = NULL; 
+
+7591 
+
+7592 eloop: 
+
+7593 
+
+7594 &nbsp;&nbsp;&nbsp;&nbsp;/* 
+
+7595 &nbsp;&nbsp;&nbsp;&nbsp; * If at the end of the directory, 
+
+7596 &nbsp;&nbsp;&nbsp;&nbsp; * the search failed. Report what 
+
+7597 &nbsp;&nbsp;&nbsp;&nbsp; * is appropriate as per flag. 
+
+7598 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+7599 
+
+7600 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_count]] == 0) { 
+
+7601 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(bp != NULL) 
+
+7602 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:brelse|brelse]](bp); 
+
+7603 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(flag==1 && c==’\0’) { 
+
+7604 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if([[code:access|access]](dp, IWRITE)) 
+
+7605 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  goto out; 
+
+7606 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:user|u.u_pdir]] = dp; 
+
+7607 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(eo) 
+
+7608 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:user|u.u_offset]][1] = eo-DIRSIZ-2; else 
+
+7609 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; dp->i_flag <nowiki>=|</nowiki> IUPD; 
+
+7610 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return(NULL); 
+
+7611 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+7612 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = ENOENT; 
+
+7613 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto out; 
+
+7614 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若搜索完成，且没有找到匹配的目录项
+**若 为添加模式 ，则执行 7603 - 7611
+**否则，抛出错误,[[错误代码]]:ENOENT
+*7608行的用法 参看 [[code:namei#标志位说明|标志位说明]]
+*7609行 并未能理解，列入[[遗留问题]]
+</blockquote>
+7615 
+
+7616 &nbsp;&nbsp;&nbsp;&nbsp;/* 
+
+7617 &nbsp;&nbsp;&nbsp;&nbsp; * If offset is on a block boundary, 
+
+7618 &nbsp;&nbsp;&nbsp;&nbsp; * read the next directory block. 
+
+7619 &nbsp;&nbsp;&nbsp;&nbsp; * Release previous if it exists. 
+
+7620 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+7621 
+
+7622 &nbsp;&nbsp;&nbsp;&nbsp;if(([[code:user|u.u_offset]][1]&0777) == 0) { 
+
+7623 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(bp != NULL) 
+
+7624 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:brelse|brelse]](bp); 
+
+7625 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bp = [[code:bread|bread]](dp->i_dev, 
+
+7626 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:bmap|bmap]](dp, ldiv([[code:user|u.u_offset]][1], 512))); 
+
+7627 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 读完了当前目录项块，则读取下一个目录项块
+*7626 由于 u.u_offset[1] 单位为字节，所以除以512
+</blockquote>
+7628 
+
+7629 &nbsp;&nbsp;&nbsp;&nbsp;/* Note first empty directory slot 
+
+7630 &nbsp;&nbsp;&nbsp;&nbsp; * in eo for possible creat. 
+
+7631 &nbsp;&nbsp;&nbsp;&nbsp; * String compare the directory entry 
+
+7632 &nbsp;&nbsp;&nbsp;&nbsp; * and the current component. 
+
+7633 &nbsp;&nbsp;&nbsp;&nbsp; * If they do not match, go back to eloop. 
+
+7634 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+7635 
+
+7636 &nbsp;&nbsp;&nbsp;&nbsp;[[code:bcopy|bcopy]](bp->b_addr+([[code:user|u.u_offset]][1]&0777), &[[code:user|u.u_dent]], 
+
+<blockquote>
+*读取下一个目录项，复制到[[code:user|u.u_dent]]
+</blockquote>
+7637 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;(DIRSIZ+2)/2); 
+
+7638 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_offset]][1] =+ DIRSIZ+2; 
+
+7639 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_count]]--; 
+
+7640 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_dent.u_ino]] == 0) { 
+
+7641 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(eo == 0) 
+
+7642 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   eo = [[code:user|u.u_offset]][1]; 
+
+7643 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto eloop; 
+
+7644 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若读到了空目录项(指向第0块)，则用eo标识
+</blockquote>
+7645 &nbsp;&nbsp;&nbsp;&nbsp;for(cp = &[[code:user|u.u_dbuf]][0]; cp &lt; &[[code:user|u.u_dbuf]][DIRSIZ]; cp++) 
+
+7646 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(*cp != cp[ [[code:user|u.u_dent.u_name]] - [[code:user|u.u_dbuf]] ]) 
+
+7647 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   goto eloop; 
+
+<blockquote>
+*匹配 当前目录项 和 欲查找的目录项，若不匹配，则继续循环
+*7646实际比较了 cp的内容 和 与cp对应的u.u_dent.u_name数组中的内容
+**[[code:user|u.u_dent.u_name]] - [[code:user|u.u_dbuf]] 的用法是 用地址偏移寻址
+</blockquote>
+7648 
+
+7649 
+
+7650 &nbsp;&nbsp;&nbsp;&nbsp;/* Here a component matched is a directory. 
+
+7651 &nbsp;&nbsp;&nbsp;&nbsp; * If there is more pathname, go back to 
+
+7652 &nbsp;&nbsp;&nbsp;&nbsp; * cloop, otherwise return. 
+
+7653 &nbsp;&nbsp;&nbsp;&nbsp; */ 
+
+7654 
+
+7655 &nbsp;&nbsp;&nbsp;&nbsp;if(bp != NULL) 
+
+7656 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:brelse|brelse]](bp); 
+
+7657 &nbsp;&nbsp;&nbsp;&nbsp;if(flag==2 && c==’\0’) { 
+
+7658 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if([[code:access|access]](dp, IWRITE)) 
+
+7659 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   goto out; 
+
+7660 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return(dp); 
+
+7661 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若为删除模式，进行权限检查，并返回dp
+</blockquote>
+7662 &nbsp;&nbsp;&nbsp;&nbsp;bp = dp->i_dev; 
+
+7663 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]](dp); 
+
+7664 &nbsp;&nbsp;&nbsp;&nbsp;dp = [[code:iget|iget]](bp, [[code:user|u.u_dent.u_ino]]); 
+
+7665 &nbsp;&nbsp;&nbsp;&nbsp;if(dp == NULL) 
+
+7666 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return(NULL); 
+
+7667 &nbsp;&nbsp;&nbsp;&nbsp;goto cloop; 
+
+7668 
+
+7669 out: 
+
+7670 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]](dp); 
+
+7671 &nbsp;&nbsp;&nbsp;&nbsp;return(NULL); 
+
+7672 } 
+
+7673 /* ------------------------- */ 
+
+
+
+===Extend===
+
+=附图=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_namei.png"/></p>
+=标志位说明=
+====查找模式====
+返回指向匹配inode的指针
+====添加模式====
+*若 要添加的目录项已经存在，则返回指向匹配inode的指针，与查找模式相同
+*否则
+**返回null
+**[[code:user|u-pdir]]指向 新目录项欲填入 的内存inode
+**u-offset指向 新目录项欲填入的位置
+====删除模式====
+*返回欲删除的目录项所在的内存inode(即其父目录inode)指针
+*u-offset指向欲删除项的下一个位置
+
+===Ref===
+*[[文件系统]]
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:exec]]
+*[[code:unlink]]
+*[[code:chdir]]
+*[[code:core]]
+*[[code:open]]
+*[[code:creat]]
+*[[code:link]]
+*[[code:mknod]]
+*[[code:stat]]
+*[[code:smount]]
+*[[code:getmdev]]
+*[[code:owner]]

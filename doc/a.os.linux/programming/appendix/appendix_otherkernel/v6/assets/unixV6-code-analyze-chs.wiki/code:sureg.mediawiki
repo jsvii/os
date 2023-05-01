@@ -1,0 +1,116 @@
+===Source===
+<div class="wikiheadnote">
+*将 相对地址映照表 加载为 地址映照表
+*相对地址映照表 为 [[code:user|u.u_uisa]]/[[code:user|u.u_uisd]]
+*加载到 UISA UISD 寄存器
+</div>
+
+1732 
+
+1733 /* 
+
+1734 &nbsp;* Load the user hardware segmentation 
+
+1735 &nbsp;* registers from the software prototype. 
+
+1736 &nbsp;* The software registers must have 
+
+1737 &nbsp;* been setup prior by estabur. 
+
+1738 &nbsp;*/ 
+
+1739 sureg() 
+
+1740 { 
+
+1741 &nbsp;&nbsp;&nbsp;&nbsp;register *up, *rp, a; 
+
+1742 
+
+1743 &nbsp;&nbsp;&nbsp;&nbsp;a = [[code:user|u.u_procp]]->p_addr; 
+
+<blockquote>
+*a 指向 PPDA区
+</blockquote>
+1744 &nbsp;&nbsp;&nbsp;&nbsp;up = &[[code:user|u.u_uisa]][16]; 
+
+1745 &nbsp;&nbsp;&nbsp;&nbsp;rp = &UISA[[skill:r|->r]][16]; 
+
+1746 &nbsp;&nbsp;&nbsp;&nbsp;if(cputype == 40) { 
+
+1747 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;up =- 8; 
+
+1748 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rp =- 8; 
+
+1749 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*up 指向 [[code:user|u.u_uisa[8]]]
+*rp 指向 UISA[8]
+*1746 的 判断 当前机器为pdp11/40时为真
+不为pdp11/40时不作讨论
+</blockquote>
+1750 &nbsp;&nbsp;&nbsp;&nbsp;while(rp > &UISA[[skill:r|->r]][0]) 
+
+1751 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;*--rp = *--up + a; 
+
+<blockquote>
+* UISA[i] ← [[code:user|u.u_uisa]][i] + a
+i = 0..7
+</blockquote>
+1752 &nbsp;&nbsp;&nbsp;&nbsp;if((up=[[code:user|u.u_procp]]->p_textp) != NULL) 
+
+1753 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;a =- up->x_caddr; 
+
+<blockquote>
+*若已加载正文段，则 a ← PPDA区首地址 - 正文段首地址
+</blockquote>
+1754 &nbsp;&nbsp;&nbsp;&nbsp;up = &[[code:user|u.u_uisd]][16]; 
+
+1755 &nbsp;&nbsp;&nbsp;&nbsp;rp = &UISD[[skill:r|->r]][16]; 
+
+1756 &nbsp;&nbsp;&nbsp;&nbsp;if(cputype == 40) { 
+
+1757 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;up =- 8; 
+
+1758 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rp =- 8; 
+
+1759 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*up 指向 [[code:user|u.u_uisd[8]]]
+*rp 指向 UISD[8]
+*1756 的 判断 当前机器为pdp11/40时为真
+不为pdp11/40时不作讨论
+</blockquote>
+1760 &nbsp;&nbsp;&nbsp;&nbsp;while(rp > &UISD[[skill:r|->r]][0]) { 
+
+1761 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;*--rp = *--up; 
+
+1762 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if((*rp & WO) == 0) 
+
+1763 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   rp[(UISA-UISD)/2] =- a; 
+
+1764 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+* UISD[i] ← [[code:user|u.u_uisd[i]]]
+i = 0..7
+* 若 [[code:user|u.u_uisd[i]]] 不含有写标志 (1762)(数据段和栈段含有写标志，只有正文段不含写标志)，则
+UISA[i] ← UISA[i] - a
+i = 0..7
+相当于UISA[i] ← [[code:user|u.u_uisa]][i] + 正文段起始地址
+</blockquote>
+1765 } 
+
+1766 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[内存管理]]
+
+===Caller===
+*[[code:estabur]]
+*[[code:swtch]]
+*[[code:expand]]

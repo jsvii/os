@@ -1,0 +1,109 @@
+===Source===
+
+4561 
+
+4562 /* 
+
+4563 &nbsp;* This is the head of the queue of available 
+
+4564 &nbsp;* buffers-- all unused except for the 2 list heads. 
+
+4565 &nbsp;*/ 
+
+4566 
+
+4567 [[code:struct buf|struct buf]] bfreelist; 
+
+<blockquote>
+*[[自由队列]]
+</blockquote>
+4568 
+
+<blockquote>
+*以下是[[code:struct buf|struct buf]]结构中 b_flags 使用的定义常量
+</blockquote>
+4569 /* 
+
+4570 &nbsp;* These flags are kept in b_flags. 
+
+4571 &nbsp;*/ 
+
+4572 #define B_WRITE 0 /* non-read pseudo-flag */ 
+
+4573 #define B_READ 01 /* read when I/O occurs */ 
+
+4574 #define B_DONE 02 /* transaction finished */ 
+
+<blockquote>
+*该缓存块读/写设备完成
+</blockquote>
+4575 #define B_ERROR 04 /* transaction aborted */ 
+
+<blockquote>
+*该缓存块读/写设备出错
+</blockquote>
+4576 #define B_BUSY 010 /* not on av_forw/back list */ 
+
+<blockquote>
+*该缓存块正在读/写设备，设备忙
+</blockquote>
+4577 #define B_PHYS 020 /* Physical IO potentially 
+
+4578 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;using the Unibus map */ 
+
+4579 #define B_MAP 040 /* This block has the UNIBUS 
+
+4580 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;map allocated */ 
+
+4581 #define B_WANTED 0100 /* issue wakeup when 
+
+4582 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;BUSY goes off */ 
+
+<blockquote>
+*有进程正在请求该缓存块
+</blockquote>
+4583 #define B_RELOC 0200 /* no longer used */ 
+
+4584 #define B_ASYNC 0400 /* don’t wait wait for I/O 
+
+<blockquote>
+*该缓存块 进行异步写
+</blockquote>
+4585 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;completion */ 
+
+4586 #define B_DELWRI 01000 /* don’t write till block 
+
+4587 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;leaves available list */ 
+
+<blockquote>
+*该缓存块 进行延迟写
+</blockquote>
+4588 
+
+4589 
+
+4590 
+
+4591 
+
+4592 
+
+4593 
+
+4594 
+
+4595 
+
+4596 
+
+4597 
+
+4598 
+
+4599 
+
+
+
+===Ref===
+*[[设备缓存管理]]
+

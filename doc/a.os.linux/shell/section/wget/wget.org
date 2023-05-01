@@ -1,0 +1,48 @@
+* wget
+
+** 选项
+
+  -c, --continue
+
+#+BEGIN_SRC bash
+# 在后台运行
+wget -bq domain.com/file.txt
+
+# 全站下载
+wget -m http://domain.com
+
+
+# 下载某个文件夹
+wget --recursive --no-parent http://example.com/configs/.vim/
+
+
+
+# 根据文件内容，下载多个
+cat urls.txt
+#
+# url1.com/file
+# url2.com/file
+
+wget -i urls.txt
+
+
+#+END_SRC
+
+
+*** 下载某个文件夹
+
+
+#+BEGIN_SRC bash
+# 下载某个文件夹
+wget --recursive --no-parent http://example.com/configs/.vim/
+
+# To avoid downloading the auto-generated index.html files, use the -R/--reject option:
+wget -r -np -R "index.html*" http://example.com/configs/.vim/
+#+END_SRC
+
+
+*** ~-O -~ 是什么操作
+
+~-O -~ 是指把内容放入 STDOUT 之中。
+
+wget -O - <url> means that wget will download the url and print the file to STDOUT, hence the garbage in your terminal. The full command pipes that output to tar xzf to extract and (presumably) produce useful files.

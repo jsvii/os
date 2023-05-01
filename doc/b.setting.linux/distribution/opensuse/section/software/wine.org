@@ -1,0 +1,13 @@
+* wine
+
+** setup
+
+#+BEGIN_SRC bash
+zypper in wine-staging
+
+winehq-staging
+#+EDN_SRC
+
+** Warcraft 3
+
+ 1. 下载 [[https://www.battlenet.com.cn/download/getInstaller?os=win&installer=Warcraft-III-Setup.exe]] 会提示要安装wine mono installer

@@ -1,0 +1,249 @@
+===Source===
+<div class="wikiheadnote">
+*给定文件中相应的块号返回该块的实际物理块号
+*传入两个参数,ip,nb
+**ip:文件对应的内存inode
+**nb:指定的在文件中的相应块号
+</div>
+
+6407 
+
+6408 /* Bmap defines the structure of file system storage 
+
+6409 &nbsp;* by returning the physical block number on a device given 
+
+6410 &nbsp;* the inode and the logical block number in a file. 
+
+6411 &nbsp;* When convenient, it also leaves the physical 
+
+6412 &nbsp;* block number of the next block of the file in rablock 
+
+6413 &nbsp;* for use in read-ahead. 
+
+6414 &nbsp;*/ 
+
+6415 bmap(ip, bn) 
+
+6416 [[code:struct inode|struct inode]] *ip; 
+
+6417 int bn; 
+
+6418 { 
+
+6419 &nbsp;&nbsp;&nbsp;&nbsp;register *bp, *bap, nb; 
+
+6420 &nbsp;&nbsp;&nbsp;&nbsp;int *nbp, d, i; 
+
+6421 
+
+6422 &nbsp;&nbsp;&nbsp;&nbsp;d = ip->i_dev; 
+
+6423 &nbsp;&nbsp;&nbsp;&nbsp;if(bn & ~077777) { 
+
+6424 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = EFBIG; 
+
+6425 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return(0); 
+
+6426 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+6427 &nbsp;&nbsp;&nbsp;&nbsp;if((ip->i_mode&ILARG) == 0) { 
+
+<blockquote>
+*判断是否含ILARG标志,包含表明为大文件.详见[[file:ino.h|ino.h]]
+</blockquote>
+6428 
+
+6429 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;/* small file algorithm */ 
+
+6430 
+
+6431 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if((bn & ~7) != 0) { 
+
+<blockquote>
+*判断块号是否大于七,(小于则仍为小型文件,大于表明要进行扩展)
+</blockquote>
+6432 
+
+6433 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   /* convert small to large */ 
+
+6434 
+
+6435 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if ((bp = [[code:alloc|alloc]](d)) == NULL) 
+
+6436 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  return(NULL); 
+
+6437 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   bap = bp->b_addr; 
+
+6438 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   for(i=0; i&lt;8; i++) { 
+
+6439 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;*bap++ = ip->i_addr[i]; 
+
+6440 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  ip->i_addr[i] = 0; 
+
+6441 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } 
+
+6442 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   ip->i_addr[0] = bp->b_blkno; 
+
+6443 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:bdwrite|bdwrite]](bp); 
+
+<blockquote>
+*此处之所以要写将bp写回是因为在调用[[code:alloc|alloc]](d)时清空了bp的内容,此时bp的内容与磁盘上对应块的内容不同,于是采取延迟写策略写回磁盘
+</blockquote>
+6444 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   ip->i_mode <nowiki>=|</nowiki> ILARG; 
+
+6445 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   goto large; 
+
+6446 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+6447 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;nb = ip->i_addr[bn]; 
+
+6448 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(nb == 0 && (bp = [[code:alloc|alloc]](d)) != NULL) { 
+
+6449 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:bdwrite|bdwrite]](bp); 
+
+6450 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   nb = bp->b_blkno; 
+
+6451 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   ip->i_addr[bn] = nb; 
+
+6452 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   ip->i_flag <nowiki>=|</nowiki> IUPD; 
+
+6453 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+6454 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rablock = 0; 
+
+6455 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (bn&lt;7) 
+
+6456 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rablock = ip->i_addr[bn+1]; 
+
+<blockquote>
+*如果bn指示的块号小于7,则将预读块置为其下一块的物理地址.关于rablock的定义,见[[file:systm.h|systm.h]]第235行
+</blockquote>
+6457 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return(nb); 
+
+6458 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+6459 
+
+6460 /* large file algorithm */ 
+
+6461 
+
+6462 &nbsp;&nbsp;&nbsp;&nbsp; large: 
+
+6463 &nbsp;&nbsp;&nbsp;&nbsp;i = bn>>8; 
+
+6464 &nbsp;&nbsp;&nbsp;&nbsp;if(bn & 0174000) 
+
+6465 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;i = 7; 
+
+<blockquote>
+*若bn >= 8*256,则(i = bn>>8) >= 8,此时将i置为7
+</blockquote>
+6466 &nbsp;&nbsp;&nbsp;&nbsp;if((nb=ip->i_addr[i]) == 0) { 
+
+6467 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ip->i_flag <nowiki>=|</nowiki> IUPD; 
+
+6468 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if ((bp = [[code:alloc|alloc]](d)) == NULL) 
+
+6469 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return(NULL); 
+
+6470 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ip->i_addr[i] = bp->b_blkno; 
+
+6471 &nbsp;&nbsp;&nbsp;&nbsp;} else 
+
+6472 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bp = [[code:bread|bread]](d, nb); 
+
+6473 &nbsp;&nbsp;&nbsp;&nbsp;bap = bp->b_addr; 
+
+6474 
+
+6475 &nbsp;&nbsp;&nbsp;&nbsp;/* "huge" fetch of double indirect block */ 
+
+6476 
+
+6477 &nbsp;&nbsp;&nbsp;&nbsp;if(i == 7) { 
+
+6478 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;i = ((bn>>8) & 0377) - 7; 
+
+6479 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if((nb=bap[i]) == 0) { 
+
+6480 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if((nbp = alloc(d)) == NULL) { 
+
+6481 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:brelse|brelse]](bp); 
+
+6482 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  return(NULL); 
+
+6483 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   } 
+
+6484 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   bap[i] = nbp->b_blkno; 
+
+6485 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:bdwrite|bdwrite]](bp); 
+
+<blockquote>
+*由于bp的内容已与磁盘中对应块中内容不符,故需延迟写回磁盘以更新
+</blockquote>
+6486 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} else { 
+
+6487 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:brelse|brelse]](bp); 
+
+6488 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   nbp = [[code:bread|bread]](d, nb); 
+
+6489 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+6490 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bp = nbp; 
+
+6491 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bap = bp->b_addr; 
+
+6492 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+6493 
+
+6494 &nbsp;&nbsp;&nbsp;&nbsp;/* normal indirect fetch */ 
+
+6495 
+
+6496 &nbsp;&nbsp;&nbsp;&nbsp;i = bn & 0377; 
+
+6497 &nbsp;&nbsp;&nbsp;&nbsp;if((nb=bap[i]) == 0 && (nbp = [[code:alloc|alloc]](d)) != NULL) { 
+
+6498 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;nb = nbp->b_blkno; 
+
+6499 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bap[i] = nb; 
+
+6500 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:bdwrite|bdwrite]](nbp); 
+
+6501 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:bdwrite|bdwrite]](bp); 
+
+<blockquote>
+*由于bp,nbp的内容已与磁盘中对应块中内容不符,故需延迟写回磁盘以更新
+</blockquote>
+6502 &nbsp;&nbsp;&nbsp;&nbsp;} else 
+
+6503 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:brelse|brelse]](bp); 
+
+6504 &nbsp;&nbsp;&nbsp;&nbsp;rablock = 0; 
+
+6505 &nbsp;&nbsp;&nbsp;&nbsp;if(i &lt; 255) 
+
+6506 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rablock = bap[i+1]; 
+
+<blockquote>
+*如果bn指示的块号小于255,则将预读块置为其下一块的物理地址.关于rablock的定义,见[[file:systm.h|systm.h]]第235行
+</blockquote>
+6507 &nbsp;&nbsp;&nbsp;&nbsp;return(nb); 
+
+6508 } 
+
+6509 /* ------------------------- */ 
+
+
+
+===Extend===
+=附图=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_bmap.png"/></p>
+===Ref===
+[[文件系统]]
+===Caller===
+*[[code:readi]]
+*[[code:writei]]
+*[[code:namei]]

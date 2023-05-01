@@ -1,0 +1,24 @@
+===Source===
+
+2851
+
+2852 /*
+
+2853 &nbsp;* nonexistent system call-- set fatal error code.
+
+2854 &nbsp;*/
+
+2855 nosys()
+
+2856 {
+
+2857 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_error]] = 100;
+
+2858 }
+
+2859 /*------------------------- */ 
+
+
+
+===Ref===
+*[[系统调用]]

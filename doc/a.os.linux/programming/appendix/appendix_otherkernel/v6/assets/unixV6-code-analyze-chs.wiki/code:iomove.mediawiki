@@ -1,0 +1,159 @@
+===Source===
+<div class="wikiheadnote">
+*完成 读取/写入 功能
+**读取功能：从 bp->b_addr[o](缓存块偏移o字节) 读出 an个字节字节 到 指定地址空间 的 指定地址
+**写入功能：将 指定地址空间 的 指定地址的an个字节，写入 bp->b_addr[o](缓存块偏移o字节)
+*输入参数
+**bp : 指定 的 [[code:struct buf|struct buf]]
+**o : 缓存块偏移量
+**an : 传输字节数
+**flag : 写标志
+***若为 B_WRITE，则函数执行写入功能
+***否则，函数执行读取功能
+**[[code:user|u.segflg]] : 指定地址空间由[[code:user|u.segflg]]选择
+**[[code:user|u.base]] : 指定地址由[[code:user|u.base]]给定
+*运行时修正以下参数
+**[[code:user|u.u_base]]
+**[[code:user|u.u_offset]]
+**[[code:user|u.u_count]]
+</div>
+
+6350 /* Move ’an’ bytes at byte location 
+
+6351 &nbsp;* &bp->b_addr[o] to/from (flag) the 
+
+6352 &nbsp;* user/kernel (u.segflg) area starting at u.base. 
+
+6353 &nbsp;* Update all the arguments by the number 
+
+6354 &nbsp;* of bytes moved. 
+
+6355 &nbsp;* 
+
+6356 &nbsp;* There are 2 algorithms, 
+
+6357 &nbsp;* if source address, dest address and count 
+
+6358 &nbsp;* are all even in a user copy, 
+
+6359 &nbsp;* then the machine language copyin/copyout 
+
+6360 &nbsp;* is called. 
+
+6361 &nbsp;* If not, its done byte-by-byte with 
+
+6362 &nbsp;* cpass and passc. 
+
+6363 &nbsp;*/ 
+
+<blockquote>
+*总体算法是
+**若 指定地址空间 为 [[用户态]]地址空间，且 n , bp->b_addr+o , u.u_base都为偶数，使用[[code:copyin|copyin]]/[[code:copyout|copyout]]
+**否则，使用[[code:cpass|cpass]]/[[code:passc|passc]]
+</blockquote>
+6364 iomove(bp, o, an, flag) 
+
+6365 [[code:struct buf|struct buf]] *bp; 
+
+6366 { 
+
+6367 &nbsp;&nbsp;&nbsp;&nbsp;register char *cp; 
+
+6368 &nbsp;&nbsp;&nbsp;&nbsp;register int n, t; 
+
+6369 
+
+6370 &nbsp;&nbsp;&nbsp;&nbsp;n = an; 
+
+6371 &nbsp;&nbsp;&nbsp;&nbsp;cp = bp->b_addr + o; 
+
+<blockquote>
+*cp 为 读取/写入 源地址
+</blockquote>
+6372 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:user|u.u_segflg]]==0 && ((<nowiki>n | cp | </nowiki>[[code:user|u.u_base]])&01)==0) { 
+
+<blockquote>
+*若 指定地址空间 为 [[用户态]]地址空间，且 n , cp , u.u_base都为偶数，使用[[code:copyin|copyin]]/[[code:copyout|copyout]]
+</blockquote>
+6373 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (flag==B_WRITE) 
+
+6374 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   cp = [[code:copyin|copyin]]([[code:user|u.u_base]], cp, n); 
+
+6375 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;else 
+
+6376 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   cp = [[code:copyout|copyout]](cp, [[code:user|u.u_base]], n); 
+
+<blockquote>
+*若为写操作，则使用[[code:copyin|copyin]] 从目标地址读出数据到缓存块
+*否则，使用[[code:copyout|copyout]] 从缓存块读出数据，写入到目标地址
+</blockquote>
+6377 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (cp) { 
+
+6378 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:user|u.u_error]] = EFAULT; 
+
+6379 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return; 
+
+6380 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若出错
+**抛出错误，[[错误代码]]:EFAULT
+**函数返回
+</blockquote>
+6381 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_base]] =+ n; 
+
+6382 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:dpadd|dpadd]]([[code:user|u.u_offset]], n); 
+
+6383 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u.u_count]] =- n; 
+
+<blockquote>
+*修正参数
+**[[code:user|u.u_base]]
+**[[code:user|u.u_offset]]
+**[[code:user|u.u_count]]
+*参考 [[code:user|user]]
+</blockquote>
+6384 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+6385 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+6386 &nbsp;&nbsp;&nbsp;&nbsp;if (flag==B_WRITE) { 
+
+6387 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;while(n--) { 
+
+6388 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if ((t = [[code:cpass|cpass]]()) < 0) 
+
+6389 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  return; 
+
+6390 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;*cp++ = t; 
+
+6391 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+6392 &nbsp;&nbsp;&nbsp;&nbsp;} else 
+
+6393 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;while (n--) 
+
+6394 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if([[code:passc|passc]](*cp++) < 0) 
+
+6395 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  return; 
+
+6396 } 
+
+<blockquote>
+*若为写操作，则使用[[code:cpass|cpass]] 从目标地址读出数据到缓存块
+*否则，使用[[code:passc|passc]] 从缓存块读出数据，写入到目标地址
+*相关参数 在 [[code:cpass|cpass]]/[[code:passc|passc]] 被修正
+</blockquote>
+6397 /* ------------------------- */ 
+
+6398 
+
+6399 
+
+
+===Ref===
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:readi]]
+*[[code:writei]]

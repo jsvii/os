@@ -1,0 +1,9 @@
+* OS 类型
+
+- Linux
+
+- FreeBSD
+
+- Minix
+
+- IBM: AIX, OS/390, OS/2, OS/400, PCDOS7, PCDOS/2000

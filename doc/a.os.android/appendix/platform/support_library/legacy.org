@@ -1,0 +1,15 @@
+* androidx.legacy:legacy-support-v4
+
+implementation "androidx.legacy:legacy-support-v4:1.0.0"
+
+Dependencies
+
+1. androidx.core:core:1.0.0
+
+1. androidx.media:media:1.0.0
+
+1. androidx.legacy:legacy-support-core-utils:1.0.0
+
+1. androidx.legacy:legacy-support-core-ui:1.0.0
+
+1. androidx.fragment:fragment:1.0.0

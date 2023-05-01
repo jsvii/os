@@ -1,0 +1,7 @@
+* view
+
+Android APP中，所有的用户界面元素都是由 ~View~ 和 ~ViewGroup~ 的对象构成的。
+
+1. View是绘制在屏幕上的用户能与之交互的一个对象。
+
+1. ViewGroup则是一个用于存放其他View（和ViewGroup）对象的布局容器

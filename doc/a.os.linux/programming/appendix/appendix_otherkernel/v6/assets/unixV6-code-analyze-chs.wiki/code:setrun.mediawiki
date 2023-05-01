@@ -1,0 +1,72 @@
+===Source===
+<div class="wikiheadnote">
+*设置进程为就绪态
+*如有需要的话将进程调入内存
+*传入一个参数p
+**p指向一个进程的[[code:proc|proc结构]]
+</div>
+
+2129
+
+2130 /* 
+
+2131 &nbsp;* Set the process running; 
+
+2132 &nbsp;* arrange for it to be swapped in if necessary. 
+
+2133 &nbsp;*/ 
+
+2134 setrun(p) 
+
+2135 { 
+
+2136 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:proc|struct proc]] *rp; 
+
+2137
+
+2138 &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rp]] = p; 
+
+2139 &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rp]]->p_wchan = 0; 
+
+2140 &nbsp;&nbsp;&nbsp;&nbsp;[[code:proc|rp]]->p_stat = SRUN; 
+
+<blockquote>
+*将睡眠原因置为0
+*将进程状态置为SRUN(就绪状态)
+</blockquote>
+2141 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:proc|rp]]->p_pri < curpri) 
+
+2142 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  runrun++;
+
+<blockquote>
+*若进程优先级比当前进程要高,则置runrun标志,以等待进程调度
+**参看 [[进程调度#runrun]]
+</blockquote>
+2143 &nbsp;&nbsp;&nbsp;&nbsp;if(runout != 0 && ([[code:proc|rp]]->p_flag&SLOAD) == 0) { 
+
+2144 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  runout = 0;
+
+2145 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  [[code:wakeup|wakeup]](&runout);
+
+<blockquote>
+*若runout已被置,且当前进程图象不在内存中
+**则清runout标志,并唤醒因runout睡眠的0#进程,以调用[[code:sched|sched]]函数将进程图象调入内存
+*关于为何唤醒的是0#进程,参看[[进程调度|进程调度之0#进程]]
+</blockquote>
+2146 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+2147 } 
+
+2148 /* ------------------------- */
+
+2149 
+
+
+===Ref===
+*[[进程调度]]
+===Caller===
+*[[code:wakeup]]
+*[[code:exit]]
+*[[code:wait]]
+*[[code:psignal]]
+*[[code:ptrace]]

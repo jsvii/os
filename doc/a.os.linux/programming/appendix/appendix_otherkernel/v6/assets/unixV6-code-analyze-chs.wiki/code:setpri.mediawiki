@@ -1,0 +1,64 @@
+===Source===
+<div class="wikiheadnote">
+*计算并设置指定进程的[[进程优先级]]
+</div>
+
+2149 
+
+2150 /* 
+
+2151 &nbsp;* Set user priority. 
+
+2152 &nbsp;* The rescheduling flag (runrun) 
+
+2153 &nbsp;* is set if the priority is higher 
+
+2154 &nbsp;* than the currently running process. 
+
+2155 &nbsp;*/ 
+
+2156 setpri(up) 
+
+2157 { 
+
+2158 &nbsp;&nbsp;&nbsp;&nbsp;register *pp, p; 
+
+2159 
+
+2160 &nbsp;&nbsp;&nbsp;&nbsp;pp = up; 
+
+2161 &nbsp;&nbsp;&nbsp;&nbsp;p = (pp->p_cpu & 0377)/16; 
+
+2162 &nbsp;&nbsp;&nbsp;&nbsp;p =+ PUSER + pp->p_nice; 
+
+2163 &nbsp;&nbsp;&nbsp;&nbsp;if(p > 127) 
+
+2164 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;p = 127; 
+
+<blockquote>
+*进程优先级 p = min{127,(p-cpu/16 + PUSER + p-nice)}
+*参看 [[进程优先级]]
+</blockquote>
+2165 &nbsp;&nbsp;&nbsp;&nbsp;if(p > curpri) 
+
+2166 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;runrun++; 
+
+<blockquote>
+*若 p > curpri (优先级小于现行进程的优先级)，则置runrun申请进程切换
+*看似这个结论很不合逻辑，应当是优先级高于现行进程时才置runrun申请进程切换
+关于这点的解释，参看 [[进程调度#runrun]]
+</blockquote>
+2167 &nbsp;&nbsp;&nbsp;&nbsp;pp->p_pri = p; 
+
+2168 } 
+
+2169 /* ------------------------- */ 
+
+
+
+===Ref===
+*[[进程调度]]
+
+===Caller===
+*[[code:trap]]
+*[[code:clock]]

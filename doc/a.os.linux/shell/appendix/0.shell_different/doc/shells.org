@@ -1,0 +1,59 @@
+* shells
+
+
+https://www.geeksforgeeks.org/different-shells-in-linux/
+
+Types of Shell:
+
+** The C Shell –
+
+Denoted as ~csh~
+
+Bill Joy created it at the University of California at Berkeley. It incorporated features such as aliases and command history. It includes helpful programming features like built-in arithmetic and C-like expression syntax.
+
+In C shell:
+
+Command full-path name is /bin/csh,
+Non-root user default prompt is hostname %,
+Root user default prompt is hostname #.
+
+** The Bourne Shell
+
+Denoted as ~sh~
+
+Bourne是 “小溪” 的意思
+
+It was written by Steve Bourne at AT&T Bell Labs. It is the original UNIX shell. It is faster and more preferred. It lacks features for interactive use like the ability to recall previous commands. It also lacks built-in arithmetic and logical expression handling. It is default shell for Solaris OS.
+
+For the Bourne shell the:
+
+Command full-path name is /bin/sh and /sbin/sh,
+Non-root user default prompt is $,
+Root user default prompt is #.
+
+** The Korn Shell
+
+It is denoted as ~ksh~
+
+ It Was written by David Korn at AT&T Bell LabsIt is a superset of the Bourne shell.So it supports everything in the
+ Bourne shell.It has interactive features. It includes features like built-in arithmetic and C-like arrays, functions,
+ and string-manipulation facilities.It is faster than C shell. It is compatible with script written for C shell.
+
+ For the Korn shell the:
+
+Command full-path name is /bin/ksh,
+Non-root user default prompt is $,
+Root user default prompt is #.
+
+** GNU Bourne-Again Shell
+
+Denoted as ~bash~
+
+ It is compatible to the Bourne shell. It includes features from Korn and Bourne shell.
+
+ For the GNU Bourne-Again shell the:
+
+Command full-path name is /bin/bash,
+Default prompt for a non-root user is bash-g.gg$
+(g.ggindicates the shell version number like bash-3.50$),
+Root user default prompt is bash-g.gg#.

@@ -1,0 +1,81 @@
+===Source===
+
+0461
+
+0462 /* u_error codes */
+
+0463 /* See section "INTRO(II)" of 
+
+0464 &nbsp;* the UNIX Programmer’s manual 
+
+0465 &nbsp;* for the meanings of these codes. */ 
+
+0466 #define EFAULT 106
+
+0467 #define EPERM 1
+
+0468 #define ENOENT 2
+
+0469 #define ESRCH 3
+
+0470 #define EINTR 4
+
+0471 #define EIO 5
+
+0472 #define ENXIO 6
+
+0473 #define E2BIG 7
+
+0474 #define ENOEXEC 8
+
+0475 #define EBADF 9
+
+0476 #define ECHILD 10
+
+0477 #define EAGAIN 11
+
+0478 #define ENOMEM 12
+
+0479 #define EACCES 13
+
+0480 #define ENOTBLK 15
+
+0481 #define EBUSY 16
+
+0482 #define EEXIST 17
+
+0483 #define EXDEV 18
+
+0484 #define ENODEV 19
+
+0485 #define ENOTDIR 20
+
+0486 #define EISDIR 21
+
+0487 #define EINVAL 22
+
+0488 #define ENFILE 23
+
+0489 #define EMFILE 24
+
+0490 #define ENOTTY 25
+
+0491 #define ETXTBSY 26
+
+0492 #define EFBIG 27
+
+0493 #define ENOSPC 28
+
+0494 #define ESPIPE 29
+
+0495 #define EROFS 30
+
+0496 #define EMLINK 31
+
+0497 #define EPIPE 32
+
+0498
+
+0499
+
+

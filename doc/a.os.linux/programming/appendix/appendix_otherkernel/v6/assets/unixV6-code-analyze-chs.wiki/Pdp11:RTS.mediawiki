@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===RTS
+===Code===00020R
+===Operation===PC ← reg<br/>reg ← (SP)↑ 
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===程序控制从子程序返回，进行现场恢复 <br/>RTS执行过程中(reg)送入PC，进行程序跳转，并从堆栈中弹出(reg)，恢复现场，与[[pdp11:JSR|JSR]]作用相反<br/>[ [[遗留问题]] ]
+===Example===<p>RTS_R5<br/><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_instruction_Rts_r5.png"/></p>

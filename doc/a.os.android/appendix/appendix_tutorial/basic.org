@@ -1,0 +1,38 @@
+* basic
+
+  基础教程
+
+https://developer.android.com/docs
+
+
+** 官方资源
+
+- Android官方Training: https://developer.android.com/training/index.html
+
+- 源码相关 https://source.android.com/
+
+   https://developer.android.com/courses/fundamentals-training/overview-v2?hl=zh-cn
+
+
+   https://www.runoob.com/android/android-tutorial.html
+
+
+** gradle
+
+   http://rinvay.github.io/android/2015/03/26/Gradle-Plugin-User-Guide%28Translation%29/#102
+
+
+** 博客主系统
+
+
+Java多线程系列   https://www.cnblogs.com/skywang12345/p/java_threads_category.html
+
+
+扔物线 https://rengwuxian.com/
+
+** 论坛
+
+http://www.apkbus.com/
+
+
+android 周报 http://androidweekly.net/

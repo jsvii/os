@@ -1,0 +1,85 @@
+===Source===
+<div class="wikiheadnote">
+*唤醒所有因某原因睡眠的进程
+*传入一个参数chan
+**chan:进程睡眠原因
+</div>
+
+2109
+
+2110 /*
+
+2111 * Wake up all processes sleeping on chan.
+
+2112 */
+
+2113 wakeup(chan)
+
+2114 {
+
+2115 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:proc|struct proc]] *p;
+
+2116 &nbsp;&nbsp;&nbsp;&nbsp;register c, i;
+
+2117
+
+2118 &nbsp;&nbsp;&nbsp;&nbsp;c = chan;
+
+2119 &nbsp;&nbsp;&nbsp;&nbsp;p = &[[code:proc|proc]][0];
+
+2120 &nbsp;&nbsp;&nbsp;&nbsp;i = NPROC;
+
+<blockquote>
+*NPROC为[[code:proc|proc数组]]的大小,值为50,定义见[[file:param.h|param.h]] 的0144行
+</blockquote>
+2121 &nbsp;&nbsp;&nbsp;&nbsp;do {
+
+2122 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(p->p_wchan == c) {
+
+2123 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:setrun|setrun]](p);
+
+2124 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;}
+
+2125 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;p++;
+
+2126 &nbsp;&nbsp;&nbsp;&nbsp;} while(--i);
+
+2127 }
+
+<blockquote>
+*遍历[[code:proc|proc数组]],遇到因为chan而睡眠的进程时将其置为就绪状态
+</blockquote>
+2128 /* -------------------------*/
+
+
+
+
+===Ref===
+*[[睡眠原因]]
+*[[睡眠优先级]]
+
+===Caller===
+*[[code:sleep]]
+*[[code:setrun]]
+*[[code:exec]]
+*[[code:exit]]
+*[[code:stime]]
+*[[code:clock]]
+*[[code:stop]]
+*[[code:ptrace]]
+*[[code:procxmt]]
+*[[code:xswap]]
+*[[code:brelse]]
+*[[code:iodone]]
+*[[code:swap]]
+*[[code:physio]]
+*[[code:closef]]
+*[[code:alloc]]
+*[[code:free]]
+*[[code:ialloc]]
+*[[code:readp]]
+*[[code:writep]]
+*[[code:prele]]
+*[[code:klxint]]
+*[[code:flushtty]]
+*[[code:ttyinput]]

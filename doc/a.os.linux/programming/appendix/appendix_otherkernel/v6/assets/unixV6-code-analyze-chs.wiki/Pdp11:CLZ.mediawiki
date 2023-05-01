@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===CLZ
+===Code===000244
+===Operation===Clear Z
+===Coden===无影响
+===Codez===清
+===Codev===无影响
+===Codec===无影响
+===Description===清标志位Z 
+===Example===无

@@ -1,0 +1,68 @@
+===Source===
+
+1500 #
+
+1501 #include "../param.h"
+
+1502 #include "../user.h"
+
+1503 #include "../systm.h"
+
+1504 #include "../proc.h"
+
+1505 #include "../text.h"
+
+1506 #include "../inode.h"
+
+1507 #include "../seg.h"
+
+1508
+
+1509 #define CLOCK1 0177546
+
+1510 #define CLOCK2 0172540
+
+1511 /*
+
+1512 &nbsp;* Icode is the octal bootstrap
+
+1513 &nbsp;* program executed in user mode
+
+1514 &nbsp;* to bring up the system.
+
+1515 &nbsp;*/
+
+1516 int icode[]
+
+1517 {
+
+1518 &nbsp;&nbsp;&nbsp;&nbsp;0104413, /* sys exec; init; initp */
+
+1519 &nbsp;&nbsp;&nbsp;&nbsp;0000014,
+
+1520 &nbsp;&nbsp;&nbsp;&nbsp;0000010, /* br . */
+
+1521 &nbsp;&nbsp;&nbsp;&nbsp;0000777, /* initp: init; 0 */
+
+1522 &nbsp;&nbsp;&nbsp;&nbsp;0000014,
+
+1523 &nbsp;&nbsp;&nbsp;&nbsp;0000000,
+
+1524 &nbsp;&nbsp;&nbsp;&nbsp;0062457, /* init: </etc/init\0> */
+
+1525 &nbsp;&nbsp;&nbsp;&nbsp;0061564,
+
+1526 &nbsp;&nbsp;&nbsp;&nbsp;0064457,
+
+1527 &nbsp;&nbsp;&nbsp;&nbsp;0064556,
+
+1528 &nbsp;&nbsp;&nbsp;&nbsp;0000164,
+
+1529 };
+
+<blockquote>
+*参看 LIONS 代码分析
+</blockquote>
+1530 /* ------------------------- */
+
+

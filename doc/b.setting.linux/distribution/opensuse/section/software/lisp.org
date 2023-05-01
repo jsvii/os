@@ -1,0 +1,14 @@
+* lisp
+
+** lisp
+
+#+BEGIN_SRC bash
+# sbcl
+zyper in sbcl
+
+#
+#+END_SRC
+
+** ccl
+
+https://ccl.clozure.com/download.html

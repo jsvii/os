@@ -1,0 +1,28 @@
+=中断处理过程=
+*由 硬件产生 中断
+*处理机 接受 中断，进行 处理
+**将 旧的 pc , ps 保护入栈
+**从 中断向量表([[file:low.s|low.s]]) 取出 新的pc,ps
+*继续运行 进行中断处理
+**根据 中断入口不同，会调用不同的中断处理函数<br/>一般调用 [[code:call|call]] 进行中断处理
+**[[code:call|call]] 进行进一步的现场保护 ,并调用具体设定的中断处理子程序
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Main_interupt.png"/></p>
+=中断向量=
+*中断向量由新的PC,PS构成，参看 中断处理过程
+=陷入=
+*由 软件产生的中断 
+*其处理机制与一般的中断基本无异,只有细微的区别:
+**1.陷入矢量表在[[file:low.s|low.s]]的511 - 518行定义
+**2.陷入时首先进入一段汇编程序[[code:0751 ~ 0805|汇编trap]]
+**3.陷入调用[[code:call1|call1]]而非中断的[[code:call|call]]进行进一步现场保护
+**4.现场保护结束后陷入会调用[[code:trap|c语言版trap]]进行进一步处理
+=举例=
+如 rk 磁盘产生 中断
+*硬件 保护 旧的pc，ps入栈
+*从 中断向量表(内存地址220/[[file:low.s|low.s]] 544) 取出新的pc,ps
+**pc = rkio ([[file:low.s|low.s]] 577)
+**ps = br4 ([[file:low.s|low.s]] 502)
+*rkio 调用[[code:call|call]] , 并将 中断处理子程序 [[code:rkintr|rkintr]] 函数指针传给 [[code:call|call]]
+*[[code:call|call]]
+**进行 进一步的现场保护
+** 调用[[code:rkintr|rkintr]] 处理这次中断

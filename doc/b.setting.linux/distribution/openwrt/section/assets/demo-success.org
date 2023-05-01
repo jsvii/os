@@ -1,0 +1,84 @@
+*  wifi加密
+
+**  wifi
+
+#+BEGIN_SRC text
+config wifi-device 'radio0'
+    option type 'mac80211'
+    option hwmode '11g'
+    option path 'platform/ar934x_wmac'
+    option legacy_rates '1'
+    option country 'CN'
+    option macaddr '30:35:ad:48:12:6e'
+    option channel '1'
+    option disabled '0'
+    option htmode 'HT20'
+
+config wifi-iface
+    option network 'wwan'
+    option ssid 'DEV-WIFI'
+    option device 'radio0'
+    option mode 'sta'
+    option bssid '00:C8:8B:1B:2D:D3'
+    option encryption 'wpa'
+    option eap_type 'peap'
+    option auth 'EAP-MSCHAPV2'
+    option identity 'z673252'
+    option password '6yhn&UJM'
+    option macaddr '30:35:ad:48:12:6e'
+    option disassoc_low_ack '0'
+#+END_SRC
+
+
+#+BEGIN_SRC text
+config interface 'loopback'
+    option ifname 'lo'
+    option proto 'static'
+    option ipaddr '127.0.0.1'
+    option netmask '255.0.0.0'
+
+config globals 'globals'
+    option ula_prefix 'fd72:6155:1779::/48'
+
+config interface 'lan'
+    option type 'bridge'
+    option ifname 'eth0.1'
+    option proto 'static'
+    option ipaddr '192.168.1.1'
+    option netmask '255.255.255.0'
+    option ip6assign '60'
+
+config device 'lan_dev'
+    option name 'eth0.1'
+    option macaddr '80:37:73:fc:a2:e7'
+
+config interface 'wan'
+    option ifname 'eth0.2'
+    option proto 'dhcp'
+    option type 'bridge'
+    option clientid '00:C8:8B:1B:2D:D3'
+
+config device 'wan_dev'
+    option name 'eth0.2'
+    option macaddr '80:37:73:fc:a2:e8'
+
+config switch
+    option name 'switch0'
+    option reset '1'
+    option enable_vlan '1'
+
+config switch_vlan
+    option device 'switch0'
+    option vlan '1'
+    option ports '1 2 3 4 0t'
+
+config switch_vlan
+    option device 'switch0'
+    option vlan '2'
+    option ports '5 0t'
+
+config interface 'wwan'
+    option proto 'dhcp'
+    option clientid '30:35:ad:48:12:6e'
+# 这一条似乎比较重要，是用于指发送请求时的mac地址？
+#+END_SRC

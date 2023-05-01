@@ -1,0 +1,43 @@
+===Source===
+<div class="wikiheadnote">
+*启动[[RK磁盘]]
+*无参数传入
+</div>
+
+5439 &nbsp;&nbsp;&nbsp;&nbsp;
+
+5440  rkstart()
+
+5441  {
+
+5442 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct buf|struct buf]] *bp;
+
+5443
+
+5444 &nbsp;&nbsp;&nbsp;&nbsp;if ((bp = [[code:struct devtab|rktab]].d_actf) == 0)
+
+5445 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return;
+
+<blockquote>
+*取[[设备I/O队列]]队首的 缓存 管理块
+*如果[[设备I/O队列]]为空,直接返回
+</blockquote>
+5446 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct devtab|rktab]].d_active++;
+
+5447 &nbsp;&nbsp;&nbsp;&nbsp;[[code:devstart|devstart]](bp, &RKADDR->rkda, [[code:rkaddr|rkaddr]](bp), 0);
+
+<blockquote>
+*如果[[设备I/O队列]]不为空,置d_active(忙标志)
+*根据[[设备I/O队列]]中的第一个buf置[[RK磁盘#RKWC|RKWC]],[[RK磁盘#RKCS|RKCS]],[[RK磁盘#RKBA|RKBA]],[[RK磁盘#RKDA|RKDA]]寄存器的值
+</blockquote>
+5448  }
+
+5449 /* ------------------------- */
+
+
+===Ref===
+*[[RK磁盘]]
+
+===Caller===
+*[[code:rkstrategy]]
+*[[code:rkintr]]

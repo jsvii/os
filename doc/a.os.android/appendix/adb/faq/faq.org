@@ -1,0 +1,4 @@
+* faq
+
+
+- [[./doc/nopermission.org]]  [linux] multi-user.target下无法看到devices & 设备未被授权

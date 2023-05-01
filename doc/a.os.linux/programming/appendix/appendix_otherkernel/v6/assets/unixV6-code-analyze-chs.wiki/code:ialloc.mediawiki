@@ -1,0 +1,222 @@
+===Source===
+<div class="wikiheadnote">
+*分配一个空闲的INODE结构,并返回指向该INODE的指针 
+**该INODE 由 7078 [[code:iget|iget]] 置锁
+*若已无空闲INODE可分配,则再搜索100个空闲的INODE
+*传入一个参数 dev,为指定设备的设备号
+</div>
+
+7055
+
+7056  /*
+
+7057 &nbsp;* Allocate an unused I node
+
+7058 &nbsp;* on the specified device.
+
+7059 &nbsp;* Used with file creation.
+
+7060 &nbsp;* The algorithm keeps up to
+
+7061 &nbsp;* 100 spare I node in the
+
+7062 &nbsp;* super block. When this runs out,
+
+7063 &nbsp;* a linear search through the
+
+7064 &nbsp;* I list is instituted to pick
+
+7065 &nbsp;* up 100 more.
+
+7066 &nbsp;*/
+
+7067  ialloc(dev)
+
+7068  {
+
+7069 &nbsp;&nbsp;&nbsp;&nbsp;register *fp, *bp, *ip;
+
+7070 &nbsp;&nbsp;&nbsp;&nbsp;int i, j, k, ino;
+
+7071
+
+7072 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct filsys|fp]] = [[code:getfs|getfs]](dev);
+
+7073 &nbsp;&nbsp;&nbsp;&nbsp;while([[code:struct filsys|fp]]->s_ilock)
+
+7074 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:sleep|sleep]](&[[code:struct filsys|fp]]->s_ilock, [[file:param.h|PINDO]]);
+
+<blockquote>
+*获取该设备的超级块
+*若该设备的INODE 队列被锁,在s_ilock上以优先级[[file:param.h|PINDO]]睡眠,参看[[睡眠原因]]
+</blockquote>
+7075  loop:
+
+7076 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct filsys|fp]]->s_ninode > 0) {
+
+<blockquote>
+*若INODE 队列不为空
+</blockquote>
+7077 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ino = [[code:struct filsys|fp]]->s_inode[--[[code:struct filsys|fp]]->s_ninode];
+
+7078 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]] = [[code:iget|iget]](dev, ino);
+
+<blockquote>
+*从INODE 队列中取出队尾的INODE号
+*从设备上读取指向该INODE的指针
+</blockquote>
+7079 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:struct inode|ip]]==NULL)
+
+7080 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return(NULL);
+
+<blockquote>
+*如果该INODE指针为空,则返回空值
+</blockquote>
+7081 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct inode|ip]]->i_mode == 0) {
+
+7082 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   for(bp = &[[code:struct inode|ip]]->i_mode; bp < &[[code:struct inode|ip]]->i_addr[8];)
+
+7083 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;*bp++ = 0;
+
+7084 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:struct filsys|fp]]->s_fmod = 1;
+
+7085 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   return([[code:struct inode|ip]]);
+
+7086 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;}
+
+<blockquote>
+*若i_mode == 0 ,清空该INODE内容(除与时间相关的参数)
+**置超级块 s_fmod标志
+**返回该INODE指针
+</blockquote>
+7087 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;/*
+
+7088 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;* Inode was allocated after all.
+
+7089 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;* Look some more.
+
+7090 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;*/
+
+7091 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:iput|iput]]([[code:struct inode|ip]]);
+
+7092 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto loop;
+
+<blockquote>
+*若i_mode != 0
+**调用iput函数尝试释放该inode
+**回到7075行 ,重新搜索空闲INODE
+</blockquote>
+7093 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+7094 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct filsys|fp]]->s_ilock++;
+
+<blockquote>
+*若INODE 队列为空,置INODE 队列锁标志
+</blockquote>
+7095 &nbsp;&nbsp;&nbsp;&nbsp;ino = 0;
+
+7096 &nbsp;&nbsp;&nbsp;&nbsp;for(i=0; i&lt;[[code:struct filsys|fp]]-&gt;s_isize; i++) {
+
+7097 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct buf|bp]] = [[code:bread|bread]](dev, i+2);
+
+7098 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct inode|ip]] = [[code:struct buf|bp]]->b_addr;
+
+7099 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for(j=0; j&lt;256; j=+16) {
+
+<blockquote>
+*从设备INODE区首部开始读入INODE块到缓存块bp
+*将ip指向块首
+*j用为当前块中偏移
+*由于j为16的倍数,所以ip[j]指向块中某一具体INODE
+</blockquote>
+7100 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   ino++;
+
+7101 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if([[code:struct inode|ip]][j] != 0)
+
+7102 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  continue;
+
+<blockquote>
+*判断当前INODE是否为空,若不为空,则直接寻找块中下一个INODE
+</blockquote>
+7103 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   for(k=0; k&lt;NINODE; k++)
+
+7104 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if(dev == inode[k].i_dev &&
+
+7105 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; ino == inode[k].i_number)
+
+7106 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  goto cont;
+
+<blockquote>
+*遍历内存INODE数组,将内存INODE逐一与当前INODE比较
+*若当前INODE在内存中有一份副本,表明该INODE不是真的为空,直接寻找块中下一个INODE
+</blockquote>
+7107 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:struct filsys|fp]]->s_inode[ [[code:struct filsys|fp]] ->s_ninode++] = ino;
+
+<blockquote>
+*若当前所找到的INODE在内存中没有副本,则表明其真的为空,插入INODE队列尾部
+</blockquote>
+7108 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   if([[code:struct filsys|fp]]->s_ninode >= 100)
+
+7109 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  break;
+
+7110 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cont:;
+
+7111 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;}
+
+7112 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:brelse|brelse]]([[code:struct buf|bp]]);
+
+<blockquote>
+*若当前磁盘块被遍历完时或者INODE队列中的元素已经突破100时
+*释放bp
+</blockquote>
+7113 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if([[code:struct filsys|fp]]->s_ninode >= 100)
+
+7114 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   break;
+
+<blockquote>
+*若INODE队列元素尚未突破100,则回到循环(7096)头,继续读取下一个INODE区磁盘块
+*否则退出循环(7096)
+</blockquote>
+7115 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+7116 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct filsys|fp]]->s_ilock = 0;
+
+7117 &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]](&[[code:struct filsys|fp]]->s_ilock);
+
+<blockquote>
+*去除INODE队列锁标志
+*唤醒一切在s_ilock上睡眠的进程,见[[睡眠原因]]
+</blockquote>
+7118 &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:struct filsys|fp]]->s_ninode > 0)
+
+7119 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;goto loop;
+
+<blockquote>
+*若INODE队列不为空,则返回到loop(7075),从当前不为空的INODE队列中分配空闲INODE
+</blockquote>
+7120 &nbsp;&nbsp;&nbsp;&nbsp;[[code:prdev|prdev]]("Out of inodes", dev);
+
+7121 &nbsp;&nbsp;&nbsp;&nbsp;[[code:user|u]].u_error = ENOSPC;
+
+<blockquote>
+*若未能搜索到INODE,即所有空闲INODE已用完,抛出错误,见[[错误代码]]
+</blockquote>
+7122 &nbsp;&nbsp;&nbsp;&nbsp;return(NULL);
+
+7123  }
+
+7124 /* -------------------------*/
+
+7125 /* -------------------------*/
+
+
+===Extend===
+=附图=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_ialloc_1.png"/></p> 
+
+===Ref===
+*[[文件系统]]
+
+===Caller===
+*[[code:maknode]]
+*[[code:pipe]]

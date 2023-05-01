@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===MFPI
+===Code===0065SS
+===Operation===(temp) ← (src)<br/>↓(SP) ← (temp) [ [[遗留问题]] ]
+===Coden===若 (src) < 0,则置位<br/>否则,清位
+===Codez===若 (src) = 0,则置位<br/>否则,清位
+===Codev===清
+===Codec===无影响
+===Description===从上一指令空间读取数据<br/>src从上一指令空间[先前态空间]寻址(由[[pdp11:处理机状态字|处理机状态字]]第13,12位决定)<br/>送入当前态空间(由[[pdp11:处理机状态字|处理机状态字]]第15,14位决定)的堆栈<br/>The address of the source operand is determined in the current address space. That is, the address is determined using the SP and memory segments determined by PS(bits 15,14).The address it self is then used in the previous mode (as determined by PS(bits 13,12) to get the source operand). This operand is then pushed on to the current R6 stack[ [[遗留问题]] ]
+===Example===无

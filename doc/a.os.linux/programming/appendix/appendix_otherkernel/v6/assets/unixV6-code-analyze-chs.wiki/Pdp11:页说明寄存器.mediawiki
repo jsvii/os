@@ -1,0 +1,55 @@
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_memory_pdr.png"/></p>
+
+*长度为16位
+*用于[[pdp11:内存管理|内存管理]]
+*ACF = Access Control Field<br/>指定页 的读写权限<br/>
+
+{|
+|-
+!ACF
+!模式
+|-
+|00
+|不可访问[non-resident]
+|-
+|01
+|只读
+|-
+|10
+|不可访问[(unused)]
+|-
+|11
+|读写
+|}
+
+*W= Access Information Bit<br/>标志 指定页 是否被修改<br/>W = 1 表明指定页被修改过<br/>当页寄存器([[pdp11:页地址寄存器|页地址寄存器]] 或 [[pdp11:页说明寄存器|页说明寄存器]])被修改时，W清零
+*ED = Expansion Direction<br/>标志 指定页的地址扩展方向
+<br/>
+
+{|
+|-
+!ED
+!方向
+|-
+|0
+|从相对零位置向高地址扩展 [正向扩展]
+|-
+|1
+|从高地址向相对零位置扩展 [逆向扩展]
+|-
+|相对零位置 为 [[pdp11:页地址寄存器|页地址寄存器]] PAF段指示的位置
+|相对零位置 为 [[pdp11:页地址寄存器|页地址寄存器]] PAF段指示的位置
+|}
+
+*PLF = Page Length Field<br/>PLF = 按页扩展方向最后一个被访问到的块号
+{|
+|-
+!扩展方向
+!数值
+|-
+|正向扩展
+|指定页块数 - 1
+|-
+|逆向扩展
+|128 - 指定页块数
+|}

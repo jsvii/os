@@ -1,0 +1,5 @@
+* 内核分析类
+
+https://github.com/BeesX/BeesAndroid
+
+BeesAndroid项目于2018年3月6日同步上线，该项目的前身是android-open-source-project-analysis，这个项目提供了一系列的Android系统源码分析文章，收到了良好的反馈。但是一个人的力量是有限的，因此将其推成团体项目BeesAndroid，项目采用GPL协议，在保护作者知识产权的基础上，最大化的做到开源与开放，如果有什么问题和意见欢迎提交issue，也欢迎大家参与到本项目中来。

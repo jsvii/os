@@ -1,0 +1,127 @@
+===Source===
+<div class="wikiheadnote">
+*向tty原始队列送入1个字符
+*输入2个参数 ac , atp
+**ac : 指定字符
+**atp : 指定[[code:struct tty|tty]]
+</div>
+
+8327 /* Place a character on raw TTY input queue, putting in 
+
+8328 &nbsp;* delimiters and waking up top half as needed. 
+
+8329 &nbsp;* Also echo if required. 
+
+8330 &nbsp;* The arguments are the character and the appropriate 
+
+8331 &nbsp;* tty structure. 
+
+8332 &nbsp;*/ 
+
+8333 ttyinput(ac, atp) 
+
+8334 [[code:struct tty|struct tty]] *atp; 
+
+8335 { 
+
+8336 &nbsp;&nbsp;&nbsp;&nbsp;register int t_flags, c; 
+
+8337 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct tty|struct tty]] *tp; 
+
+8338 
+
+8339 &nbsp;&nbsp;&nbsp;&nbsp;tp = atp; 
+
+8340 &nbsp;&nbsp;&nbsp;&nbsp;c = ac; 
+
+8341 &nbsp;&nbsp;&nbsp;&nbsp;t_flags = tp->t_flags; 
+
+8342 &nbsp;&nbsp;&nbsp;&nbsp;if ((c =& 0177) == ’\r’ && t_flags&CRMOD) 
+
+8343 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;c = ’
+\n’; 
+
+<blockquote>
+*若tty 使用了CR换行，则
+*\r → 
+\n (输出([[code:ttyoutput|ttyoutput]])时 
+\n → \r
+\n)
+</blockquote>
+8344 &nbsp;&nbsp;&nbsp;&nbsp;if ((t_flags&RAW)==0 && (c==CQUIT <nowiki>||</nowiki> c==CINTR)) { 
+
+8345 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:signal|signal]](tp, c==CINTR? SIGINT:SIGQIT); 
+
+8346 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:flushtty|flushtty]](tp); 
+
+8347 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+8348 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*tty不是原始模式时
+**CQUIT : 向该终端所有进程 发送SIGQIT 信号
+**CINTR : 向该终端所有进程 发送SIGINT 信号　
+</blockquote>
+8349 &nbsp;&nbsp;&nbsp;&nbsp;if (tp->t_rawq.c_cc>=TTYHOG) { 
+
+8350 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:flushtty|flushtty]](tp); 
+
+8351 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+8352 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*若 tty原始队列 元素过多，则 清tty队列
+ (处理过量输入，方式过于粗暴...)
+</blockquote>
+8353 &nbsp;&nbsp;&nbsp;&nbsp;if (t_flags&LCASE && c>=’A’ && c&lt;=’Z’) 
+
+8354 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;c =+ ’a’-’A’; 
+
+<blockquote>
+*tty 带 LCASE 标志(tty 只支持 64字符 ASCII 子集)
+**A-Z → a-z
+**输出([[code:ttyoutput|ttyoutput]])时 a-z → A-Z，折腾原因不明...列入[[遗留问题]]
+</blockquote>
+8355 &nbsp;&nbsp;&nbsp;&nbsp;[[code:putc|putc]](c, &tp->t_rawq); 
+
+<blockquote>
+*向 tty 原始队列送入 c
+</blockquote>
+8356 &nbsp;&nbsp;&nbsp;&nbsp;if (t_flags&RAW <nowiki>||</nowiki> c==’
+\n’ <nowiki>||</nowiki> c==004) { 
+
+8357 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]](&tp->t_rawq); 
+
+8358 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if ([[code:putc|putc]](0377, &tp->t_rawq)==0) 
+
+8359 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   tp->t_delct++; 
+
+8360 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*tty 为 原始模式，或c 为 换行符(
+\n) 或 传输结尾(EOT = 004)，则
+**唤醒 等待 tty原始队列的进程
+**向原始队列送入 定界符 (送入不一定成功，参看 LIONS源代码分析)
+</blockquote>
+8361 &nbsp;&nbsp;&nbsp;&nbsp;if (t_flags&ECHO) { 
+
+8362 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:ttyoutput|ttyoutput]](c, tp); 
+
+8363 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:ttstart|ttstart]](tp); 
+
+8364 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*tty 为 全双工模式(输入字符需回显)，则回显字符
+</blockquote>
+8365 } 
+
+8366 /* ------------------------- */ 
+
+
+
+===Caller===
+*[[code:klrint]]

@@ -1,0 +1,52 @@
+* Cycles and Buffers
+
+** 原理
+
+sed 管理着两块数据缓冲区（data buffer）: 活跃的 ~pattern space~ 和辅助的 ~hold space~ ，它们初始时都是空的。
+
+sed 在输入内容的每一行上进行如此的循环操作：
+
+1. 从input stream中拿出最新一行，放至到 ~pattern space~ 区域
+
+1. 执行命令，每个命令都有着相关联的地址，地址属于一种条件码，命令只有在条件确定的情况下才执行。
+
+
+#+BEGIN_COMMENT
+这样子就方便理解：
+
+默认情况下，sed是不改变原文件的，而是将data space的内容打印出来，
+#+END_COMMENT
+
+
+SED遵循简单的工作流：读取，执行和显示。
+
+1. 读取： SED从输入流（文件，管道或者标准输入）中读取一行并且存储到它叫做模式空间（pattern buffer）的内部缓冲区
+
+1. 执行： 默认情况下，所有的SED命令都在模式空间中顺序的执行，除非指定了行的地址，否则SED命令将会在所有的行上依次执行
+
+1. 显示： 发送修改后的内容到输出流。在发送数据之后，模式空间将会被清空。
+
+在文件所有的内容都被处理完成之前，上述过程将会重复执行
+
+*** 注意点
+
+- 模式空间（ ~pattern space~ ） 是一块活跃的缓冲区，在sed编辑器执行命令时它会保存待检查的文本
+
+- 默认情况下，所有的SED命令都是在模式空间中执行，因此输入文件并不会发生改变
+
+- 还有另外一个缓冲区叫做 保持空间（ ~hold space~ ），在处理模式空间中的某些行时，可以用保持空间来临时保存一些行。在每一个循环结束的时候，SED将会移除模式空间中的内容，但是该缓冲区中的内容在所有的循环过程中是持久存储的。SED命令无法直接在该缓冲区中执行，因此SED允许数据在 **保持空间** 和 **模式空间**之间切换
+
+- 初始情况下，**保持空间** 和 **模式空间** 这两个缓冲区都是空的
+
+- 如果没有提供输入文件的话，SED将会从标准输入接收请求
+
+- 如果没有提供地址范围的话，默认情况下SED将会对所有的行进行操作
+
+
+sed maintains two data buffers: the active pattern space, and the auxiliary hold space. Both are initially empty.
+
+sed operates by performing the following cycle on each line of input: first, sed reads one line from the input stream, removes any trailing newline, and places it in the pattern space. Then commands are executed; each command can have an address associated to it: addresses are a kind of condition code, and a command is only executed if the condition is verified before the command is to be executed.
+
+When the end of the script is reached, unless the -n option is in use, the contents of pattern space are printed out to the output stream, adding back the trailing newline if it was removed.8 Then the next cycle starts for the next input line.
+
+Unless special commands (like ‘D’) are used, the pattern space is deleted between two cycles. The hold space, on the other hand, keeps its data between cycles (see commands ‘h’, ‘H’, ‘x’, ‘g’, ‘G’ to move data between both buffers).

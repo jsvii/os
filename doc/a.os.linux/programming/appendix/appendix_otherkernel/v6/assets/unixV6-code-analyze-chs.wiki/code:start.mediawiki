@@ -1,0 +1,203 @@
+===Source===
+<div class="wikiheadnote">
+*系统引导函数
+* _end _edata 是 装入程序的伪变量
+**_end : 数据段 + bss段 底地址(KISA5的末尾) + 1
+**_edata : 数据段 底地址 + 1
+</div>
+
+0610 /* ------------------------- */ 
+
+0611 .globl start, _end, _edata, _main 
+
+0612 start: 
+
+0613 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BIT|bit]] $1,[[code:SSR|SSR0]] 
+
+0614 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BNE|bne]] start / loop if restart 
+
+<blockquote>
+*等待 [[内存管理]]机制(虚实地址映照) 关闭
+</blockquote>
+0615 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RESET|reset]]
+
+<blockquote>
+*重置 总线设备
+</blockquote>
+0616 
+
+0617 / initialize systems segments 
+
+0618 
+
+0619 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $KISA0,r0 
+
+0620 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $KISD0,r1 
+
+0621 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $200,r4 
+
+0622 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] r2 
+
+0623 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $6,r3 
+
+0624 1: 
+
+0625 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r2,(r0)+ 
+
+0626 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $77406,(r1)+ / 4k rw 
+
+0627 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:ADD|add]] r4,r2 
+
+0628 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:SOB|sob]] r3,1b 
+
+<blockquote>
+*写入信息到 KISA0/KISD0 - KISA5/KISD5
+**KISAi = 200 * (i-1)
+**KISDi = 77406
+***读写
+***长度 200 (128)块
+</blockquote>
+0629 
+
+0630 / initialize user segment 
+
+0631 
+
+0632 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $_end+63.,r2 
+
+0633 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:ASH|ash]] $-6,r2 
+
+0634 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BIC|bic]] $!1777,r2 
+
+0635 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] r2,(r0)+ / ksr = sysu 
+
+0636 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $USIZE-1\<8<nowiki>|</nowiki>6,(r1)+ 
+
+0637 
+
+<blockquote>
+*KISA6 ← _end向下修正为整块(0#进程 PPDA区的起始地址)
+*KISD6 置为
+**段大小 = PPDA区大小
+**读写
+</blockquote>
+0638 / initialize io segment 
+
+0639 / set up counts on supervisor segments 
+
+0640 
+
+0641 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $IO,(r0)+ 
+
+0642 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $77406,(r1)+ / rw 4k 
+
+<blockquote>
+*KISA7 ← IO
+*KISD7 = 77406
+**读写
+**长度 200 (128)块
+</blockquote>
+0643 
+
+0644 / get a sp and start segmentation 
+
+0645 
+
+0646 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $_u+[USIZE*64.],sp 
+
+<blockquote>
+*初始化 sp
+*_u 定义在 [[file:m40.s|m40.s]]
+*此处 传入sp的是 相对地址，而 虚实地址映照 在下一句启用
+</blockquote>
+0647 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:INC|inc]] [[code:SSR|SSR0]] 
+
+<blockquote>
+*启用 虚实地址映照
+</blockquote>
+0648 
+
+0649 / clear bss 
+
+0650 
+
+0651 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $_edata,r0 
+
+0652 1: 
+
+0653 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] (r0)+ 
+
+0654 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CMP|cmp]] r0,$_end 
+
+0655 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BLO|blo]] 1b 
+
+<blockquote>
+*清零 [[.bss]]区
+</blockquote>
+0656 
+
+0657 / clear user block 
+
+0658 
+
+0659 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $_u,r0 
+
+0660 1: 
+
+0661 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] (r0)+ 
+
+0662 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CMP|cmp]] r0,$_u+[USIZE*64.] 
+
+0663 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:BLO|blo]] 1b 
+
+<blockquote>
+*清零 0#进程 PPDA区
+</blockquote>
+0664 
+
+0665 / set up previous mode and call main 
+
+0666 / on return, enter user mode at 0R 
+
+0667 
+
+0668 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $30000,PS 
+
+<blockquote>
+*置 PS
+**先前态 为 用户态
+**当前态 为 核心态
+**[[进程优先级]] 为 0
+</blockquote>
+0669 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:JSR|jsr]] pc,_main 
+
+<blockquote>
+*调用 [[code:main|main]]
+</blockquote>
+<blockquote>
+*以下 由 1# 进程 执行 (参看 [[系统初启]])
+</blockquote>
+0670 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:MOV|mov]] $170000,-(sp) 
+
+0671 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:CLR|clr]] -(sp) 
+
+<blockquote>
+*向 堆栈中 构造
+**PS = 170000
+***当前态 为 用户态
+***先前态 为 用户态
+***[[进程优先级]] 为 0
+**PC = 0
+</blockquote>
+0672 &nbsp;&nbsp;&nbsp;&nbsp;[[pdp11:RTT|rtt]] 
+
+<blockquote>
+*转入 用户态 PC=0 处 开始运行
+</blockquote>
+0673 
+
+
+
+===Ref===
+*[[系统初启]]
+*[[关于汇编函数的说明]]

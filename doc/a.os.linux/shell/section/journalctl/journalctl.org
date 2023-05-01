@@ -1,0 +1,3 @@
+* journalctl
+
+参见systemd

@@ -1,0 +1,3 @@
+* XML Drawable
+
+与svg类似的技术。

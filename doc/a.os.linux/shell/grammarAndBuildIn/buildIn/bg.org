@@ -1,0 +1,40 @@
+* bg
+
+The bg command is part of Linux/Unix shell job control. The command may be available as both internal and external command. It resumes execution of a suspended process as if they had been started with &. Use bg command to restart a stopped background process.
+
+#+BEGIN_SRC bash
+$ jobs
+[1]  + running    node node.js
+
+$ kill -s STOP %1
+
+[1]  + 8157 suspended (signal)  node node.js
+$ jobs
+[1]  + suspended (signal)  node node.js
+
+$ bg %1
+[1]  + 8157 continued  node node.js
+
+# bg使 suspend的任务变为活跃
+$ jobs
+[1]  + running    node node.js
+#+END_SRC
+
+
+
+** Understanding the job number (jobID)
+
+There are a various ways to refer to a job in the shell. The character % introduces a job specification. The JobID can be a process ID (PID) number, or you can use one of the following symbol combinations:
+
+- ~%Number~ : Use the job number such as %1 or %2.
+
+- ~%String~ : Use the string whose name begins with suspended command such as %commandNameHere or %ping.
+
+- ~%+~ OR %% : Refers to the current job.
+
+- ~%-~ : Refers to the previous job.
+
+
+** ref
+
+- https://www.cyberciti.biz/faq/unix-linux-bg-command-examples-usage-syntax/

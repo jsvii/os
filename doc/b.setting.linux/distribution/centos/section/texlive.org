@@ -1,0 +1,55 @@
+* texlive
+
+** 网络上的方法--不推荐
+
+这个方法还是有缺失的，不推荐
+
+#+BEGIN_SRC bash
+yum install texlive-*
+#+END_SRC
+
+** 下载iso后安装
+
+安装最新的版本
+
+#+BEGIN_SRC bash
+$ wget -c http://mirrors.hust.edu.cn/CTAN/systems/texlive/Images/texlive2017-20170524.iso
+$ sudo su   # 使用 root 用户安装
+$ locate texlive | xargs rm -rf     # 把所有老版本 texlive 文件删除
+$ mount -o loop texlive2017-20170524.iso /mnt/ #挂载 iso 镜像
+$ cd /mnt   #进入镜像目录
+$ ./install-tl # 运行安装指令
+#+END_SRC
+
+过一两分钟会出现提示，需要选择安装方式，可以直接按 i 安装，约二十分钟之后就安装好了，装好之后占 3GB 硬盘空间。
+
+
+** 网络安装方法
+
+https://www.tug.org/texlive/acquire-netinstall.html
+
+The best way I found is to use the texlive offical installation tool to install the full packages for texlive 2016. It will take around 4.5GB.
+
+First, remove existing texlive packages if they are installed:
+
+# yum erase texlive texlive*
+
+Then download installation package from its website.
+
+And execute the installation tools in the decompressed package:
+
+# ./install-tl
+
+It will download and install the packages/tools for texlive.
+
+You will need to install the `Digest::MD5` perl module by
+
+yum install perl-Digest-MD5 -y
+
+if it is not installed yet.
+
+After it is done, set the path in your ~/.bashrc or a global location accordingly:
+
+export PATH=/opt/texlive/2016/bin/x86_64-linux/:$PATH
+
+Here, /opt/texlive/ is the path you chose to install texlive. If you choose another location, you can replace it with the one you used.

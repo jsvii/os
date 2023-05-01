@@ -1,0 +1,161 @@
+* Unix v6 基本配置
+
+
+** 什么是simh
+
+The Computer History Simulation Project. 字面义是simulate history，模拟历史。
+
+
+** simh pdp11的特性
+
+#+CAPTION: simh pdp11
+#+NAME:   tab:basic-data
+| devices | simulates                                                             |
+|---------+-----------------------------------------------------------------------|
+| CPU     | PDP-11 CPU with 256KB of memory                                       |
+| PTR,PTP | PC11 paper tape reader/punch                                          |
+| TTI,TTO | DL11 console terminal                                                 |
+| CR      | CR11/CD11 card reader                                                 |
+| LPT     | LP11 line printer                                                     |
+| CLK     | KW11-L line frequency clock                                           |
+| PCLK    | KW11-P programmable clock                                             |
+| DCI,DCO | DC11 additional serial lines (up to 16)                               |
+| DLI,DLO | KL11/DL11 additional serial lines (up to 16)                          |
+| DZ      | DZ11 8-line terminal multiplexer (up to 4)                            |
+| VH      | DHU11 8-line terminal multiplexer (up to 4)                           |
+| RK      | RK11/RK05 cartridge disk controller with eight drives                 |
+| HK      | RK611/RK06,RK07 cartridge disk controller with eight Drives           |
+| RC      | RC11 fixed head disk                                                  |
+| RF      | RF11/RS11 fixed head disk                                             |
+| RL      | RL11(RLV12)/RL01,RL02 cartridge disk controller with four drives      |
+| RH      | RH11/RH70 Massbus adapter (up to 2)                                   |
+| RP      | RP04/05/06/07, RM02/03/05/80 Massbus disks with eight drives          |
+| RQ      | RQDX3/UDA50 MSCP controller with four drives                          |
+| RQB     | second RQDX3/UDA50 MSCP controller with four drives                   |
+| RQC     | third RQDX3/UDA50 MSCP controller with four drives fourth             |
+| RQD     | RQDX3/UDA50 MSCP controller with four drives                          |
+| RX      | RX11/RX01 floppy disk controller with two drives                      |
+| RY      | RX211/RX01 floppy disk controller with two drives                     |
+| TA      | TA11/TU60 cassette controller with two drives                         |
+| TC      | TC11/TU56 DECtape controller with eight drives                        |
+| TM      | TM11/TU10 magnetic tape controller with eight drives                  |
+| TS      | TS11/TSV05 magnetic tape controller with one drive                    |
+| TQ      | TQK50/TU81 TMSCP magnetic tape controller with four drives            |
+| TU      | TM02/TM03 magnetic tape formatter with eight drives                   |
+| XQ      | DELQA/DEQNA Qbus Ethernet controller                                  |
+| XQB     | second DELQA/DEQNA Qbus Ethernet controller                           |
+| XU      | DELUA/DEUNA Unibus Ethernet controller                                |
+| XUB     | Second DELUA/DEUNA Unibus Ethernet controller                         |
+| KE      | KE11A extended arithmetic option                                      |
+| KG      | KG11A communications arithmetic option                                |
+
+
+** 参考文档
+
+本节介绍如何在 =PDP-11/40= 中安装 =Unix v6= , 参考文档为 [[http://gunkies.org/wiki/Installing_Unix_v6_(PDP-11)_on_SIMH][如何在simh中安装 unixv6 操作系统]]
+
+
+*** 1. 系统的安装
+
+#+BEGIN_SRC SHELL
+$ pdp11
+PDP-11 simulator V3.8-1
+sim> set cpu 11/40
+Disabling XQ
+sim> set tm0 locked
+sim> attach tm0 dist.tap
+sim> attach rk0 rk0
+RK: creating new file
+sim> attach rk1 rk1
+RK: creating new file
+sim> attach rk2 rk2
+RK: creating new file
+sim> d cpu 100000 012700
+sim> d cpu 100002 172526
+sim> d cpu 100004 010040
+sim> d cpu 100006 012740
+sim> d cpu 100010 060003
+sim> d cpu 100012 000777
+sim> g 100000
+# <Ctrl> E  here
+Simulation stopped, PC: 100012 (BR 100012)
+sim> g 0
+=tmrk
+disk offset
+0
+tape offset
+100
+count
+1
+=tmrk
+disk offset
+1
+tape offset
+101
+count
+3999
+=
+Simulation stopped, PC: 137274 (TSTB @#177560)
+sim> q
+Goodbye
+$ ~/v6$ ll # 进程文件查看 rk0
+total 8160
+drwxr-xr-x  3 leo user    4096 Nov 18 18:37 ./
+drwxr-xr-x 56 leo user    4096 Nov 18 12:50 ../
+-rw-r--r--  1 leo user 6291996 Nov 18 13:52 dist.tap
+-rw-r--r--  1 leo user 2048000 Nov 18 18:39 rk0
+-rw-r--r--  1 leo user       0 Nov 18 18:37 rk1
+-rw-r--r--  1 leo user       0 Nov 18 18:37 rk2
+#+END_SRC
+
+
+
+*** 2. 初始化启动项
+
+```
+PDP-11 simulator V3.8-1
+sim>  set cpu 11/40
+Disabling XQ
+sim> set tto 7b
+sim> set tm0 locked
+sim> attach tm0 dist.tap
+sim> attach rk0 rk0
+sim> attach rk1 rk1
+sim> attach rk2 rk2
+sim> dep system sr 173030
+sim> boot rk0
+@rkunix
+mem = 1035
+RESTRICTED RIGHTS
+Use, duplication or disclosure is subject to
+restrictions stated in Contract with Western
+Electric Company, Inc.
+```
+
+*** 3. Booting up to single user mode 以单用户模式启动
+
+And this will boot us up to the bootloader, to which we just tell it to load the 'unix' kernel.
+
+```
+$ pdp11
+#
+PDP-11 simulator V3.8-1
+sim> set cpu 11/40
+Disabling XQ
+sim> set tto 7b
+sim> set tm0 locked
+sim> attach tm0 dist.tap
+sim> attach rk0 rk0
+sim> attach rk1 rk1
+sim> attach rk2 rk2
+sim> dep system sr 173030
+sim> boot rk0
+@rklinux
+@rkunix
+mem = 1035
+RESTRICTED RIGHTS
+Use, duplication or disclosure is subject to
+restrictions stated in Contract with Western
+Electric Company, Inc.
+# LS
+```

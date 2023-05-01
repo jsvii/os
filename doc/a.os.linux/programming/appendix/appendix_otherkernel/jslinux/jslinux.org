@@ -1,0 +1,20 @@
+#+TITLE: jslinux
+
+
+
+https://bellard.org/jslinux/
+
+https://bellard.org/jslinux/vm.html?cpu=riscv32&url=https://bellard.org/jslinux/buildroot-riscv32.cfg
+
+https://buildroot.org/download.html
+
+* repos
+
+- 较旧的一个项目 https://github.com/levskaya/jslinux-deobfuscated
+
+- openrisc 1000 https://github.com/s-macke/jor1k
+
+- https://github.com/riscv/riscv-angel.git  ANGEL is not under active development - it implements old draft versions of the RISC-V specs (~late 2014)
+
+
+OpenRISC项目，其包括OpenRISC 1000、OpenRISC 2000两个子项目。OpenRISC 1000项目产生了OpenRISC 1000架构，OR1200就是符合OpenRISC 1000架构的处理器。

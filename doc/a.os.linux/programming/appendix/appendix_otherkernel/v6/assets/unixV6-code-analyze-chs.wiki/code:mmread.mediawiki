@@ -1,0 +1,72 @@
+===Source===
+<div class="wikiheadnote">
+*[[内存映射文件]] 的 驱动函数(读)
+*[[code:user|u.u_offset]] 用于 传入物理内存地址
+</div>
+9016 mmread(dev) 
+
+9017 { 
+
+9018 &nbsp;&nbsp;&nbsp;&nbsp;register c, bn, on; 
+
+9019 &nbsp;&nbsp;&nbsp;&nbsp;int a, d; 
+
+9020 
+
+9021 &nbsp;&nbsp;&nbsp;&nbsp;if(dev[[skill:.d_minor|.d_minor]] == 2) 
+
+9022 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return; 
+
+<blockquote>
+*"无底洞" 模式，什么都读不出来...
+</blockquote>
+9023 &nbsp;&nbsp;&nbsp;&nbsp;do { 
+
+9024 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bn = [[code:lshift|lshift]]([[code:user|u.u_offset]], -6); 
+
+9025 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;on = u.u_offset[1] & 077; 
+
+<blockquote>
+*bn ← 块号
+*on ← 块内偏移
+</blockquote>
+9026 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;a = UISA[[skill:r|->r]][0]; 
+
+9027 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;d = UISD[[skill:r|->r]][0]; 
+
+9028 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:spl|spl7]](); 
+
+9029 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;UISA[[skill:r|->r]][0] = bn; 
+
+9030 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;UISD[[skill:r|->r]][0] = 077406; 
+
+9031 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if(dev[[skill:.d_minor|.d_minor]] == 1) 
+
+9032 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   UISA[[skill:r|->r]][0] = (ka6-6)[[skill:r|->r]][(bn>>7)&07] 
+
+9033 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;+ (bn & 0177); 
+
+<blockquote>
+*若 模式为 读取核心态内存，则将 UISA[0] 置核心态地址
+</blockquote>
+9034 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;c = [[code:fuibyte|fuibyte]](on); 
+
+<blockquote>
+*以 UISA0/UISD0 寻址，第0块第on个字节
+</blockquote>
+9035 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;UISA[[skill:r|->r]][0] = a; 
+
+9036 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;UISD[[skill:r|->r]][0] = d; 
+
+9037 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:spl|spl0]](); 
+
+9038 &nbsp;&nbsp;&nbsp;&nbsp;} while([[code:user|u.u_error]]==0 && [[code:passc|passc]](c)>=0); 
+
+9039 } 
+
+9040 /* ------------------------- */ 
+
+
+
+===Caller===
+*[[code:cdevsw]]

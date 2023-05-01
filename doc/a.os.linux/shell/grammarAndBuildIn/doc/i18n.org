@@ -1,0 +1,18 @@
+* i18n iternationalization
+
+
+LANG 未设置任务LC_xxx变量时所使用的默认值
+
+LC_ALL 用来覆盖所有其他LC_xxx变量的值
+
+LC_COLLATE 使用所指定地区的排列顺序
+
+LC_CTYPE 使用所指定地区的字符集（字母、数字、标点符号等）
+
+LC_MESSAGE 使用所指定地区的响应与信息；仅POSIX适用
+
+LC_MONETARY 使用所指定地区的货币格式
+
+LC_NUMBERIC 使用所指定地区的数字格式
+
+LC_TIME 使用所指定地区的日期与时间格式

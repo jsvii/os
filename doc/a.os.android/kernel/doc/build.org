@@ -1,0 +1,3 @@
+* android
+
+Android的源码是使用我们熟悉的Git和Repo两种代码管理工具共同管理的，Git不用介绍了，大家都很熟悉，说说Repo,它是用python开发的一个整合Git仓库的工具，在管理Android源码时，使用Repo往往会简化我们代码管理的工作。

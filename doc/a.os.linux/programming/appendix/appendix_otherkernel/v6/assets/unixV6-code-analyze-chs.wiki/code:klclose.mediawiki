@@ -1,0 +1,28 @@
+===Source===
+<div class="wikiheadnote">
+*kl接口的设备关闭函数
+*传入1个参数:设备号
+</div>
+
+8055 klclose(dev)
+
+8056 { register [[code:struct tty|struct tty]] *tp;
+
+8057 &nbsp;&nbsp;&nbsp;&nbsp;tp = &[[code:kl11|kl11]][dev.[[file:conf.h|d_minor]]<nowiki>]</nowiki>;
+
+8058 &nbsp;&nbsp;&nbsp;&nbsp;[[code:wflushtty|wflushtty]](tp);
+
+8059 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct tty|tp->t_state]] = 0;
+
+<blockquote>
+*根据设备号获得设备的tty结构
+*等待指定tty输出队列元素全部输出后清空所有队列
+*清除设备的内部工作状态
+</blockquote>
+8060 }
+
+8061 /* ------------------------- */
+
+
+===Caller===
+*[[code:cdevsw]]

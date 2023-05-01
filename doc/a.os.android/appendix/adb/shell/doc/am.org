@@ -1,0 +1,4 @@
+* am activity manager
+
+
+http://adbcommand.com/adbshell

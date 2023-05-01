@@ -1,0 +1,59 @@
+* wait
+
+https://linuxhint.com/wait_command_linux/
+
+
+** Wait Command in Linux
+
+wait is a built-in command of Linux that waits for completing any running process. wait command is used with a particular process id or job id. When multiple processes are running in the shell then only the process id of the last command will be known by the current shell. If wait command is executed this time, then it will be applied for the last command. If no process id or job id is given with wait command then it will wait for all current child processes to complete and returns exit status.
+
+The exit status value of wait command depends on the command indicated by the last operand specified. When any process terminates abnormally then the exit status will be greater than 128 and shall be different from the exit status values of other commands. wait command exits with the  value 0 when it calls with no operands and all process IDs are known by the current shell have terminated. If wait command detects any error then it returns any value from 1 to 126. If the last process id is unknown then wait command exits with value 127. How you can use wait command in Linux is shown in this tutorial.
+
+*** Example-1: Using wait command for multiple processes
+
+After executing the following script, two processes will run in the background and the process id of the first echo command is stored in $process_id variable. When wait command is executed with $process_id then the next command will wait for completing the task of the first echo command. The second wait command is used with ‘$!’ and this indicate the process id of the last running process. ‘$?’ is used to read the status value of wait command.
+
+#+BEGIN_SRC bash
+#!/bin/bash
+echo "testing wait command1" &
+process_id=$!
+echo "testing wait command2" &
+wait $process_id
+echo Job 1 exited with status $?
+wait $!
+echo Job 2 exited with status $?
+#+END_SRC
+
+*** Example-2: Test wait command after using kill command
+
+In the following script, wait command is executed after terminating the process. sleep command is running as a background process and kill command is executed to terminate the running process. After that wait command is executed with the process id of the terminated process. The output will show the process id of the terminated process.
+
+#+BEGIN_SRC bash
+#!/bin/bash
+echo "Testing wait command"
+sleep 20 &
+pid=$!
+kill $pid
+wait $pid
+echo $pid was terminated.
+#+END_SRC
+
+
+
+*** Example-3: Check the exit status value
+
+In the following script, the function check() is called by two argument values. It is discussed in the starting of the tutorial that if wait command executed successfully the exit value will 0 and if wait command detects any error then it will returns any value between 1 and 126. After running the script, if you pass 0 as second argument value then wait command terminates successfully and if you pass any value more than zero then it terminates unsuccessfully.
+
+#+BEGIN_SRC bash
+#!/bin/bash
+function check()
+{
+echo "Sleep for $1 seconds"
+sleep $1
+exit $2
+}
+check $1 $2 &
+b=$!
+echo "Checking the status"
+wait $b && echo OK || echo NOT OK
+#+END_SRC

@@ -1,0 +1,10 @@
+*  frameworks
+
+  应用程序组件是一个Android应用程序的基本构建块。这些组件由应用清单文件松耦合的组织。AndroidManifest.xml描述了应用程序的每个组件，以及他们如何交互。
+
+以下是可以在Android应用程序中使用的四个主要组件。
+
+1. Activities	描述UI，并且处理用户与机器屏幕的交互。
+1. Services	处理与应用程序关联的后台操作。
+1. Broadcast Receivers	处理Android操作系统和应用程序之间的通信。
+1. Content Providers	处理数据和数据库管理方面的问题。

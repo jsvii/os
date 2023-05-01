@@ -1,0 +1,23 @@
+* qemu
+
+
+https://wiki.archlinux.org/index.php/QEMU_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
+
+
+“Qemu”是一个广泛使用的开源计算机模拟器和虚拟机。"当作为模拟器时，可以在一种架构（如x86 PC）下运行另一种架构（如ARM）下的操作系统和程序。通过使用动态转换，它可以获得非常好的性能。
+
+作为虚拟机时，QEMU可以使用其他虚拟机管理程序（如 Xen 或 KVM）来使用CPU扩展（HVM）进行虚拟化，通过在主机CPU上直接执行客户机代码来获得接近于宿主机的性能"
+
+
+- qemu-arch-extra 额外架构支持
+
+- qemu-block-gluster Glusterfs block 支持
+
+- qemu-block-iscsi iSCSI block 支持
+
+- qemu-block-rbd RBD block 支持
+
+- samba SMB/CIFS 服务器支持
+
+
+https://www.qemu.org/docs/master/

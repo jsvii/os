@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===XOR
+===Code===074RDD
+===Operation===(dst)← R ¤ (dst)
+===Coden===若 运算结果<0，则置位<br/>否则，清位
+===Codez===若 运算结果=0，则置位<br/>否则，清位
+===Codev===清
+===Codec===无影响
+===Description===将给定寄存器与目标地址的数据做非兼异或[不可兼或]运算，结果送入目标地址
+===Example===<p>XOR_R0_,_R2<br/><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Pdp11_instruction_Xor_r0_r2.png"/></p>

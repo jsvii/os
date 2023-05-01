@@ -1,0 +1,10 @@
+{{pdp11:instruction
+===Instruction===RESET
+===Code===000005
+===Operation===向 总线 发送 INIT 10ms，所有总线设备全部重置
+===Coden===无影响
+===Codez===无影响
+===Codev===无影响
+===Codec===无影响
+===Description===
+===Example===

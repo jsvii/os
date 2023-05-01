@@ -1,0 +1,45 @@
+===Source===
+<div class="wikiheadnote">
+*设置系统时间
+*传入两个参数，分别为欲设置时间(32位长)的高位和低位
+</div>
+
+3427
+
+3428 stime()
+
+3429 {
+
+3430
+
+3431 &nbsp;&nbsp;&nbsp;&nbsp;if([[code:suser|suser]]()) {
+
+<blockquote>
+*只有超级用户可以设置系统时间
+</blockquote>
+3432 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;time[0] = [[skill:u.u_ar0|u.u_ar0]][R0]; 
+
+3433 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;time[1] = [[skill:u.u_ar0|u.u_ar0]][R1]; 
+
+<blockquote>
+*将传入的参数分别赋给time的高低位，设置系统时间
+</blockquote>
+3434 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;[[code:wakeup|wakeup]]([[睡眠原因#tout|tout]]); 
+
+<blockquote>
+*唤醒所有 睡眠原因为[[睡眠原因#tout|tout]]的睡眠进程
+*[[睡眠原因#tout|tout]]睡眠原因 含义为 睡眠固定时间，具体参考 [[睡眠原因#tout|睡眠原因]]
+*由于系统时间被重置，可能某些因[[睡眠原因#tout|tout]]睡眠的进程无法唤醒，为此需要唤醒所有因[[睡眠原因#tout|tout]]睡眠的进程
+</blockquote>
+3435 &nbsp;&nbsp;&nbsp;&nbsp;}
+
+3436 }
+
+3437 /* ------------------------- */ 
+
+
+
+===Param===
+:(stime = 25.)
+:(time in r0-r1)
+:<b>sys stime</b>

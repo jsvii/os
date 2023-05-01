@@ -1,0 +1,90 @@
+===Source===
+<div class = "wikiheadnote">
+*将指定缓存块中的内容写回设备
+*共传入一个参数 bp
+**bp : [[code:struct buf|struct buf]]结构，是 欲写入缓存块的控制结构
+</div>
+<div class = "wikicode">
+4804
+<br/>
+4805 &nbsp;&nbsp;&nbsp;&nbsp;/*
+<br/>
+4806 &nbsp;&nbsp;&nbsp;&nbsp;* Write the buffer, waiting for completion.
+<br/>
+4807 &nbsp;&nbsp;&nbsp;&nbsp;* The release the buffer.
+<br/>
+4808 &nbsp;&nbsp;&nbsp;&nbsp;*/
+<br/>
+4809 &nbsp;&nbsp;&nbsp;&nbsp;bwrite(bp)
+<br/>
+4810 &nbsp;&nbsp;&nbsp;&nbsp;[[code:struct buf|struct buf]] *bp;
+<br/>
+4811 &nbsp;&nbsp;&nbsp;&nbsp;{
+<br/>
+4812 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct buf|struct buf]] *rbp;
+<br/>
+4813 &nbsp;&nbsp;&nbsp;&nbsp;register flag;
+<br/>
+4814
+<br/>
+4815 &nbsp;&nbsp;&nbsp;&nbsp;rbp = bp;
+<br/>
+4816 &nbsp;&nbsp;&nbsp;&nbsp;flag = rbp->b_flags;
+<br/>
+4817 &nbsp;&nbsp;&nbsp;&nbsp;rbp->b_flags<nowiki> =& ~(B_READ | B_DONE | B_ERROR | B_DELWRI); </nowiki>
+<br/>
+4818 &nbsp;&nbsp;&nbsp;&nbsp;rbp->b_wcount = -256;
+<br/>
+<blockquote>
+*清 B_READ B_DONE B_ERROR B_DELWRI 标志
+*将传输字节数 设置为512字节，计数寄存器要求传入补码，-256 = 512的补码
+</blockquote>
+4819 &nbsp;&nbsp;&nbsp;&nbsp;(*[[code:bdevsw|bdevsw]][rbp->b_dev[[skill:.d_major|.d_major]] ].d_strategy)(rbp);
+
+<blockquote>
+*启动 设备驱动函数 处理此缓存块
+**将缓存块置入 [[设备I/O队列]]
+**启动设备
+</blockquote>
+4820 &nbsp;&nbsp;&nbsp;&nbsp;if ((flag&B_ASYNC) == 0) {
+<br/>
+4821 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iowait|iowait]](rbp);
+<br/>
+4822 &nbsp;&nbsp;&nbsp;&nbsp;[[code:brelse|brelse]](rbp);
+<br/>
+<blockquote>
+*当没有异步写标志时,表明该次为同步写
+*等待该次写操作I/O完成
+*释放该缓存快
+</blockquote>
+4823 &nbsp;&nbsp;&nbsp;&nbsp;} else if ((flag&B_DELWRI)==0)
+<br/>
+4824 &nbsp;&nbsp;&nbsp;&nbsp;[[code:geterror|geterror]](rbp);
+<br/>
+<blockquote>
+*若有异步写(B_ASYNC)标志,则不用等待该次I/O完成
+**当无延迟写(B_DELWRI)标志时,表明该缓存块只有当前进程修改过,[[code:geterror|geterror]]将错误信息传给[[code:user|user]]结构，返回给用户
+**当有延迟写(B_DELWRI)标志时,表明该缓存块可能被多个进程修改过.若出错则无法判断是哪个进程出错
+若调用[[code:geterror|geterror]]则只向现行进程报错,会产生歧义.
+对于这种情况，索性就不报错
+</blockquote>
+4825 &nbsp;&nbsp;&nbsp;&nbsp;}
+<br/>
+4826 &nbsp;&nbsp;&nbsp;&nbsp;/* -------------------------*/
+<br/>
+</div>
+===Extend===
+=附图=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_bwrite_1.png"/></p>
+
+===Ref===
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:exit]]
+*[[code:bawrite]]
+*[[code:getblk]]
+*[[code:bflush]]
+*[[code:free]]
+*[[code:update]]
+*[[code:iupdat]]

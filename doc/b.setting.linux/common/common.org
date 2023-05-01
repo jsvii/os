@@ -1,0 +1,18 @@
+* 通用设置
+
+  本文是一些基础设置的文档，为的是打造最佳的linux使用经验。
+
+
+** ~pcspkr~ 模块的关闭
+
+~/etc/modprobe.d/blacklist.conf~ 将 ~pcspkr~ 模块关闭
+
+#+BEGIN_SRC bash
+blacklist pcspkr
+#+END_SRC bash
+
+
+** toollist
+
+
+   sdkman

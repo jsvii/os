@@ -1,0 +1,137 @@
+===Source===
+<div class="wikiheadnote">
+*从指定设备，读取块并预读块
+*共传入三个参数 adev blkno rablkno
+**adev : 指定设备号
+**blkno : 读取块的块号
+**rablkno : 预读块的块号
+</div>
+
+4768 
+
+4769 /* 
+
+4770 &nbsp;* Read in the block, like bread, but also start I/O on the 
+
+4771 &nbsp;* read-ahead block (which is not allocated to the caller) 
+
+4772 &nbsp;*/ 
+
+4773 breada(adev, blkno, rablkno) 
+
+4774 { 
+
+4775 &nbsp;&nbsp;&nbsp;&nbsp;register [[code:struct buf|struct buf]] *rbp, *rabp; 
+
+4776 &nbsp;&nbsp;&nbsp;&nbsp;register int dev; 
+
+4777 
+
+4778 &nbsp;&nbsp;&nbsp;&nbsp;dev = adev; 
+
+4779 &nbsp;&nbsp;&nbsp;&nbsp;rbp = 0; 
+
+4780 &nbsp;&nbsp;&nbsp;&nbsp;if (![[code:incore|incore]](dev, blkno)) { 
+
+4781 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rbp = [[code:getblk|getblk]](dev, blkno); 
+
+<blockquote>
+*在指定设备的[[设备队列]]中 查找匹配 blkno 的缓存块 （[[code:incore|incore]])
+*如找不到，则调用 [[code:getblk|getblk]] 申请可用缓存块
+</blockquote>
+4782 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if ((rbp->b_flags&B_DONE) == 0) { 
+
+<blockquote>
+*此处参看 [[code:breada#讨论|讨论]]
+</blockquote>
+4783 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   rbp->b_flags <nowiki>=| </nowiki>B_READ; 
+
+4784 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   rbp->b_wcount = -256; 
+
+4785 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   (*[[code:bdevsw|bdevsw]][adev[[skill:.d_major|.d_major]] ].d_strategy)(rbp); 
+
+<blockquote>
+*置 B_READ 标志，置传输字节数
+*启动 设备驱动进行I/O
+*在此不等待I/O结束，而是在函数末尾调用 [[code:iowait|iowait]]等待I/O，以提高效率
+</blockquote>
+4786 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+4787 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*以下进行预读块处理
+</blockquote>
+4788 &nbsp;&nbsp;&nbsp;&nbsp;if (rablkno && ![[code:incore|incore]](dev, rablkno)) { 
+
+4789 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rabp = [[code:getblk|getblk]](dev, rablkno); 
+
+<blockquote>
+*在指定设备的[[设备队列]]中 查找匹配 rablkno 的缓存块 （[[code:incore|incore]])
+*如找不到，则调用 [[code:getblk|getblk]] 申请可用缓存块
+</blockquote>
+4790 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if (rabp->b_flags & B_DONE) 
+
+4791 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   [[code:brelse|brelse]](rabp); 
+
+<blockquote>
+*此处参看 [[code:breada#讨论|讨论]]
+</blockquote>
+4792 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;else { 
+
+4793 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   rabp->b_flags <nowiki>=|B_READ|B_ASYNC;</nowiki> 
+
+4794 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   rabp->b_wcount = -256; 
+
+4795 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;   (*[[code:bdevsw|bdevsw]][adev[[skill:.d_major|.d_major]] ].d_strategy)(rabp); 
+
+4796 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+<blockquote>
+*置 B_READ B_ASYNC 标志，置传输字节数
+*启动 设备驱动进行异步I/O
+*由于预读块是异步I/O,在此不等待I/O结束
+</blockquote>
+4797 &nbsp;&nbsp;&nbsp;&nbsp;} 
+
+4798 &nbsp;&nbsp;&nbsp;&nbsp;if (rbp==0) 
+
+4799 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return([[code:bread|bread]](dev, blkno)); 
+
+<blockquote>
+*若rbp == 0 ,说明直接从 指定设备[[设备队列]]中找到了读取块的缓存
+*调用[[code:bread|bread]]读出此缓存
+</blockquote>
+4800 &nbsp;&nbsp;&nbsp;&nbsp;[[code:iowait|iowait]](rbp); 
+
+4801 &nbsp;&nbsp;&nbsp;&nbsp;return(rbp); 
+
+<blockquote>
+*否则，等待读取块 I/O结束，返回块缓存
+</blockquote>
+4802 } 
+
+4803 /* ------------------------- */ 
+
+
+
+===Extend===
+=讨论=
+*以下是关于4782行，4790 - 4791行的讨论
+*以4782行为例
+:4780行调用[[code:incore|incore]]，已经完成了[[code:getblk|getblk]]中查找现成缓存块的工作(4937 - 4950)
+:所以4781调用[[code:getblk|getblk]]的作用仅是申请缓存块
+:那么4782的判断显得有些多余，因为申请的缓存块不可能置B_DONE标志
+:4790 - 4791行结论类似
+*第二种观点认为
+:[[code:incore|incore]]和 [[code:getblk|getblk]]之间可能存在 I/O中断（比如I/O完成），释放了缓存块，所以才由4782进行判断
+:但这种可能性存在可能性很小，比起每次都进行4782的判断，显得开销入不敷出
+*此处被列入[[遗留问题]]
+=附图=
+<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_breada.png"/></p>
+
+===Ref===
+*[[设备缓存管理]]
+
+===Caller===
+*[[code:readi]]
