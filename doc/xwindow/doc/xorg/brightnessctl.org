@@ -1,5 +1,0 @@
-* brightnessctl
-
-255为100%的亮度。
-
-brightnessctl set 255

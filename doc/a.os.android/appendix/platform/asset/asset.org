@@ -1,3 +1,0 @@
-* assets
-
-https://github.com/AndroidSDKSources/android-sdk-sources-for-api-level-28.git

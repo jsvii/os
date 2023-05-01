@@ -1,7 +1,0 @@
-* Hyper V 上支持Android emulator
-
-The solution (if you do not want to disable Hyper-V) is to use Microsoft’s Android emulator, which is a free download here.
-
-In order to use this with Android Studio, you need to run the emulator first. Then, in Android Studio, go to Run > Edit Configurations... and select Show Device Chooser Dialog under Deployment Target Options.
-
-Run your project, and select the VS Emulator, ignoring the invitation to “Turn off Hyper-V”.

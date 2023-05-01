@@ -1,1 +1,0 @@
-https://sourceware.org/gdb/wiki/GDB%20Front%20Ends

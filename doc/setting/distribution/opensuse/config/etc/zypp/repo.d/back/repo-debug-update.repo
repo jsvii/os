@@ -1,8 +1,0 @@
-[repo-debug-update]
-name=openSUSE-Leap-15.0-Update-Debug
-enabled=0
-autorefresh=1
-baseurl=http://download.opensuse.org/debug/update/leap/15.0/oss/
-path=/
-type=NONE
-keeppackages=0

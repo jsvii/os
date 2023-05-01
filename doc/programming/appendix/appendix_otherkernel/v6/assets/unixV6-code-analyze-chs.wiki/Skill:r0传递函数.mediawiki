@@ -1,8 +1,0 @@
-UNIX源代码 在 中断处理(尤其中断入口)时，经常使用R0来传递函数指针<br/>
-举例 说明
-<div class="wikicode">
-0558 klin: [[pdp11:JSR|jsr]] r0,[[code:call|call]]; _[[code:klrint|klrint]]
-</div>
-<p>指令执行前后对比<br/><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/R0_pass_ptr_func.png"/></p>
-*指令执行后，PC转入call1运行，而R0保存了256，可在call1中使用 *R0 得到_klrint 的函数入口
-*总体上，借用R0传递了函数指针

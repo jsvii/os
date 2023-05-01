@@ -1,9 +1,0 @@
-内存映射文件 是 一种特殊的设备装载文件
-*允许直接读取内存内容
-*驱动函数 ([[code:cdevsw|cdevsw]])
-**读函数 [[code:mmread|mmread]]
-**写函数 [[code:mmwrite|mmwrite]]
-*从设备号 定义
-**0 内存
-**1 核心态内存
-**2 "无底洞"模式

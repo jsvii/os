@@ -1,5 +1,0 @@
-[repo-150-oss]
-enabled=1
-autorefresh=1
-baseurl=https://mirrors.163.com/openSUSE/distribution/leap/15.0/repo/oss
-type=rpm-md

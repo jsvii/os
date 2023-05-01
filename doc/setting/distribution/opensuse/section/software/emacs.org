@@ -1,3 +1,0 @@
-* emacs
-
-查看git repo: emacs中的信息

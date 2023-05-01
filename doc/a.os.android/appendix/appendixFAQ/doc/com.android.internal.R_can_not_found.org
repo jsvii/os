@@ -1,5 +1,0 @@
-* com.android.internal.R
-
-com.android.internal.R.bool.config_useMasterVolume这个资源在什么地方呢？
-
-根据com.android.internal.R中internal猜想此配置文件应该是个系统配置，果然在out/target/common/R/com/android/internal/R.Java中找到了该资源文件，该资源文件是由frameworks/base/core/res/res下编译生成的。

@@ -1,8 +1,0 @@
-* BlockIO　Quiz
-
-
-** bdevsw的数量没有指定，在哪里初始化的
-
-** bdevsw结构体d_tab为什么是指针，感觉就可以是devtab
-
-1. 是为了省略空间么？

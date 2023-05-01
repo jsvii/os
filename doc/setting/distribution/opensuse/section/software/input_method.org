@@ -1,9 +1,0 @@
-* 输入法
-
-** fcitx
-
-参考 =./fcitx.org=
-
-** ibus
-
-参考 =./ibus.org=

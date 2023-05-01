@@ -1,4 +1,0 @@
-*参看 [[中断]]
-*主要由 硬件保护 和 [[code:call|call]]/[[code:call1|call1]] 两部分进行现场保护
-*保护的结构如下
-<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_0751_stack_2.png"/></p>

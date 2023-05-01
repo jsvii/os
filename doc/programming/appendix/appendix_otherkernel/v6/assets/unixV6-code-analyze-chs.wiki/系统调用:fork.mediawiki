@@ -1,8 +1,0 @@
-=父/子进程执行路径=
-*fork 编译代码 和 运行路径 如下图
-<p><img src="http://ikarishinjieva.github.io/unixV6-code-analyze-chs/images/Code_fork_path.png"/></p>
-*父进程 运行 跳过 clr r0，不清除 返回值
-*子进程 运行 清除 返回值
-*故，子进程 fork()返回0，而父进程fork()返回子进程进程号
-=源代码=
-*[[code:fork|fork]]

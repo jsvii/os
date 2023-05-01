@@ -1,7 +1,0 @@
-* 好的软件
-
-  - git, TortoiseGit
-
-  - zeal　一个API管理工具
-
-  - workrave

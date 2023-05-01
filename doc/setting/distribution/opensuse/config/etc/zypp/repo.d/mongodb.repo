@@ -1,6 +1,0 @@
-[mongodb]
-enabled=1
-autorefresh=0
-baseurl=https://repo.mongodb.org/zypper/suse/15/mongodb-org/4.2/x86_64/
-type=rpm-md
-gpgcheck=1

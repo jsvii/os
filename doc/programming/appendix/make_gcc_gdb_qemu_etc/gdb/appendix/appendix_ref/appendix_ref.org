@@ -1,3 +1,0 @@
-* ref
-
-https://sourceware.org/gdb/wiki/Internals

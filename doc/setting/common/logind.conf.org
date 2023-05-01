@@ -1,3 +1,0 @@
-* 电脑会自动休眠
-
-修改文件 =/etc/systemd/logind.conf= 将 =HandleLidSwitch=ignore=

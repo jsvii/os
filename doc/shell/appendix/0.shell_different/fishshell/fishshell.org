@@ -1,4 +1,0 @@
-* fishshell
-
-
-http://fishshell.com/

@@ -1,6 +1,0 @@
-* asdf
-
-#+BEGIN_SRC bash
-asdf plugin add nodejs
-asdf install nodejs 14.10.1
-#+END_SRC

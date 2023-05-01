@@ -1,5 +1,0 @@
-# git ignore no suffix files
-*
-!/**/
-!*.*
-*.out

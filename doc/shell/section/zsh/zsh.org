@@ -1,7 +1,0 @@
-* zsh
-
-- zinit https://github.com/zdharma/zinit
-
-- p10k https://github.com/romkatv/powerlevel10k
-
-- sdkman https://sdkman.io/

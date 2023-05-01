@@ -1,3 +1,0 @@
-* ref
-
-https://wangchujiang.com/linux-command/c/firewall-cmd.html

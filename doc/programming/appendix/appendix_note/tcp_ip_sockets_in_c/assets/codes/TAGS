@@ -1,198 +1,0 @@
-
-TCPEchoClient4.c,17
-int main(11,197
-
-Practical.h,97
-#define PRACTICAL_H_2,21
-enum sizeConstants 25,846
-  MAXSTRINGLENGTH 26,867
-  BUFSIZE 27,892
-
-DieWithMessage.c,64
-void DieWithUserMessage(4,40
-void DieWithSystemMessage(12,210
-
-TCPEchoServer4.c,53
-static const int MAXPENDING 10,177
-int main(12,254
-
-TCPServerUtility.c,131
-static const int MAXPENDING 8,130
-int SetupTCPServerSocket(10,207
-int AcceptTCPConnection(57,2058
-void HandleTCPClient(76,2625
-
-TCPEchoServer6.c,53
-static const int MAXPENDING 10,177
-int main(12,254
-
-GetAddrInfo.c,16
-int main(7,102
-
-AddressUtility.c,59
-void PrintSocketAddress(6,84
-bool SockAddrsEqual(40,1276
-
-TCPClientUtility.c,32
-int SetupTCPClientSocket(8,130
-
-TCPEchoClient.c,17
-int main(10,169
-
-TCPEchoServer.c,15
-int main(5,63
-
-UDPEchoClient.c,16
-int main(9,146
-
-UDPEchoServer.c,16
-int main(8,130
-
-TestSizes.c,15
-int main(5,60
-
-BruteForceCoding.c,317
-const uint8_t val8 7,103
-const uint16_t val16 8,152
-const uint32_t val32 9,206
-const uint64_t val64 10,271
-const int MESSAGELENGTH 11,334
-static char stringBuf[stringBuf14,439
-char *BytesToDecString(BytesToDecString15,471
-int EncodeIntBigEndian(27,844
-uint64_t DecodeIntBigEndian(35,1106
-int main(43,1296
-
-VoteClientTCP.c,17
-int main(16,304
-
-VoteProtocol.h,207
-struct VoteInfo 1,0
-  uint64_t count;2,18
-  int candidate;3,76
-  bool isInquiry;4,142
-  bool isResponse;5,160
-typedef struct VoteInfo VoteInfo;8,183
-    MAX_CANDIDATE 11,225
-    MAX_WIRE_SIZE 12,251
-
-VoteServerTCP.c,55
-static uint64_t counts[counts14,262
-int main(16,306
-
-DelimFramer.c,77
-static const char DELIMITER 6,83
-int GetNextMsg(17,600
-int PutMsg(42,1247
-
-LengthFramer.c,43
-int GetNextMsg(15,519
-int PutMsg(42,1337
-
-VoteEncodingText.c,277
-static const char *MAGIC MAGIC14,287
-static const char *VOTESTR VOTESTR15,324
-static const char *INQSTR INQSTR16,358
-static const char *RESPONSESTR RESPONSESTR17,391
-static const char *DELIMSTR DELIMSTR18,429
-  BASE 20,471
-size_t Encode(27,667
-bool Decode(44,1205
-
-VoteEncodingBin.c,388
-  REQUEST_SIZE 27,867
-  RESPONSE_SIZE 28,887
-  COUNT_SHIFT 29,909
-  INQUIRE_FLAG 30,929
-  RESPONSE_FLAG 31,954
-  MAGIC 32,980
-  MAGIC_MASK 33,998
-typedef struct voteMsgBin voteMsgBin;36,1024
-struct voteMsgBin 38,1063
-  uint16_t header;39,1083
-  uint16_t candidateID;40,1102
-  uint32_t countHigh;41,1126
-  uint32_t countLow;42,1148
-size_t Encode(45,1173
-bool Decode(70,1995
-
-SigAction.c,52
-int main(9,187
-void InterruptSignalHandler(29,790
-
-UDPEchoServer-SIGIO.c,91
-int servSock;17,366
-int main(19,420
-void UseIdleTime(78,2622
-void SIGIOHandler(83,2696
-
-UDPEchoClient-Timeout.c,160
-static const unsigned int TIMEOUT_SECS 12,209
-static const unsigned int MAXTRIES 13,284
-unsigned int tries 15,355
-int main(19,492
-void CatchAlarm(105,3903
-
-TCPEchoServer-Fork.c,16
-int main(7,105
-
-TCPEchoServer-Thread.c,103
-struct ThreadArgs 10,213
-  int clntSock;11,233
-int main(14,285
-void *ThreadMain(ThreadMain43,1302
-
-TCPEchoServer-ForkN.c,41
-int main(8,132
-void ProcessMain(34,954
-
-TCPEchoServer-Select.c,16
-int main(9,145
-
-BroadcastSender.c,77
-static const char *IN6ADDR_ALLNODES IN6ADDR_ALLNODES9,150
-int main(11,224
-
-MulticastSender.c,16
-int main(7,103
-
-MulticastReceiver.c,16
-int main(7,103
-
-PracticalSocket.h,878
-#define __PRACTICALSOCKET_INCLUDED__21,844
-typedef int socklen_t;27,994
-typedef char raw_type;28,1017
-typedef unsigned int uint32_t;31,1160
-typedef unsigned short in_port_t;32,1191
-typedef void raw_type;40,1557
-class SocketException 51,1783
-class SocketAddress 72,2405
-  enum AddressType 75,2477
-  enum AddressType { TCP_SOCKET,75,2477
-  enum AddressType { TCP_SOCKET, TCP_SERVER,75,2477
-  enum AddressType { TCP_SOCKET, TCP_SERVER, UDP_SOCKET 75,2477
-  sockaddr *getSockaddr(getSockaddr100,3633
-  socklen_t getSockaddrLen(105,3779
-  sockaddr_storage addr;125,4626
-  socklen_t addrLen;128,4697
-class Socket 131,4722
-  int sockDesc;168,6121
-class CommunicatingSocket 182,6508
-class TCPSocket 226,8320
-  std::iostream *myStream;myStream273,9856
-  std::streambuf *myStreambuf;myStreambuf276,9927
-class TCPServerSocket 282,10004
-class UDPSocket 320,11157
-
-SurveyCommon.h,181
-#define __SURVEYCOMMON_H__2,27
-const in_port_t SURVEY_PORT 9,166
-void sendInt(12,257
-struct Question 25,813
-  std::string qText;26,831
-  std::vector<std::string> rList;27,896
-
-VoteEncoding.h,0
-
-Framer.h,0

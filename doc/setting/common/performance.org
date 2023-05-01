@@ -1,5 +1,0 @@
-** 用圆周率来测试电脑性能
-
-#+BEGIN_SRC bash
-time echo "scale=10000; 4*a(1)" | bc -l -q
-#+END_SRC

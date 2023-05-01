@@ -1,4 +1,0 @@
-* NetworkManager
-
-
-Network Initscript vs NetworkManager

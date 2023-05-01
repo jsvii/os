@@ -1,4 +1,0 @@
-* android 设置
-
-
-sdk.dir=/Users/user/Path/To/Android/sdk

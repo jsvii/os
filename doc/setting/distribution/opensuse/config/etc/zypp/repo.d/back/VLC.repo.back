@@ -1,5 +1,0 @@
-[VLC]
-enabled=1
-autorefresh=1
-baseurl=https://download.videolan.org/pub/vlc/SuSE/Leap_15.0/
-type=rpm-md

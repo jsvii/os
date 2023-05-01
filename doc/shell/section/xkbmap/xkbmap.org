@@ -1,7 +1,0 @@
-* xkbmap.org
-
-
-#+BEGIN_SRC bash
-/usr/bin/setxkbmap -option "ctrl:nocaps"
-/usr/bin/setxkbmap -option "altwin:swap_alt_win"
-#+END_SRC

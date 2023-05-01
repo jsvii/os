@@ -1,5 +1,0 @@
-* schdule
-
-** 定时任务
-
-  - 定时关闭centos

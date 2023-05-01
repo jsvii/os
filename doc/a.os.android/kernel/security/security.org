@@ -1,5 +1,0 @@
-#+TITLE: android安全
-
-1、 ID用在App和组成员上
-
-1. 4.4版本启动SELinux MAC 强制访问控制

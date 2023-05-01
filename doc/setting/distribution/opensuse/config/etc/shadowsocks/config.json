@@ -1,9 +1,0 @@
-{
-	"server": "104.224.134.210",
-	"server_port": 443,
-	"local_address": "0.0.0.0",
-	"local_port": 1086,
-	"password": "pqUzzDJxmy",
-	"timeout": 300,
-	"workers": 4
-}

@@ -1,3 +1,0 @@
-*SW 定义在 [[file:param.h|param.h]] 中的 0166 行，值为0177570
-*SW 表示寄存器Console Switch Register<br/>描述在 The PDP11-40 Processor Handbook ([[参考文献]]) 8-2<br/>并未理解其含义
-*SW->integ 用法使用了 [[编程技巧#直接取地址数据|直接取地址数据]]

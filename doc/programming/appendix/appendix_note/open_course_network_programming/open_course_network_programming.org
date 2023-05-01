@@ -1,3 +1,0 @@
-* Bilibili上的公开课
-
-https://github.com/834810071/NetworkProgramming.git
