@@ -1,6 +1,13 @@
 * crond
 
+** 文件位置
+
+~/var/spool/cron/crontabs~
+
+
 ** command
+
+sudo crontab -e
 
 #+BEGIN_SRC bash
 # For details see man 4 crontabs
@@ -27,4 +34,5 @@ HOME=/                              <==默认此 shell 的家目录所在
 02  4  *  *  *   root      run-parts /etc/cron.daily    <==每天
 22  4  *  *  0   root      run-parts /etc/cron.weekly   <==每周日
 42  4  1  *  *   root      run-parts /etc/cron.monthly  <==每个月 1 号
+42  4  *  *  0-5   root      run-parts /etc/cron.monthly  <==每周日至周5
 #+END_SRC

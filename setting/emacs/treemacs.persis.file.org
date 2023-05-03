@@ -17,6 +17,8 @@
  - path :: ~/workspace/leo/sqlite-internal
 ** ccl
  - path :: ~/workspace/github/lisp.commonlisp/ccl
+** nginx1.25-commentary
+ - path :: ~/workspace/leo/nginx1.25-commentary
 * Literature
 ** todo-now
  - path :: ~/workspace/leo/todo-now
