@@ -1,0 +1,9 @@
+* mhwk-kernel
+
+** manjaro kernel
+
+#+BEGIN_SRC bash
+mhwk-kernel -li
+#+END_SRC
+
+list kernel

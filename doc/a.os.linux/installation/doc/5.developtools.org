@@ -8,10 +8,12 @@ sudo pacman -Sy base-devel
 
 ** Dev Tools
 
+#+BEGIN_SRC bash
 pacman -S the_silver_searcher
 pacman -S fzf
 
 git clone https://github.com/wting/autojump.git
+#+END_SRC
 
 *** google-chrome
 
