@@ -1,0 +1,34 @@
+* hardware
+
+** keyboard
+
+** display
+
+.Xresources 文件
+
+#+BEGIN_SRC conf
+Xft.dpi: 144
+! These might also be useful depending on your monitor and personal preference:
+Xft.autohint: 0
+Xft.lcdfilter:  lcddefault
+Xft.hintstyle:  hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
+#+END_SRC
+
+Xft.dpi 的值设置为 96 乘以需要缩放的比例即可，比如 2K 屏幕需要缩放 1.5 倍，就是 96 X 1.5 = 144 , 如果需要缩放 2 倍，就设置为 192 即可。
+1440p的dpi 120 （120%） 144（150%）
+
+~.xinitrc~ 文件中加入一行新功能
+
+#+BEGIN_SRC conf
+xrdb -merge ~/.Xresources
+#+END_SRC
+
+
+https://linuxreviews.org/HOWTO_set_DPI_in_Xorg
+
+鼠标的DPI是每英寸点数,也就是鼠标每移动一英寸指针在屏幕上移动的点数。
+
+联想小新参数

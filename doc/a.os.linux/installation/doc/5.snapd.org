@@ -1,0 +1,24 @@
+* snapd
+
+snap install
+#+BEGIN_SRC bash
+git clone https://aur.archlinux.org/snapd.git
+
+makepkg -si
+
+sudo systemctl enable --now snapd.socket
+
+sudo ln -s /var/lib/snapd/snap /snap
+#+END_SRCX
+
+snapcraft.io
+
+#+BEGIN_SRC bash
+sudo snap install thunderbird
+
+# sublime
+sudo snap install sublime-text --classic
+
+# vscode
+sudo snap install code --classic
+#+END_SRC

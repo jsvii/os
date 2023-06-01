@@ -1,0 +1,5 @@
+mhwd-kernel -i linux63
+
+mhwd-kernel -li 列出已经安装的
+
+mhwd-kernel -l 列出可以安装的kernel

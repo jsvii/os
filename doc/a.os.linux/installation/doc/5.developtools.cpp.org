@@ -1,0 +1,39 @@
+* codelite
+
+pacman -Sy sqlite3 zlib hunspell libssh pcre2
+
+
+https://docs.codelite.org/build/build_from_sources/
+
+#+BEGIN_SRC bash
+# download wxWidgets 3.2.0 & extract it
+wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.0/wxWidgets-3.2.0.tar.bz2
+bzip2 -d wxWidgets-3.2.0.tar.bz2
+tar xvf wxWidgets-3.2.0.tar.bz2
+
+# build and install it
+cd wxWidgets-3.2.0
+mkdir -p build-release
+cd build-release
+../configure --disable-debug_flag --with-gtk=3 --enable-stl
+make -j$(nproc) && sudo make install
+#+END_SRC
+
+
+cd build-release
+../configure --disable-debug_flag --with-gtk=3 --enable-stl
+make -j$(nproc) && sudo make install
+
+cd wxWidgets
+
+git submodules update --init
+
+git clone https://github.com/eranif/codelite.git
+
+#
+mkdir build-release
+cd build-release
+cmake -DCMAKE_BUILD_TYPE=Release .. -DCOPY_WX_LIBS=1 -DWITH_NATIVEBOOK=1
+
+
+1. WITH_NATIVEBOOK user cutomer theme, ref to https://github.com/eranif/codelite/issues/2804

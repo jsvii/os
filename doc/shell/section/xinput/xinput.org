@@ -1,0 +1,21 @@
+* xinput
+
+#+BEGIN_SRC bash
+> xinput list
+xinput list
+⎡ Virtual core pointer                          id=2	[master pointer  (3)]
+⎜   ↳ Virtual core XTEST pointer                id=4	[slave  pointer  (2)]
+⎜   ↳ ASUE140D:00 04F3:31B9 Mouse               id=9	[slave  pointer  (2)]
+⎜   ↳ ASUE140D:00 04F3:31B9 Touchpad            id=10	[slave  pointer  (2)]
+⎣ Virtual core keyboard                         id=3	[master keyboard (2)]
+    ↳ Virtual core XTEST keyboard               id=5	[slave  keyboard (3)]
+    ↳ Video Bus                                 id=6	[slave  keyboard (3)]
+    ↳ Power Button                              id=7	[slave  keyboard (3)]
+    ↳ USB2.0 HD UVC WebCam: USB2.0 HD           id=8	[slave  keyboard (3)]
+    ↳ ASUE140D:00 04F3:31B9 Keyboard            id=11	[slave  keyboard (3)]
+    ↳ Asus WMI hotkeys                          id=12	[slave  keyboard (3)]
+    ↳ AT Translated Set 2 keyboard              id=13	[slave  keyboard (3)]
+
+## disable touchpad
+> xinput disable 10
+#+END_SRC
