@@ -1,0 +1,29 @@
+fc-list
+
+This program follows the usual GNU command line syntax, with long options starting with two dashes ('-'). A summary of options is included below.
+
+- -v
+Print verbose output of the whole font pattern for each match, or elements if any is provided.
+
+- -f Format output according to the format specifier format.
+
+- -V Show version of the program and exit.
+
+- ~-h~ Show summary of options.
+
+- ~pattern~ If this argument is set, only fonts matching pattern are displayed.
+
+- ~element~ If set, the element property is displayed for matching fonts.
+
+** Examples
+fc-list
+
+Lists all font faces.
+
+fc-list :lang=hi
+
+Lists font faces that cover Hindi.
+
+fc-list : family style file spacing
+
+Lists the filename and spacing value for each font face. '':'' is an empty pattern that matches all fonts.

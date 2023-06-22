@@ -1,0 +1,28 @@
+* fc-cache
+
+The fc-cache command in Linux scans the font directories and build font cache for applications which use fontconfig for their font handling. When no arguments are passed fc-cache scans each directory for font files readable by FreeType. A cache is created which contains properties of each font and the associated file name, this cache is further used to speed up application when using fontconfig library during boot.
+
+
+
+-f
+Force re-generation of apparently up-to-date cache files, overriding the timestamp checking.
+
+-s
+
+Only scan system-wide directories, omitting the places located in the user's home directory.
+
+-v
+
+Display status information while busy.
+
+-h
+
+Show summary of options.
+
+-V
+
+Show version of the program and exit.
+
+dir
+
+Directory to scan for fonts.
