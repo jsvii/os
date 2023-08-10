@@ -1,5 +1,16 @@
 * ntp
 
+** 用法
+
+#+BEGIN_SRC bash
+sudo su
+ntpdate -vd cn.pool.ntp.org
+ntpdate -vd time.windows.com
+
+# hardware clock write
+hwclock -w
+#+END_SRC
+
 ** 123端口被封
 
 ntp走的是UDP协议123端口，公司的CMD-CCD网络中被限制
