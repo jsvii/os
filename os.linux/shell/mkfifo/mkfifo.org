@@ -1,0 +1,7 @@
+* mkfifo
+
+#+BEGIN_SRC shell
+mkfifo backpipe
+
+curl www.google.om > backpipe
+#+END_SRC

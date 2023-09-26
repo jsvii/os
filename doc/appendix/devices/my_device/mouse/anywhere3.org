@@ -1,0 +1,7 @@
+* anywhere3
+
+pair 时务必按一下 前进键，否则无法配对
+
+#+BEG_SRC bash
+bluetoothctl pair CF:FB:48:99:A6:F4
+#+END_SRC

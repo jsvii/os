@@ -1,0 +1,15 @@
+* bluetoothctl
+
+
+#+BEGIN_SRC bash
+bluetoothctl power on
+
+#扫描设备
+bluetoothctl scan on
+
+bluetoothctl pair CF:FB:48:99:A6:F4
+
+bluetoothctl connect CF:FB:48:99:A6:F4
+
+bluetoothctl devices
+#+END_SRC

@@ -1,0 +1,7 @@
+* golden
+
+https://aur.archlinux.org/goldendict.git
+
+https://downloads.freedict.com
+
+http://louischeung.top:225
