@@ -1,6 +1,6 @@
-# /Users/leo/.config/tmuxinator/workspace.yml
+# /workspace/leo/os/software.setting/tmuxinator/workspace.yml
 
-name: desk
+name: workspace
 root: ~/
 
 # Optional tmux socket
@@ -53,3 +53,7 @@ windows:
      layout: main-vertical
      panes:
        - cd /home/leo/workspace/leo/os
+  - .emacs.d:
+     layout: main-vertical
+     panes:
+       - cd /home/leo/.emacs.d

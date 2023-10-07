@@ -13,3 +13,15 @@ bluetoothctl connect CF:FB:48:99:A6:F4
 
 bluetoothctl devices
 #+END_SRC
+
+
+** /etc/tlp.conf
+
+#+BEGIN_SRC bash
+  # 2. /etc/tlp.d/*.conf - Drop-in customization snippets
+  # 3. /etc/tlp.conf     - User configuration (this file)
+
+# Restore radio device state (Bluetooth, WiFi, WWAN) from previous shutdown
+RESTORE_DEVICE_STATE_ON_STARTUP=1
+
+#+END_SRC
