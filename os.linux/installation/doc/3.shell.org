@@ -4,6 +4,8 @@
 
 #+BEGIN_SRC bash
 pacman -S tmux
+
+pacman -S fzf
 # ruby
 pacman -S ruby
 
@@ -22,9 +24,11 @@ export PATH=$HOME/.local/share/gem/ruby/3.0.0/bin:$PATH
 
 ** oh-my-zsh
 
-
-
 #+BEGIN_SRC bash
+git clone https://github.com/ohmyzsh/ohmyzsh
+cd ohmyzsh
+./tools/install.sh
+
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
@@ -34,7 +38,7 @@ git clone https://github.com/gradle/gradle-completion.git ${ZSH_CUSTOM:-~/.oh-my
 git clone https://github.com/unixorn/fzf-zsh-plugin.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fzf-zsh-plugin
 #+END_SRC
 
-oh-myzsh-plugins
+~.zshrc~ update plugins
 
 #+BEGIN_SRC bash
 plugins=(git
@@ -63,7 +67,6 @@ $ ln -s -f .tmux/.tmux.conf
 $ cp .tmux/.tmux.conf.local .
 #+END_SRC
 
-
 #+BEGIN_SRC conf
 set -gu prefix2
 unbind C-a
@@ -72,29 +75,15 @@ set -g prefix 'C-\'
 bind 'C-\' send-prefix
 #+END_SRC
 
-
-
-** tmux tmuxinator, alacritty, zsh, oh-my-zsh
-
-manjaro
-
-oh-my-zsh
+** fonts
 
 #+BEGIN_SRC bash
-wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
-sh install.sh
-#+END_SRC
-
-#+BegiN_SRC bash
 https://github.com/ryanoasis/nerd-fonts
 
 https://github.com/adobe-fonts/source-code-pro
 
 https://github.com/romkatv/powerlevel10k
 #+END_SRC
-
-
-
 
 ** linux headers
 
@@ -112,18 +101,16 @@ sudo pacman -S linux-headers
 
 /usr/bin/setxkbmap -option "ctrl:nocaps"
 
-
+#+BEGIN_SRC
 # KEYBOARD CONFIGURATION FILE
-
 # Consult the keyboard(5) manual page.
 
 XKBMODEL="pc105"
 XKBLAYOUT="us"
 XKBVARIANT=""
 XKBOPTIONS="ctrl:swapcaps"
-
 BACKSPACE="guess"
-
+#+END_SRC
 
 ** xmonad
 

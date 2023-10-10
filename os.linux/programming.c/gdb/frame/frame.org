@@ -1,0 +1,13 @@
+* frame
+
+** info frame
+
+list genneral info about the frame(where things start in memory, etc.)
+
+** info args
+
+list arguments to the function
+
+** info locals
+
+list local variables stored in the frame
