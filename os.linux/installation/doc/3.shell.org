@@ -101,6 +101,7 @@ sudo pacman -S linux-headers
 
 /usr/bin/setxkbmap -option "ctrl:nocaps"
 
+~/etc/default/keyboard~
 #+BEGIN_SRC
 # KEYBOARD CONFIGURATION FILE
 # Consult the keyboard(5) manual page.

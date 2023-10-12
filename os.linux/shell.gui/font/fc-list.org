@@ -1,0 +1,24 @@
+* fc-list
+
+install
+
+~/usr/share/fonts~
+
+
+clear and regenerate font cache
+
+fc-cache -f -v
+
+** url
+
+https://nerdfonts.com/cheat-sheet
+
+
+** 推荐的nerd font
+
+1. hack
+
+字体格式较全，推荐使用
+
+
+1. FiraCode 没有mono bold italy 字体
