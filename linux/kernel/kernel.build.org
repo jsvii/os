@@ -1,16 +1,23 @@
+* build linux kernel
+
 https://forum.manjaro.org/t/howto-build-your-very-first-custom-kernel/47683
 
 To start, grab the Linux kernel source. Go ahead and head to kernel.org 329, and choose the kernel you want to compile. I’ll use the mainline kernel as an example, which is 5.11-rc2 at the time of writing this post. You can grab it with git clone or wget the download link to it if you want.
 
 Extract the archive:
 
+#+BEGIN_SRC bash
 bsdtar -xvf [kernel-archive-file]
+#+END_SRC
 
 Where, obviously you have to replace [kernel-archive-file] with the name of the compressed archive of the kernel.
 
 cd into the directory it was extracted in. And run the following if you want to use the config that came with your distro. (RECOMMENDED)
 
- zcat /proc/config.gz >> .config
+proc/config.gz 中包含了linux编译时的选项
+#+BEGIN_SRC bash
+zcat /proc/config.gz >> .config
+#+END_SRC
 
 If you want to configure some extra features with the stock config, run the following:
 
