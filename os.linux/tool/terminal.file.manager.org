@@ -1,0 +1,11 @@
+* file manager
+
+https://github.com/topics/file-manager
+
+https://arewesizelyet.com
+
+1. nnn
+
+1. vifm
+
+1. joshuto
