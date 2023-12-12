@@ -1,0 +1,15 @@
+* ~__attribute__~
+
+#+BEGIN_SRC c
+
+struct S {
+  short[3];
+} __attribute__ ((aligned)
+
+sizeof(S) // 8
+
+// short 是 2 byte ，所以short[3] 为6 bytes， 因为align，所以必须是2的次方，为8
+
+
+
+#+END_SRC

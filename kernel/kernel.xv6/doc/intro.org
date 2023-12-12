@@ -1,0 +1,20 @@
+* xv6
+
+1. 在多核处理器上运行 multi-core RISC-V microprocessor
+
+1. LP64 long 和 pointer 都是64位的, int 是32位的
+
+1.
+
+
+risc-v 三种模式
+
+- machine mode
+
+- supervisor mode
+
+- user mode
+
+
+
+- privileged architecture.

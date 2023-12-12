@@ -1,4 +1,3 @@
 #+TITLE: Linux操作系统
 
-
 1. setup 设置

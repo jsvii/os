@@ -1,0 +1,5 @@
+* unzip
+
+一些windows上的文件，在linux 下解压乱码，用unzip指定GBM
+
+unzip -O GBK xxx.zip

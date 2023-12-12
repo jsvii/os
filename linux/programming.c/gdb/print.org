@@ -1,0 +1,16 @@
+* print
+
+#+BEGIN_SRC bash
+p argv
+
+p *argv
+
+# 寄存器前加$
+p $eax
+
+#+END_SRC
+
+p/格式 变量
+
+- u
+- o

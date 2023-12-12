@@ -1,0 +1,17 @@
+* run riscv
+
+
+** requirement
+pacman -S qemu
+
+选择qemu all
+
+yay -S riscv64-linux-gnu-gcc
+
+yay -S gdb-multiarch
+
+** run
+
+make qemu-gdb
+
+gdb-multiarch kernel/kernel

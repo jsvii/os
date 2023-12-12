@@ -1,0 +1,11 @@
+* sway
+
+** chrome
+
+flag:  Prefer Ozone Platform
+
+Wayland
+
+** emacs
+
+sudo pacman -S emacs-wayland

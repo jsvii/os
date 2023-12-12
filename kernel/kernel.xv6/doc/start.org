@@ -1,0 +1,12 @@
+#+BEGIN_SRC c
+  unsigned long x = r_mstatus();
+  x &= ~MSTATUS_MPP_MASK;
+  x |= MSTATUS_MPP_S;
+  w_mstatus(x);
+#+END_SRC
+
+machine-mode
+
+supervisor-mode
+
+M 模式必须都实现

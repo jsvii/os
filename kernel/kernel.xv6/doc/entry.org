@@ -1,0 +1,81 @@
+* entry
+
+系统的启动处
+
+这些使用的是伪汇编指令，与riscv中最终的机器码还是有些区别的。
+
+#+BEGIN_SRC asm
+.section .text
+.global _entry
+_entry:
+        # set up a stack for C.
+        # stack0 is declared in start.c,
+        # with a 4096-byte stack per CPU.
+        # sp = stack0 + (hartid * 4096)
+        la sp, stack0      # load stack 0 到 sp
+        li a0, 1024*4      # a0 4096
+        csrr a1, mhartid   # control status register read
+        addi a1, a1, 1
+        mul a0, a0, a1
+        add sp, sp, a0
+        # jump to start() in start.c
+        call start
+spin:
+        j spin
+#+END_SRC
+
+#+BEGIN_SRC asm
+Disassembly of section .text:
+
+0000000080000000 <_entry>:
+    80000000:	00009117                auipc	sp,0x9
+    80000004:	a1010113                add	sp,sp,-1520 # 80008a10 <stack0>
+    80000008:	6505                    lui	a0,0x1
+    8000000a:	f14025f3                csrr	a1,mhartid
+    8000000e:	0585                    add	a1,a1,1
+    80000010:	02b50533                mul	a0,a0,a1
+    80000014:	912a                    add	sp,sp,a0
+    80000016:	076000ef                jal	8000008c <start>
+
+000000008000001a <spin>:
+    8000001a:	a001                    j	8000001a <spin>
+#+END_SRC
+
+#+BEGIN_SRC asm
+  la sp, stack0
+  # 翻译为
+  auipc sp, symbol[31:12];
+  addi sp, sp, symbol[11:0]
+
+    80000000:	00009117                auipc	sp,0x9
+    80000004:	a1010113                add	sp,sp,-1520 # 80008a10 <stack0>
+#+END_SRC
+auipc add upper imm to PC.
+
+stack 的值是0x8008a10，加上8192
+
+a10 的值是-1520 可以理解，但为什么0x8 却变为0x9了？？
+
+
+#+BEGIN_SRC c
+__attribute__ ((aligned (16))) char stack0[4096 * NCPU];
+
+// char 本来是8位的，align 16，
+
+// 4096 * 8 = 32768
+// 32768 /  = 32768
+// 每多一个byte， 地址就加1
+#+END_SRC
+
+
+
+#+BEGIN_SRC c
+    csrr rd, csr
+
+    csrrs rd, csr, x0 // Read CSR
+#+END_SRC
+
+mhartid 这个是指hardware thread id. 一个核心可以有多个thread 即hyper-threading
+
+
+mhartid似乎是告诉有几个核心的

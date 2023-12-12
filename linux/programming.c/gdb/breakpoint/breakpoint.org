@@ -1,3 +1,6 @@
 * breakpoint
 
-b
+
+#+BEGIN_SRC bash
+(gdb) save breakpoints debug.brk
+#+END_SRC
