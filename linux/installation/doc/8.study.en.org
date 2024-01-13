@@ -1,4 +1,13 @@
-* golden
+* english
+
+** golden-dict
+
+#+BEGIN_SRC bash
+sudo snap install goldendictionary
+
+# download dict
+wget -r -np http://example.com/config/
+#+END_SRC
 
 https://aur.archlinux.org/goldendict.git
 
