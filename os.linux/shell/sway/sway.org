@@ -1,0 +1,11 @@
+* sway
+
+
+swaymsg create_ouput
+
+
+print a description of the new output.
+
+#+BEGIN_SRC bash
+swaymsg -pt get_outputs
+#+END_SRC

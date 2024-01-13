@@ -1,0 +1,122 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-c",
+      "-std=c99",
+      "-D_XOPEN_SOURCE=600",
+      "-g",
+      "-pedantic",
+      "-Wall",
+      "-W",
+      "-Wpointer-arith",
+      "-Wmissing-prototypes",
+      "-Wno-sign-compare",
+      "-Wno-unused-parameter",
+      "-Wno-format-y2k",
+      "-Wno-long-long",
+      "-o",
+      "TCPEchoServer4.o",
+      "TCPEchoServer4.c"
+    ],
+    "directory": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes",
+    "file": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes/TCPEchoServer4.c",
+    "output": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes/TCPEchoServer4.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-c",
+      "-std=c99",
+      "-D_XOPEN_SOURCE=600",
+      "-g",
+      "-pedantic",
+      "-Wall",
+      "-W",
+      "-Wpointer-arith",
+      "-Wmissing-prototypes",
+      "-Wno-sign-compare",
+      "-Wno-unused-parameter",
+      "-Wno-format-y2k",
+      "-Wno-long-long",
+      "-o",
+      "TCPServerUtility.o",
+      "TCPServerUtility.c"
+    ],
+    "directory": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes",
+    "file": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes/TCPServerUtility.c",
+    "output": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes/TCPServerUtility.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-c",
+      "-std=c99",
+      "-D_XOPEN_SOURCE=600",
+      "-g",
+      "-pedantic",
+      "-Wall",
+      "-W",
+      "-Wpointer-arith",
+      "-Wmissing-prototypes",
+      "-Wno-sign-compare",
+      "-Wno-unused-parameter",
+      "-Wno-format-y2k",
+      "-Wno-long-long",
+      "-o",
+      "AddressUtility.o",
+      "AddressUtility.c"
+    ],
+    "directory": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes",
+    "file": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes/AddressUtility.c",
+    "output": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes/AddressUtility.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-c",
+      "-std=c99",
+      "-D_XOPEN_SOURCE=600",
+      "-g",
+      "-pedantic",
+      "-Wall",
+      "-W",
+      "-Wpointer-arith",
+      "-Wmissing-prototypes",
+      "-Wno-sign-compare",
+      "-Wno-unused-parameter",
+      "-Wno-format-y2k",
+      "-Wno-long-long",
+      "-o",
+      "DieWithMessage.o",
+      "DieWithMessage.c"
+    ],
+    "directory": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes",
+    "file": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes/DieWithMessage.c",
+    "output": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes/DieWithMessage.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-c",
+      "-std=c99",
+      "-D_XOPEN_SOURCE=600",
+      "-g",
+      "-pedantic",
+      "-Wall",
+      "-W",
+      "-Wpointer-arith",
+      "-Wmissing-prototypes",
+      "-Wno-sign-compare",
+      "-Wno-unused-parameter",
+      "-Wno-format-y2k",
+      "-Wno-long-long",
+      "-o",
+      "TCPEchoClient4.o",
+      "TCPEchoClient4.c"
+    ],
+    "directory": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes",
+    "file": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes/TCPEchoClient4.c",
+    "output": "/home/leo/workspace/leo/os/os.linux/programming/books/tcp_ip_sockets_in_c/appendix.codes/TCPEchoClient4.o"
+  }
+]

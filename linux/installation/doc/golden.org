@@ -1,0 +1,5 @@
+* golden
+
+snapd
+
+sudo snap install goldendictionary
