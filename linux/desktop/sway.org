@@ -1,4 +1,7 @@
 * sway
+** .zprofile
+
+[ "$(tty)" = "/dev/tty1" ] && exec sway
 
 ** chrome
 

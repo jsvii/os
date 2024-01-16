@@ -3,3 +3,18 @@
 一些windows上的文件，在linux 下解压乱码，用unzip指定GBM
 
 unzip -O GBK xxx.zip
+
+
+/home/leo/workspace/temp/korean1/01 韩国语基础教程 (前言).mp3
+/home/leo/workspace/temp/korean1/02 韩文1.mp3
+/home/leo/workspace/temp/korean1/03 韩文2.mp3
+/home/leo/workspace/temp/korean1/04 韩文3.mp3
+/home/leo/workspace/temp/korean1/05 韩文4.mp3
+/home/leo/workspace/temp/korean1/06 预备篇1会话1.mp3
+/home/leo/workspace/temp/korean1/07 预备篇1会话2.mp3
+/home/leo/workspace/temp/korean1/08 预备篇2会话1.mp3
+/home/leo/workspace/temp/korean1/09 预备篇2会话2.mp3
+/home/leo/workspace/temp/korean1/10 预备篇3会话1.mp3
+/home/leo/workspace/temp/korean1/11 预备篇3会话2.mp3
+/home/leo/workspace/temp/korean1/12 预备篇4会话1.mp3
+/home/leo/workspace/temp/korean1/13 预备篇4会话2.mp3
