@@ -1,0 +1,7 @@
+#!/bin/zsh
+
+for track in *.mp3; do
+    title=${track}
+    echo "${title}"
+    id3v2 -2 --TCON "audio/mpeg" -t "${title}" -A "Korean_Xijiang1" -a "Korean_Xijiang1" ${track}
+done
