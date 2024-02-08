@@ -14,3 +14,11 @@ https://aur.archlinux.org/goldendict.git
 https://downloads.freedict.com
 
 http://louischeung.top:225
+
+kor-kor 国语大词典
+
+http://dadako.narod.ru/paperpoe.htm
+
+sdcv
+
+https://abloz.comhuzheng/stardict-dict/zh_CN
