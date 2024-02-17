@@ -1,0 +1,16 @@
+* asus
+
+** BIOS
+
+按Esc键进入
+
+
+** driver
+
+mediaTek Wifi-6E MT7922 (RZ616)
+
+** 系统 激活
+
+windows 已使用数字许可证激活
+
+荒野间谍
