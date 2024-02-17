@@ -1,0 +1,5 @@
+* acer notebook 宏碁蜂鸟非凡S5 英特尔酷睿i7
+
+** BIOS
+
+f2
