@@ -1,4 +1,7 @@
-* codelite
+* Cpp tools
+
+** codelite
+
 
 pacman -Sy sqlite3 zlib hunspell libssh pcre2
 

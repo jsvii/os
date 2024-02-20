@@ -17,17 +17,16 @@ git clone https://github.com/wting/autojump.git
 
 *** google-chrome
 
+#+BEGIN_SRC bash
 pacman -S chromium
 
-
-https://aur.archlinux.org/packages/google-chrome
-
+# google chrome
 git clone https://aur.archlinux.org/google-chrome.git
 
 makepkg -s
 
 sudo pacman -U google-chrome-98.0.4758.102-1-x86_64.pkg.tar.zst
-
+#+END_SRC
 
 ** lisp
 
@@ -41,25 +40,14 @@ sudo pacman -U chez-scheme
 
 Linux的字体都在/usr/share/fonts这个目录里，一种字体就是这个目录下面的一个子目录。注意，如果把Windows某个字体的ttf文件复制到某个新建的子目录里面，还需要在子目录里用root用户身份依次执行如下三条命令，这个字体才能用，并不是复制到/usr/share/fonts目录就可以用了：
 
-
-
 https://github.com/romkatv/powerlevel10k  zsh theme
 
-
-
 #+BEGNIN_SRC
-
-#+END_SRC
-
-
 
 mkfontscale
 mkfontdir
 fc-cache -f
-
-
-** ibus
-
+#+END_SRC
 
 ** kmscon
 

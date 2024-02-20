@@ -96,26 +96,3 @@ sudo pacman -S linux-headers
 ** linux-headers上踩过的坑
 
 1. linux-headers 默认没有usb网卡的驱动，导致怎么也安装不了绿联的网卡
-
-* keyboard
-
-/usr/bin/setxkbmap -option "ctrl:nocaps"
-
-~/etc/default/keyboard~
-#+BEGIN_SRC
-# KEYBOARD CONFIGURATION FILE
-# Consult the keyboard(5) manual page.
-
-XKBMODEL="pc105"
-XKBLAYOUT="us"
-XKBVARIANT=""
-XKBOPTIONS="ctrl:swapcaps"
-BACKSPACE="guess"
-#+END_SRC
-
-** xmonad
-
-ref: https://eason0210.github.io/post/install-xmonad-on-arch-linux/
-
-
-默认，系统是不进行缩放的，这样在 2K 屏幕下，应用的字体会非常小，完全没法使用。经过一番查询，其实设置很简单，在 Arch Wiki 中就有介绍，只要在 $HOME/.Xresource 中加入以下配置即可：
