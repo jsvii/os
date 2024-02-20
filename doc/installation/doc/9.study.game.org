@@ -1,0 +1,5 @@
+* lutris
+
+#+BEGIN_SRC bash
+lutris install mgname
+#+END_SRC

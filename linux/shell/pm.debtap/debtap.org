@@ -1,0 +1,8 @@
+* debtap
+
+a script for converting .deb pacakges into arch linux package, docused on accuracy.
+
+#+BEGIN_SRC bash
+yay -S debtap
+
+#+END_SRC

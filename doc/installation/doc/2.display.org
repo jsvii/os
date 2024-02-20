@@ -1,5 +1,0 @@
-* display
-
-** desktop
-
-xfce

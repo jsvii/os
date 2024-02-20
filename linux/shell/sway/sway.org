@@ -1,11 +1,13 @@
 * sway
 
-
 swaymsg create_ouput
-
 
 print a description of the new output.
 
 #+BEGIN_SRC bash
+# output messages
 swaymsg -pt get_outputs
+
+# input messages
+swaymsg -pt get_inputs
 #+END_SRC

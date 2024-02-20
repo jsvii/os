@@ -1,7 +1,0 @@
-* cn
-
-pacman -S noto-fonts
-
-#+BEGIN_SRC bash
-pacman -S fcitx5 fcitx5-rime
-#+END_SRC
