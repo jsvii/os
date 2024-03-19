@@ -7,3 +7,6 @@ https://pdos.csail.mit.edu/6.828/2023/xv6/book-riscv-rev3.pdfz
 
 
 https://github.com/riscv-collab/riscv-gnu-toolchain
+
+
+https://github.com/FrankZn/xv6-riscv-book-Chinese.git

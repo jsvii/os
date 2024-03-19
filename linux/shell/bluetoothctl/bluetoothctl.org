@@ -1,18 +1,19 @@
 * bluetoothctl
 
+bluetoothctl
 
 #+BEGIN_SRC bash
-bluetoothctl power on
+# 打开
+power on
 
-#扫描设备
-bluetoothctl scan on
+# 扫描设备
+scan on
 
-bluetoothctl pair CF:FB:48:99:A6:F4
-
-bluetoothctl connect CF:FB:48:99:A6:F4
-
-bluetoothctl devices
+#
+pair CF:FB:48:99:A6:F4
 #+END_SRC
+
+先pair 再connect
 
 
 ** /etc/tlp.conf

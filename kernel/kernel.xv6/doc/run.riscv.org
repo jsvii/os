@@ -1,17 +1,37 @@
 * run riscv
 
-
 ** requirement
+
+*** qemu
+
 pacman -S qemu
 
 选择qemu all
 
+*** riscv-gnu-toolchain-bin
+
+这些工具不一定一下子装得全，同时还相当地耗时，所以可以选择用 github 中的源码编译。
+
+#+BEGIN_SRC bash
+yay -S riscv-gnu-toolchain-bin
+
 yay -S riscv64-linux-gnu-gcc
 
 yay -S gdb-multiarch
+#+END_SRC
+
+https://github.com/riscv-collab/riscv-gnu-toolchain/releases/ (用百度云下载链接)
+
+- qemu-system-riscv64 是运行软件的
+
+- riscv64-unknow-elf-gdb 是用来调试的
 
 ** run
 
 make qemu-gdb
 
 gdb-multiarch kernel/kernel
+
+*** make qemu-gdb
+
+会生成.gdbinit 文件

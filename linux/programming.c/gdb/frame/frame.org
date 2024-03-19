@@ -1,13 +1,15 @@
 * frame
 
-** info frame
+** frame
+show frames
 
-list genneral info about the frame(where things start in memory, etc.)
+** up: select the prvious stack frame or one of the frames precding it.
 
-** info args
 
-list arguments to the function
+#+BEGIN_SRC bash
+(gdb) up
+#7
+(gdb) up
+#6
 
-** info locals
-
-list local variables stored in the frame
+#+END_SRC
