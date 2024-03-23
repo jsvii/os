@@ -1,0 +1,3 @@
+* dict
+
+http://mdx.mdict.org

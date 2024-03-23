@@ -22,6 +22,13 @@ export PATH=$HOME/.local/share/gem/ruby/3.0.0/bin:$PATH
 #+END_SRC
 
 
+** zinit
+
+#+BEGIN_SRC bash
+git clone https://github.com/zdharma-continuum/zinit.git
+
+#+END_SRC
+
 ** oh-my-zsh
 
 #+BEGIN_SRC bash
@@ -71,19 +78,17 @@ $ cp .tmux/.tmux.conf.local .
 set -gu prefix2
 unbind C-a
 unbind C-b
-set -g prefix 'C-\'
-bind 'C-\' send-prefix
+set -g prefix 'C-z'
+bind 'C-z' send-prefix
 #+END_SRC
 
-** fonts
+** mise
 
-#+BEGIN_SRC bash
-https://github.com/ryanoasis/nerd-fonts
+curl https://mise.run | sh
 
-https://github.com/adobe-fonts/source-code-pro
 
-https://github.com/romkatv/powerlevel10k
-#+END_SRC
+eval "$(/home/leo/.local/bin/mise activate zsh)"
+
 
 ** linux headers
 
