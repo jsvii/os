@@ -1,0 +1,6 @@
+* output 配置
+
+
+#+BEGIN_SRC config
+output eDP-1 scale 1.4
+#+END_SRC

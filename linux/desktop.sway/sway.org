@@ -1,4 +1,9 @@
 * sway
+
+** swaymsg
+
+swaymsg -t get_outputs
+
 ** .zprofile
 
 [ "$(tty)" = "/dev/tty1" ] && exec sway

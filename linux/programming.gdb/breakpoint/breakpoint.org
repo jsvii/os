@@ -3,4 +3,6 @@
 
 #+BEGIN_SRC bash
 (gdb) save breakpoints debug.brk
+
+(gdb) source debug.brk
 #+END_SRC

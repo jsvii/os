@@ -1,0 +1,7 @@
+* threads
+
+#+BEGIN_SRC bash
+info threads
+
+thread <thread_id>
+#+END_SRC
