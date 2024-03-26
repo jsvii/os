@@ -1,0 +1,23 @@
+* tui
+
+ctrl-x ctrl-a toggle tui
+
+ctrl-x 1 显示源码
+
+ctrl-x 2 显示assemble language
+
+
+
+* layout asm
+
+#+BEGIN_SRC bash
+(gdb) layout asm
+#+END_SRC
+
+C-x s  singlekey mode
+
+** next instruction
+
+1. stepi
+
+1. nexti
