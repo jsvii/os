@@ -188,3 +188,13 @@ pacman -Scc：清理所有的缓存文件。
 #+END_SRC
 
 https://www.jianshu.com/p/ea651cdc5530
+
+
+** -F
+
+#+BEGIN_SRC bash
+pacman -F ulem.sty
+
+# extra/texlive-plaingeneric 2023.66594-14 (texlive)
+#    usr/share/texmf-dist/tex/generic/ulem/ulem.sty
+#+END_SRC
