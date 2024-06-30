@@ -1,0 +1,11 @@
+* bindkey
+
+如果设置了 $EDITOR $VISUAL 的值为vi/vim/nvim
+
+那么就无法使用Ctrl-A ctrl-E等传统快捷键了
+
+解决方式为
+
+#+BEGIN_SRC bash
+bindkey -e
+#+END_SRC

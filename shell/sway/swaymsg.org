@@ -1,0 +1,33 @@
+* swaymsg
+
+./config/sway/config 是其配置文件
+
+# output messages
+swaymsg -pt get_outputs
+
+
+
+** 禁用某一设备
+
+
+
+#+BEGIN_SRC bash
+$ swaymsg -pt get_inputs
+
+#######################################
+Input device: Weida Hi-Tech CoolTouch® System
+  Type: Touch
+  Identifier: 9589:2309:Weida_Hi-Tech_CoolTouch___System
+  Product ID: 2309
+  Vendor ID: 9589
+  Libinput Send Events: enabled
+#+END_SRC
+
+
+#+BEGIN_SRC bash
+swaymsg input 9589:2309:Weida_Hi-Tech_CoolTouch___System events disabled
+#+END_SRC
+
+input type:touch {
+  events disable
+}
