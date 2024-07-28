@@ -1,0 +1,16 @@
+* utils
+
+** desktop
+
+- sway
+
+** terminal
+
+- wezterm
+
+
+** multi media
+
+- okular, evince pdf  viewer
+
+- player

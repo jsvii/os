@@ -1,0 +1,19 @@
+* pacman-keys
+
+update keys
+
+#+BEGIN_SRC bash
+sudo systemcl start haveged
+
+sudo rm -r /etc/pacman.d/gnupg
+
+sudo pacman-key --init
+
+sudo pacman -Sy gnupg archlinux-keyring manjaro-keyring
+
+sudo pacman-key --populate archlinux manjaro
+
+sudo pacman-key --refresh-keys
+
+sudo pacman -Sc
+#+END_SRC
