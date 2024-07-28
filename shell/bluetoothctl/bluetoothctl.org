@@ -2,6 +2,10 @@
 
 bluetoothctl
 
+pacman -S bluez-utils
+
+bluez-utils development and debugging utilities for the bluetooth protocol stack
+
 #+BEGIN_SRC bash
 # 打开
 power on
