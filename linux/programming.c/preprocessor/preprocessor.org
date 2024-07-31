@@ -1,0 +1,46 @@
+* preprocessors
+
+主要有四种类型的宏
+
+1. Macro
+
+2. File inclusion
+
+3. Conditional Compliation
+
+4. Other directives
+
+
+#define
+
+#undef
+
+#include
+
+#ifdef
+
+#ifndef
+
+#if
+#else
+#endif
+
+
+#pragma
+
+#pragma startup func1
+#pragma exit fun2
+
+用于开启或者关闭某些编译器特性的指令
+
+
+#+BEGIN_SRC c
+#if defined(__GNUC__) && __GNUC__ >= 7
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
+
+#if defined(__GNUC__) && __GNUC__ >= 5
+#pragma GCC diagnostic pop
+#endif
+#+END_SRC

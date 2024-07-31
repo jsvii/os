@@ -1,0 +1,6 @@
+* starship
+#+BEGIN_SRC shell
+eval "$(startship init zsh)"
+#+END_SRC
+
+https://github.com/ansidev/startship-primer.git

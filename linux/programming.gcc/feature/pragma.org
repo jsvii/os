@@ -1,0 +1,22 @@
+* gcc pragma
+
+https://gcc.gnu.org/onlinedocs/gcc-7.3.0/gcc/Diagnostic-Pragmas.html#:~:text=%23pragma%20GCC%20diagnostic%20push%20%23pragma%20GCC%20diagnostic%20pop,no%20matching%20push%2C%20the%20command-line%20options%20are%20restored.
+
+
+#+BEGIN_SRC c
+#pragma GCC diagnostic push
+#pragma GCC diagnostic pop
+Causes GCC to remember the state of the diagnostics as of each push, and restore to that point at each pop. If a pop has no matching push, the command-line options are restored.
+
+#pragma GCC diagnostic error "-Wuninitialized"
+  foo(a);                       /* error is given for this one */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+  foo(b);                       /* no diagnostic for this one */
+#pragma GCC diagnostic pop
+  foo(c);                       /* error is given for this one */
+#pragma GCC diagnostic pop
+  foo(d);                       /* depends on command-line options */
+#+END_SRC
+
+push用于记录当前的诊断状态，pop弹出，中间设置一系列ignore的
