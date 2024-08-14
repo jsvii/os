@@ -17,3 +17,65 @@ sudo pacman-key --refresh-keys
 
 sudo pacman -Sc
 #+END_SRC
+
+
+** initialize the pacman keyring
+
+This use case is necessary when setting up a new Arch Linux System or when the keyring needs to be reinitialized.
+
+#+BEGIN_SRC bash
+pacman-key --init
+#+END_SRC
+
+** add the default arch linux keys
+
+#+BEGIN_SRC bash
+pacman-key --populate archlinux
+#+END_SRC
+
+the use case is necessary to add the default Arch Linux keys to the keyring
+
+** refresh keys
+
+#+BEGIN_SRC bash
+pacman-key --refresh-keys
+#+END_SRC
+
+** list keys from the public keyring
+
+
+#+BEGIN_SRC bash
+pacman-key --list-keys
+#+END_SRC
+
+this options is used to list all the keys in the public keyring
+
+** add the specified keys
+
+#+BEGIN_SRC bash
+pacman-key --add path/to/keyfile.gpg
+#+END_SRC
+
+** receive a key from a key server
+
+#+BEGIN_SRC bash
+pacman-key --recv-keys "uid|name|email"
+#+END_SRC
+
+** print the fingerprint of a specific key
+
+#+BEGIN_SRC bash
+pacman-key --finger "uid|name|email"
+#+END_SRC
+
+** sign an imported key locally
+
+#+BEGIN_SRC bash
+pacman-key --lsign-key "uid|name|email"
+#+END_SRC
+
+** remove a specific key
+
+#+BEGIN_SRC bash
+pacman-key --delete "uid|name|email"
+#+END_SRC
