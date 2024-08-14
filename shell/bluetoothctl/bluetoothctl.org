@@ -9,12 +9,16 @@ bluez-utils development and debugging utilities for the bluetooth protocol stack
 #+BEGIN_SRC bash
 # 打开
 power on
-
 # 扫描设备
 scan on
-
 #
 pair CF:FB:48:99:A6:F4
+# list paired-devices
+paired-devices
+# unpair 刪除掉不可用的設備
+remove CF:FB:48:99:A6:F4
+
+cancel-pairing
 #+END_SRC
 
 先pair 再connect

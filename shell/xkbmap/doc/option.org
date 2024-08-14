@@ -885,3 +885,6 @@
   solaris:sun_compat   Sun Key compatibility
   terminate            Key sequence to kill the X server
   terminate:ctrl_alt_bksp Ctrl + Alt + Backspace
+
+
+;;

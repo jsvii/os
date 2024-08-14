@@ -14,3 +14,26 @@
 - okular, evince pdf  viewer
 
 - player
+
+** printer
+
+brother printer
+
+pcaman -S cups
+
+brother-hl2250dn
+
+git clone https://aur.archlinux.org/brother-hl2250dn.git
+
+hplip-plugin
+
+http://localhost:631/printers/
+
+添加打印机
+
+#+BEGIN_SRC
+lpinfo -v
+
+direct usb://Brother/HL-2250DN%20series?serial=A1J523490
+
+#+END_SRC
