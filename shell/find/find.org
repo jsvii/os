@@ -1216,3 +1216,10 @@ EXIT STATUS
 SEE ALSO
        locate(1),  locatedb(5),  updatedb(1),  xargs(1),  chmod(1),  fnmatch(3),  regex(7),  stat(2), lstat(2), ls(1), printf(3), strftime(3),
        ctime(3), Finding Files (on-line in Info, or printed).
+
+
+** 如何把一个文件夹排除
+
+find . -path ./dir4 -prune -o -print
+
+find . -type f -not -path "./dir1/*" -not -path "./dir4/*" -exec cp '{}' /tmp \;

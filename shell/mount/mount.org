@@ -1,9 +1,44 @@
 * mount
 
-** 如何把一个文件夹排除
+** mount 输出的基本信息
 
-find . -path ./dir4 -prune -o -print
+- 媒体的设备文件名
 
+- 媒体的挂载到的虚拟目录的挂载点
 
+- 文件系统的类型
 
-find . -type f -not -path "./dir1/*" -not -path "./dir4/*" -exec cp '{}' /tmp \;
+- 已挂载媒体的访问状态
+
+#+BEGIN_SRC txt
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+sys on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+dev on /dev type devtmpfs (rw,nosuid,relatime,size=7061680k,nr_inodes=1765420,mode=755,inode64)
+run on /run type tmpfs (rw,nosuid,nodev,relatime,mode=755,inode64)
+efivarfs on /sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)
+/dev/nvme0n1p2 on / type ext4 (rw,noatime)
+securityfs on /sys/kernel/security type securityfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev,inode64)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000)
+cgroup2 on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)
+pstore on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
+bpf on /sys/fs/bpf type bpf (rw,nosuid,nodev,noexec,relatime,mode=700)
+systemd-1 on /proc/sys/fs/binfmt_misc type autofs (rw,relatime,fd=39,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=15428)
+mqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)
+#+END_SRC
+
+U盘一般为vfat格式
+
+CD 为 iso9660
+
+** mount
+
+mount -t vfat /dev/sdb1 /media/disk
+
+-f 模拟
+
+-F
+
+-v verbose
+
+-I
