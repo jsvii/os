@@ -1,0 +1,59 @@
+* test
+
+** 数值比较
+
+n1 -eq n2  equal
+
+n1 -ge n2 great or equal
+
+n1 -gt n2 greater than
+
+n1 -le n2 less or equal
+
+n1 -lt n1 less than
+
+n1 -ne n2 not equal
+
+** 字符串比较
+
+= 相同
+
+!= 不同
+
+str1 < str2
+
+str1 > str2
+
+-n str1  str1长度是否为非0
+
+-z str1  str1长度是0
+
+** 文件比较
+
+-d file 是否是一个目录
+
+-e file 是否存在 exist
+
+-f file  是否存在并是一个文件
+
+-r file 是否可读
+
+-s file 是否为空
+
+-w file 是否存在并可写
+
+-x file 是否存在并可执行
+
+-O file 是否存在并属于当前用户
+
+-G file 是否存在文件并且默认组与当前的相同
+
+file1  -nt file2 file1是否比file2新
+
+file1  -ot file2 file1是否比file2旧
+
+
+
+** if then
+
+见if then

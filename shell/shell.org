@@ -1,0 +1,27 @@
+* shell
+
+** monitor
+
+top
+
+kill
+
+
+** file
+
+ls
+
+file
+
+
+
+
+
+
+** text
+
+cat
+
+sort
+
+grep
