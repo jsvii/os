@@ -9,13 +9,13 @@ sudo rm -r /etc/pacman.d/gnupg
 
 sudo pacman-key --init
 
-sudo pacman -Sy gnupg archlinux-keyring manjaro-keyring
-
 sudo pacman-key --populate archlinux manjaro
+
+sudo pacman -Sy gnupg archlinux-keyring manjaro-keyring
 
 sudo pacman-key --refresh-keys
 
-sudo pacman -Sc
+sudo pacman -Syu
 #+END_SRC
 
 

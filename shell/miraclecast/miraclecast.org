@@ -1,0 +1,7 @@
+* miracle cast
+
+systemctl stop NetworkManager.service
+
+systemctl stop wpa_supplicant.service
+
+pamac install gdm

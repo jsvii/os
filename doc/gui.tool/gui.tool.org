@@ -1,0 +1,10 @@
+* gui tools
+
+** wemeet
+
+yay -S wemeet
+
+
+** zoom
+
+yay -S zoom
