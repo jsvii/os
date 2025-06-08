@@ -9,5 +9,9 @@
    https://cocoapods.org/
 
 #+BEGIN_SRC bash
+# gem change to china mirror
+gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org/
+gem sources -l
+
 gem install cocoapods
 #+END_SRC

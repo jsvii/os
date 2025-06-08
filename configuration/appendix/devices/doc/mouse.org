@@ -1,0 +1,58 @@
+* mouse
+
+** 服务
+
+bluz
+
+/usr/lib/bluetooth/bluetoothd
+
+#+BEGIN_SRC bash
+➜  jshERP-boot git:(feature/leo-s-0604-init) sudo systemctl status bluetooth.service
+[sudo] password for leo:
+● bluetooth.service - Bluetooth service
+     Loaded: loaded (/usr/lib/systemd/system/bluetooth.service; enabled; preset: disabled)
+     Active: active (running) since Sun 2025-06-08 12:12:07 CST; 6h ago
+ Invocation: 1b322a8f0e284c07b449eb537bcef2ec
+       Docs: man:bluetoothd(8)
+   Main PID: 1779 (bluetoothd)
+     Status: "Running"
+      Tasks: 1 (limit: 16548)
+     Memory: 3.9M (peak: 4.4M)
+        CPU: 529ms
+     CGroup: /system.slice/bluetooth.service
+             └─1779 /usr/lib/bluetooth/bluetoothd
+
+6月 08 15:45:58 lenovo bluetoothd[1779]: Endpoint registered: sender=:1.43 path=/MediaEndpoint/A2DPSource>
+6月 08 15:45:58 lenovo bluetoothd[1779]: Endpoint registered: sender=:1.43 path=/MediaEndpoint/A2DPSource>
+6月 08 15:45:58 lenovo bluetoothd[1779]: Endpoint registered: sender=:1.43 path=/MediaEndpoint/A2DPSource>
+6月 08 15:45:58 lenovo bluetoothd[1779]: Endpoint registered: sender=:1.43 path=/MediaEndpoint/A2DPSource>
+6月 08 15:45:58 lenovo bluetoothd[1779]: Endpoint registered: sender=:1.43 path=/MediaEndpoint/A2DPSink/o>
+6月 08 15:45:58 lenovo bluetoothd[1779]: Endpoint registered: sender=:1.43 path=/MediaEndpoint/A2DPSource>
+6月 08 15:45:58 lenovo bluetoothd[1779]: Endpoint registered: sender=:1.43 path=/MediaEndpoint/A2DPSink/o>
+6月 08 15:45:58 lenovo bluetoothd[1779]: Endpoint registered: sender=:1.43 path=/MediaEndpoint/A2DPSource>
+6月 08 18:29:15 lenovo bluetoothd[1779]: src/adv_monitor.c:btd_adv_monitor_power_down() Unexpected NULL b>
+6月 08 18:29:42 lenovo bluetoothd[1779]: src/device.c:set_wake_allowed_complete() Set device flags return>
+#+END_SRC
+
+
+#+BEGIN_SRC bash
+bluetoothctl
+
+[bluetoothctl] power off
+
+[bluetoothctl] power on
+
+[bluetoothctl] scan on
+
+# 如果之前有设备
+[bluetoothctl] remove XX.XX
+
+# 信任设备
+[bluetoothctl] trust XX.XX
+
+# 配对
+[bluetoothctl] pair XX.XX
+
+# 连接
+[bluetoothctl] connect XX.XX
+#+END_SRC
