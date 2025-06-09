@@ -4,6 +4,10 @@
 
 yay -S wemeet
 
+** edge
+
+yay -S microsoft-edge-stable-bin
+
 
 ** zoom
 
