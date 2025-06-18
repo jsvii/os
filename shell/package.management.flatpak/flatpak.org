@@ -1,0 +1,13 @@
+* flatpak
+
+中国源
+
+sudo flatpak remote-modify flathub --url=https://mirror.sjtu.edu.cn/flathub
+
+https://mirror.sjtu.edu.cn/docs/archlinux-cn
+
+** package
+
+com.tencent.wemeet
+
+com.tencent.Wechat
