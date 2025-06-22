@@ -1,0 +1,22 @@
+* wemeet
+
+flatpak install com.tencent.wemeet
+
+
+flatpak overrider --user com.tencent.wemeet --filesystem=host --device-all
+
+
+flatpak override --env=__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json com.tencent.wemeet
+
+
+cat /var/lib/flatpak/overrides/com.tencent.wemeet
+
+#+BEGIN_SRC config
+[Environment]
+
+#__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json
+#MOZ_ENABLE_WAYLAND=1
+#+END_SRC
+
+
+/var/lib/flatpak/app/com.tencent.wemeet/current/active/files/lib/wemeet/libhook.so

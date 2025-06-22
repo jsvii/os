@@ -1,15 +1,14 @@
 * swaymsg
 
+** config file
+
 ./config/sway/config 是其配置文件
 
-# output messages
+** 查看输出设备信息
+
 swaymsg -pt get_outputs
 
-
-
-** 禁用某一设备
-
-
+** 禁用touch
 
 #+BEGIN_SRC bash
 $ swaymsg -pt get_inputs

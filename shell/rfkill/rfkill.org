@@ -1,0 +1,8 @@
+* rfkill
+
+rfkill list
+
+
+** unblock all items
+
+rfkill unblock all

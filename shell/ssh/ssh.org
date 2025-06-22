@@ -1,0 +1,17 @@
+* ssh
+
+
+** ssh 忽然变得非常慢
+
+➜  ~ ssh -v somewhere
+debug1: OpenSSH_10.0p2, OpenSSL 3.5.0 8 Apr 2025
+debug1: Reading configuration data /home/leo/.ssh/config
+debug1: /home/leo/.ssh/config line 1: Applying options for bob
+debug1: Reading configuration data /etc/ssh/ssh_config
+debug1: Reading configuration data /etc/ssh/ssh_config.d/20-systemd-ssh-proxy.conf
+debug1: Connecting to 889526.xyz [2408:823c:7c10:85a0::bca] port 10000.
+
+
+** /etc/gai.conf
+
+precedence
