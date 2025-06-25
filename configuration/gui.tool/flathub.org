@@ -1,0 +1,13 @@
+* flathub
+
+
+** Browser
+
+- Edge com.microsoft.Edge
+
+
+** devtools
+
+- Idea
+
+- Edge com.microsoft.Edge

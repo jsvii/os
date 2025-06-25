@@ -1,0 +1,8 @@
+* tmux
+
+
+** tmux 行为怪异
+
+无法ctrl-a, ctrl-b
+
+是因为EDITOR这个变量不是vim
