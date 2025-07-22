@@ -1,5 +1,7 @@
 * flathub
 
+flatpak install *
+
 
 ** Browser
 
