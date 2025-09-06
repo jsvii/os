@@ -1,10 +1,6 @@
 * bluetoothctl
 
-bluetoothctl
 
-pacman -S bluez-utils
-
-bluez-utils development and debugging utilities for the bluetooth protocol stack
 
 ** 连接方法
 
@@ -31,15 +27,3 @@ cancel-pairing
 #+END_SRC
 
 先pair 再connect
-
-
-** /etc/tlp.conf
-
-#+BEGIN_SRC bash
-  # 2. /etc/tlp.d/*.conf - Drop-in customization snippets
-  # 3. /etc/tlp.conf     - User configuration (this file)
-
-# Restore radio device state (Bluetooth, WiFi, WWAN) from previous shutdown
-RESTORE_DEVICE_STATE_ON_STARTUP=1
-
-#+END_SRC

@@ -18,7 +18,7 @@ terminal
 
 - Apperance
 
-  color scheme 选择 Ansi colors on black
+   color scheme 选择 Ansi colors on black
 
 ** x11
 

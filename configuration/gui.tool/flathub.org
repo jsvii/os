@@ -2,14 +2,22 @@
 
 flatpak install *
 
-
 ** Browser
 
 - Edge com.microsoft.Edge
 
+** office
+
+- com.wps.Office
+
+- com.xunlei.Thunder
 
 ** devtools
 
-- Idea
+- Idea com.jetbrains.IntelliJ-IDEA-Community
 
 - Edge com.microsoft.Edge
+
+- gime org.gimp.GIMP
+
+thunder

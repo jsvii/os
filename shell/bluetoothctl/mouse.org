@@ -1,8 +1,23 @@
 * mouse info
 
-bluz
+** 蓝牙
 
-/usr/lib/bluetooth/bluetoothd
+bluez-utils development and debugging utilities for the bluetooth protocol stack
+
+
+#+BEGIN_SRC bash
+pacman -S bluez-utils
+#+END_SRC
+
+** 查看是否有蓝牙设备
+
+#+BEGIN_SRC bash
+lsusb | grep -i bluetooth
+#+END_SRC
+
+#+BEGIN_SRC bash
+systemctl status bluetooth.service
+#+END_SRC
 
 #+BEGIN_SRC bash
 ➜  jshERP-boot git:(feature/leo-s-0604-init) sudo systemctl status bluetooth.service
@@ -53,4 +68,18 @@ bluetoothctl
 
 # 连接
 [bluetoothctl] connect XX.XX
+#+END_SRC
+
+
+
+
+** /etc/tlp.conf
+
+#+BEGIN_SRC bash
+  # 2. /etc/tlp.d/*.conf - Drop-in customization snippets
+  # 3. /etc/tlp.conf     - User configuration (this file)
+
+# Restore radio device state (Bluetooth, WiFi, WWAN) from previous shutdown
+RESTORE_DEVICE_STATE_ON_STARTUP=1
+
 #+END_SRC
