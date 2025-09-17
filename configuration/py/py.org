@@ -2,10 +2,70 @@
 
 ** anaconda
 
-curl -O https://repo.anaconda.com/archive/Anaconda3-2025.06-0-Linux-x86_64.sh
+anaconda 中国镜像
+
+https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/
 
 ** HF
 
 export HF_ENDPOINT=https://hf-mirror.com
 
-anaconda 中国镜像
+
+** bitnet
+
+huggingface-cli download --resume-download microsoft/BitNet-b1.58-2B-4T-gguf --local-dir models/BitNet-b1.58-2B-4T
+
+
+llama3
+
+huggingface-cli download --resume-download HF1BitLLM/Llama3-8B-1.58-100B-tokens --local-dir models/Llama3-8B-1.58-100B-tokens
+
+https://hf-mirror.com/
+
+export HF_ENDPOINT=https://hf-mrror.com
+export HF_HUB_ETAG_TIMEOUT=1500000000
+
+
+python setup_env.py -md models/Llama3-8B-1.58-100B-tokens
+
+
+python run_inference.py -m models/Llama3-8B-1.58-100B-tokens -p "You are a helpful assistant" -cnv
+
+
+
+
+最新地址
+地址1：https://suyunti82.xyz
+其他地址（需翻墙打开）
+地址1：https://suyunti101.com
+地址2：https://suyunti111.com
+地址3：https://suyunti181.com
+地址4：https://suyunti400.com
+地址5：https://suyunti500.com
+地址6：https://suyunti818.com
+地址7：https://suyunti900.com
+地址8：https://suyunti911.com
+地址9：https://suyunti100.com
+地址10：https://suyunti100.com
+地址11：https://suyunti100.net
+地址12：https://suyunti666.xyz
+地址13：https://suyunti100.xyz
+地址14：https://suyunti168.com
+地址15：https://suyunti888.xyz
+地址16：https://suyunti168.net
+地址17：https://suyunti168.xyz
+地址18：https://suyunti999.xyz
+地址19：https://suyunti668.com
+地址20：https://suyunti668.net
+地址21：https://suyunti668.top
+地址22：https://suyunti668.xyz
+地址23：https://suyunti689.com
+地址24：https://suyunti689.net
+地址25：https://suyunti2.com
+地址26：https://suyunti689.top
+地址27：https://suyunti88.xyz
+地址28：https://suyunti99.xyz
+
+
+
+wget -O config.yml 您尚未有有效套餐，请购买后使用！&log-level=info

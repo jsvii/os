@@ -2,6 +2,8 @@
 
 flatpak install *
 
+com.jetbrains.IntelliJ-IDEA_Ultimate
+
 ** Browser
 
 - Edge com.microsoft.Edge
