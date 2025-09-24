@@ -4,9 +4,13 @@ flatpak install *
 
 com.jetbrains.IntelliJ-IDEA_Ultimate
 
+flathub document-export ~/my_file.png com.tencent.WeChat
+
 ** Browser
 
 - Edge com.microsoft.Edge
+
+- com.tencent.WeChat
 
 ** office
 

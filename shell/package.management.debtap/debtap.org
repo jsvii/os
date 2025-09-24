@@ -5,4 +5,19 @@ a script for converting .deb pacakges into arch linux package, docused on accura
 #+BEGIN_SRC bash
 yay -S debtap
 
+paru -S debtap
 #+END_SRC
+
+** update database
+
+#+BEGIN_SRC bash
+sudo debtap -u
+#+END_SRC
+
+** install pacakge
+
+debtap TencentDocs-x64.deb
+
+sudo debtap -U
+
+sudo pacman -U tdappdesktop-3.10.10-1-x86_64.pkg.tar.zst

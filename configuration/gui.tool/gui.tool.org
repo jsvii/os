@@ -9,6 +9,6 @@ yay -S wemeet
 yay -S microsoft-edge-stable-bin
 
 
-** zoom
+** zoom (not avaiable in China)
 
 yay -S zoom
